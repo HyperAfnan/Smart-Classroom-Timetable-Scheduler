@@ -1,0 +1,6 @@
+- NEP 2020 implementation
+- credit system  
+	 - 1 credit for 1 hr
+- max 8 subjects 
+- 3 classes for low credit subject 
+- 5 classes for high credit subject
