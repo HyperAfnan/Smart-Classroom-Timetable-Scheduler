@@ -23,15 +23,16 @@ The following parameters can be taken into account as variables for creating opt
 - Average number of leaves a faculty member takes in a month  
 - Special classes that have fixed slots in timetable  
   
-Students may also consider additional variables that may help in effective timetable preparation.  
+Students may also consider additional variables that may help in effective timetable preparation 
+( <mark style="background: #BBFABBA6;">like Elective Clashes Across Departments and Lab Session Availability )</mark>  
   
 <h2>Expected Solution</h2>
   
 A web-based platform that can be linked to the college website. Authorized personnel will be able to login and input data against the listed variables to generate fully optimized timetables.  
   
 The platform should include:  
-• Login facility for authorized personnel to create and manage timetables  
-• Multiple options of optimized timetables to choose from  
-• Review and approval workflow for competent authorities  
-• Suggestions for suitable rearrangements when optimal solutions are not available  
-• Support for multi-department and multi-shift scheduling
+• Login facility for authorized personnel to create and manage timetables  (<mark style="background: #BBFABBA6;"> Done: we have 3 roles for the app: admin, teacher, student)</mark>
+• Multiple options of optimized timetables to choose from  (<mark style="background: #BBFABBA6;">Done: well be using backtracking + heuristics for the most optimized time tables </mark>)
+• Review and approval workflow for competent authorities <mark style="background: #FFF3A3A6;">(tba) </mark>
+• Suggestions for suitable rearrangements when optimal solutions are not available  <mark style="background: #BBFABBA6;">(Done: we'll be providing manual rearrangements also, if the algo is not working as expected</mark>)
+• Support for multi-department and multi-shift scheduling (<mark style="background: #BBFABBA6;">Done</mark>)
