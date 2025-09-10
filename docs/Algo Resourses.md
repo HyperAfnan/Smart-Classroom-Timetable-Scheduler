@@ -1,0 +1,6 @@
+- https://www.khanacademy.org/computing/ap-computer-science-principles/algorithms-101/solving-hard-problems/a/using-heuristics
+- https://www.geeksforgeeks.org/artificial-intelligence/constraint-satisfaction-problems-csp-in-artificial-intelligence/
+- https://ics.uci.edu/~csp/R69.pdf
+- https://www.sciencedirect.com/science/article/abs/pii/S0952197621004255
+- https://titan.dcs.bbk.ac.uk/~igor/papers/proceedings/ercimcbj.pdf
+- https://www.researchgate.net/publication/220742752_Heuristic_techniques_for_variable_and_value_ordering_in_CSPs

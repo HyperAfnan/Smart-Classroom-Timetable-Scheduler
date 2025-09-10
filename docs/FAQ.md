@@ -70,3 +70,5 @@ In scheduling, there are cases where **all constraints cannot be satisfied simul
 🔹 **3. Multiple Near-Optimal Options**
 	- If a perfect timetable is not possible, the algorithm can generate **near-optimal timetables** that satisfy most constraints while clearly marking which rules were relaxed (e.g., one faculty slightly exceeding teaching hours, or one elective shifted to evening).
 
+
+#### Why this project?
