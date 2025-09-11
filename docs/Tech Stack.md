@@ -1,5 +1,5 @@
 #frontend 
-- react js/ts for ui
+- react js for ui
 - react-redux for client side state management 
 - react-router for web app's routing 
 - tanstack-query for server side state management
