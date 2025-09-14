@@ -1,0 +1,53 @@
+import React from "react"
+import { AlertCircle, X } from "lucide-react"
+
+export default function StudentNotificationBanner({ notifications, onDismiss }) {
+  if (notifications.length === 0) return null
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className="space-y-2">
+        {notifications.map(notification => (
+          <div
+            key={notification.id}
+            className={`p-4 rounded-lg border-l-4 ${
+              notification.type === "warning"
+                ? "bg-orange-50 border-orange-400"
+                : notification.type === "success"
+                ? "bg-green-50 border-green-400"
+                : "bg-blue-50 border-blue-400"
+            } transition-all duration-300 animate-in slide-in-from-top-2`}
+          >
+            <div className="flex items-start justify-between">
+              <div className="flex items-start space-x-3">
+                <AlertCircle
+                  className={`w-5 h-5 mt-0.5 ${
+                    notification.type === "warning"
+                      ? "text-orange-600"
+                      : notification.type === "success"
+                      ? "text-green-600"
+                      : "text-blue-600"
+                  }`}
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">
+                    {notification.message}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {notification.timestamp}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => onDismiss(notification.id)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
