@@ -26,7 +26,6 @@ import {
   AlertCircle,
   Loader2,
   RefreshCw,
-  Sparkles,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/config/supabase.js";
@@ -53,57 +52,17 @@ export default function Timetable() {
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState("");
-  const [payload, setPayload] = useState({});
-  const [fitnessScore, setFitnessScore] = useState(null);
-  const [generationCount, setGenerationCount] = useState(null);
-  const [statistics, setStatistics] = useState(null);
+   const [payload,setPayload] = useState({});
 
-  const organizeTimetableData = useCallback((data) => {
-    // Handle the student timetables format from backend
-    if (data.student_timetables) {
-      const organized = {};
-
-      data.student_timetables.forEach((classData) => {
-        const classId = classData.class_id.toString();
-        organized[classId] = {};
-
-        // Process each day's timetable
-        classData.timetable.forEach((daySchedule, dayIndex) => {
-          const day = days[dayIndex];
-          organized[classId][day] = {};
-
-          // Process each slot in the day
-          daySchedule.forEach((slot) => {
-            if (!slot.is_free) {
-              organized[classId][day][times[slot.slot]] = {
-                subject_id: slot.subject_id,
-                teacher_id: slot.teacher_id,
-                room_id: slot.room_id,
-                class_id: slot.class_id,
-                day: day,
-                start_time: times[slot.slot],
-                subject_name: slot.subject_name,
-                teacher_name: slot.teacher_name,
-                room_name: slot.room_name,
-                type: "Lecture", // Default type
-              };
-            }
-          });
-        });
-      });
-
-      setTimetableData(organized);
-    } else if (data.combined_view) {
-      // Legacy format handling
-      const organized = {};
-      data.combined_view.forEach((slot) => {
-        if (!organized[slot.class_id]) organized[slot.class_id] = {};
-        if (!organized[slot.class_id][slot.day])
-          organized[slot.class_id][slot.day] = {};
-        organized[slot.class_id][slot.day][slot.start_time] = slot;
-      });
-      setTimetableData(organized);
-    }
+  const organizeTimetableData = useCallback((slots) => {
+    const organized = {};
+    slots.forEach((slot) => {
+      if (!organized[slot.class_id]) organized[slot.class_id] = {};
+      if (!organized[slot.class_id][slot.day])
+        organized[slot.class_id][slot.day] = {};
+      organized[slot.class_id][slot.day][slot.start_time] = slot;
+    });
+    setTimetableData(organized);
   }, []);
 
   const loadData = useCallback(async () => {
@@ -136,8 +95,7 @@ export default function Timetable() {
           .filter((i) => i !== -1);
       });
 
-      // Create payload object locally before using it
-      const payloadData = {
+      setPayload({
         num_classes: classesData.length,
         days: new Set(timeslotData.map((s) => s.day)).size,
         slots_per_day: timeslotData.filter((s) => s.day === timeslotData[0].day)
@@ -149,10 +107,8 @@ export default function Timetable() {
         subject_names: subjectsData.map((s) => s.subject_name),
         teacher_names,
         room_names: roomsData.map((r) => String(r.room_number)),
-      };
+      });
 
-      // Update state with all data
-      setPayload(payloadData);
       setClasses(classesData);
       setTeachers(teachersData);
       setSubjects(subjectsData);
@@ -161,35 +117,16 @@ export default function Timetable() {
       const resp = await fetch("http://localhost:8000/generate-timetable", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payloadData),
+        body: JSON.stringify(payload),
       });
 
       if (!resp.ok) {
         throw new Error(`Backend error: ${resp.status}`);
       }
 
-      const data = await resp.json();
-
-      if (data.success) {
-        // Store fitness score and generation count
-        setFitnessScore(data.fitness_score);
-        setGenerationCount(data.generation_count);
-
-        // Store statistics if available
-        if (data.statistics) {
-          setStatistics(data.statistics);
-        }
-
-        // Store timeslots if using legacy format
-        if (data.combined_view) {
-          setTimeSlots(data.combined_view);
-        }
-
-        // Organize timetable data
-        organizeTimetableData(data);
-      } else {
-        throw new Error("Timetable generation failed");
-      }
+      const slots = await resp.json();
+      setTimeSlots(slots.combined_view);
+      organizeTimetableData(slots.combined_view);
     } catch (err) {
       console.error(err);
       setError("Error loading timetable data");
@@ -210,38 +147,12 @@ export default function Timetable() {
     setGenerating(true);
     setError("");
     try {
-      // Make a copy of the current payload state
-      const currentPayload = { ...payload };
-
-      if (Object.keys(currentPayload).length === 0) {
-        setError("Please wait for data to load");
-        setGenerating(false);
-        return;
-      }
-
-      const resp = await fetch("http://localhost:8000/generate-timetable", {
+      await fetch("http://localhost:8000/generate-timetable", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...currentPayload, class_id: selectedClass }),
+        body: JSON.stringify({ ...payload, class_id: selectedClass }),
       });
-
-      const data = await resp.json();
-
-      if (data.success) {
-        // Store fitness score and generation count
-        setFitnessScore(data.fitness_score);
-        setGenerationCount(data.generation_count);
-
-        // Store statistics if available
-        if (data.statistics) {
-          setStatistics(data.statistics);
-        }
-
-        // Organize timetable data
-        organizeTimetableData(data);
-      } else {
-        throw new Error("Timetable generation failed");
-      }
+      await loadData();
     } catch (err) {
       console.error(err);
       setError("Error generating timetable");
@@ -281,44 +192,6 @@ export default function Timetable() {
             Generate and view individual class schedules
           </p>
         </div>
-
-        {fitnessScore !== null && (
-          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 p-3 rounded-lg border border-indigo-100 shadow-sm">
-            <div className="flex items-center gap-2 mb-1">
-              <Sparkles className="w-4 h-4 text-indigo-500" />
-              <span className="font-medium text-indigo-800">
-                Generation Results
-              </span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
-              <div>
-                <span className="text-slate-600">Fitness Score:</span>{" "}
-                <span className="font-semibold text-indigo-700">
-                  {fitnessScore}
-                </span>
-              </div>
-              <div>
-                <span className="text-slate-600">Generations:</span>{" "}
-                <span className="font-semibold text-indigo-700">
-                  {generationCount}
-                </span>
-              </div>
-              {statistics && (
-                <div>
-                  <span className="text-slate-600">Slots Used:</span>{" "}
-                  <span className="font-semibold text-indigo-700">
-                    {statistics.occupied_slots}/{statistics.total_slots} (
-                    {Math.round(
-                      (statistics.occupied_slots / statistics.total_slots) *
-                        100,
-                    )}
-                    %)
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Controls */}
@@ -407,7 +280,7 @@ export default function Timetable() {
                 </TableHeader>
                 <TableBody>
                   <AnimatePresence>
-                    {times.map((time, timeIndex) => (
+                    {times.map((time) => (
                       <motion.tr
                         key={time}
                         initial={{ opacity: 0 }}
@@ -420,7 +293,7 @@ export default function Timetable() {
                             {time}
                           </div>
                         </TableCell>
-                        {days.map((day, dayIndex) => {
+                        {days.map((day) => {
                           const slot = getSlotData(day, time);
                           return (
                             <TableCell key={day} className="p-2 text-center">
@@ -431,23 +304,19 @@ export default function Timetable() {
                                   className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200 text-left"
                                 >
                                   <div className="font-semibold text-blue-900 text-sm">
-                                    {slot.subject_name ||
-                                      getSubjectName(slot.subject_id)}
+                                    {getSubjectName(slot.subject_id)}
                                   </div>
                                   <div className="text-xs text-blue-600 mt-1">
-                                    {slot.teacher_name ||
-                                      getTeacherName(slot.teacher_id)}
+                                    {getTeacherName(slot.teacher_id)}
                                   </div>
                                   <div className="text-xs text-blue-500 mt-1">
-                                    Room:{" "}
-                                    {slot.room_name ||
-                                      getRoomNumber(slot.room_id)}
+                                    Room: {getRoomNumber(slot.room_id)}
                                   </div>
                                   <Badge
                                     variant="outline"
                                     className="bg-blue-200 text-blue-800 border-blue-300 text-xs mt-1"
                                   >
-                                    {slot.type || "Lecture"}
+                                    {slot.type}
                                   </Badge>
                                 </motion.div>
                               ) : (
