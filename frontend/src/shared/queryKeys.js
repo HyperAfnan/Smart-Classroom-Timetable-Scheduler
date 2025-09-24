@@ -17,6 +17,12 @@ export const queryKeys = Object.freeze({
     detail: (id) => ["rooms", "detail", String(id)],
   }),
 
+  classes: Object.freeze({
+    all: ["classes"],
+    list: () => ["classes", "list"],
+    detail: (id) => ["classes", "detail", String(id)],
+  }),
+
   departments: Object.freeze({
     all: ["departments"],
     detail: (idOrCode) => ["departments", "detail", String(idOrCode)],
