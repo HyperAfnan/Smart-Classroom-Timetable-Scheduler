@@ -23,6 +23,10 @@ export const queryKeys = Object.freeze({
     detail: (id) => ["classes", "detail", String(id)],
   }),
 
+  dashboard: Object.freeze({
+    stats: ["dashboard", "stats"],
+  }),
+
   departments: Object.freeze({
     all: ["departments"],
     detail: (idOrCode) => ["departments", "detail", String(idOrCode)],

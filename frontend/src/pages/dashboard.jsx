@@ -1,6 +1,7 @@
+import React from "react";
 import  { useSelector } from 'react-redux';
 import { lazy } from "react";
-const AdminDashboard = lazy(() => import("./admindashboard.jsx"));
+const AdminDashboard = lazy(() => import("../features/admin-role/dashboard/page.jsx"));
 const TeacherDashboard = lazy(() => import("./teacherDashboard.jsx"));
 const StudentDashboard = lazy(() => import("./studentdashboard.jsx"));
 const HODDashboard = lazy(() => import("./hoddashboard.jsx"));
@@ -8,16 +9,12 @@ const HODDashboard = lazy(() => import("./hoddashboard.jsx"));
 export default function Dashboard() {
   const roles = useSelector((state) => state.auth.roles);
 
-   if (roles.includes('admin')) {
-       return <AdminDashboard />;  
-   }
-   if (roles.includes('teacher')) {
-      return <TeacherDashboard />
-   }
-   if (roles.includes('student')) {
-      return <StudentDashboard />;
-   }
-   if (roles.includes('hod')) {
-      return <HODDashboard />;
-   }
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      {roles.includes('admin') && <AdminDashboard />}
+      {roles.includes('teacher') && <TeacherDashboard />}
+      {roles.includes('student') && <StudentDashboard />}
+      {roles.includes('hod') && <HODDashboard />}
+    </React.Suspense>
+  );
 }
