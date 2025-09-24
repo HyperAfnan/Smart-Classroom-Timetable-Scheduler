@@ -1,10 +1,10 @@
 /**
- * React Query mutations for teacher CRUD operations (create, update, delete).
+ * React Query mutations for Subjects CRUD operations (create, update, delete).
  *
  * Goals:
- * - Centralize all write operations for the Teachers feature.
+ * - Centralize all write operations for the Subjects feature.
  * - Keep page components free of direct API calls.
- * - Ensure cache stays in sync by invalidating the teachers list after mutations.
+ * - Ensure cache stays in sync by invalidating the subjects list after mutations.
  *
  * Requirements:
  * - App must be wrapped in React Query's QueryClientProvider.
@@ -12,32 +12,28 @@
  *
  * Usage example:
  *
- *   import useTeachers from "./useTeachers";
- *   import useTeacherMutations from "./useTeacherMutations";
+ *   import useSubjectMutations, { queryKeys } from "./useSubjectMutations";
  *
- *   export default function TeachersPage() {
- *     const { teachers, departments, isLoading } = useTeachers();
+ *   export default function SubjectsPage() {
  *     const {
- *       createTeacherAsync,
- *       updateTeacherAsync,
- *       deleteTeacherAsync,
+ *       createSubjectAsync,
+ *       updateSubjectAsync,
+ *       deleteSubjectAsync,
  *       createStatus,
  *       updateStatus,
  *       deleteStatus,
- *     } = useTeacherMutations();
+ *     } = useSubjectMutations();
  *
- *     async function handleSubmit(e) {
- *       e.preventDefault();
- *       if (editingTeacher) {
- *         await updateTeacherAsync({ id: editingTeacher.id, updates: formData });
+ *     async function handleSave(subject, editingSubject) {
+ *       if (editingSubject) {
+ *         await updateSubjectAsync({ id: editingSubject.id, updates: subject });
  *       } else {
- *         await createTeacherAsync(formData);
+ *         await createSubjectAsync(subject);
  *       }
- *       resetForm();
  *     }
  *
  *     async function handleDelete(id) {
- *       await deleteTeacherAsync(id);
+ *       await deleteSubjectAsync(id);
  *     }
  *
  *     // render...
@@ -49,59 +45,57 @@ import { supabase } from "@/config/supabase";
 import { queryKeys } from "@/shared/queryKeys";
 
 /**
- * Insert a new teacher row.
- * @param {Object} teacher - The teacher payload to insert.
- * @returns {Promise<Object>} Inserted teacher row.
+ * Insert a new subject row.
+ * @param {Object} subject - The subject payload to insert.
+ * @returns {Promise<Object>} Inserted subject row.
  */
-async function insertTeacher(teacher) {
+async function insertSubject(subject) {
   const { data, error } = await supabase
-    .from("teacher_profile")
-    .insert([teacher])
-    .select("*");
+    .from("subjects")
+    .insert([subject])
+    .select("*")
+    .single();
 
   if (error) {
-    throw new Error(error.message || "Failed to create teacher");
+    throw new Error(error.message || "Failed to create subject");
   }
-  return Array.isArray(data) ? data[0] : data;
+  return data;
 }
 
 /**
- * Update a teacher by id.
+ * Update a subject by id.
  * @param {{ id: string|number, updates: Object }} params
- * @returns {Promise<Object>} Updated teacher row.
+ * @returns {Promise<Object>} Updated subject row.
  */
-async function updateTeacherById({ id, updates }) {
+async function updateSubjectById({ id, updates }) {
   const { data, error } = await supabase
-    .from("teacher_profile")
+    .from("subjects")
     .update(updates)
     .eq("id", id)
     .select("*")
     .single();
 
   if (error) {
-    throw new Error(error.message || "Failed to update teacher");
+    throw new Error(error.message || "Failed to update subject");
   }
   return data;
 }
 
 /**
- * Delete a teacher by id.
+ * Delete a subject by id.
  * @param {string|number} id
  * @returns {Promise<{ id: string|number }>} Deleted id for convenience.
  */
-async function deleteTeacherById(id) {
-  const { error } = await supabase
-    .from("teacher_profile")
-    .delete()
-    .eq("id", id);
+async function deleteSubjectById(id) {
+  const { error } = await supabase.from("subjects").delete().eq("id", id);
   if (error) {
-    throw new Error(error.message || "Failed to delete teacher");
+    throw new Error(error.message || "Failed to delete subject");
   }
   return { id };
 }
 
 /**
- * Hook that exposes mutations for creating, updating, and deleting teachers.
+ * Hook that exposes mutations for creating, updating, and deleting subjects.
  *
  * @param {Object} [options]
  * @param {import('@tanstack/react-query').UseMutationOptions<any, Error, any>} [options.createOptions]
@@ -112,18 +106,18 @@ async function deleteTeacherById(id) {
  *  Additional options for the delete mutation.
  *
  * @returns {{
- *   createTeacher: (variables: Object, options?: import('@tanstack/react-query').MutateOptions)=>void,
- *   createTeacherAsync: (variables: Object)=>Promise<any>,
- *   updateTeacher: (variables: {id: string|number, updates: Object}, options?: import('@tanstack/react-query').MutateOptions)=>void,
- *   updateTeacherAsync: (variables: {id: string|number, updates: Object})=>Promise<any>,
- *   deleteTeacher: (id: string|number, options?: import('@tanstack/react-query').MutateOptions)=>void,
- *   deleteTeacherAsync: (id: string|number)=>Promise<any>,
+ *   createSubject: (variables: Object, options?: import('@tanstack/react-query').MutateOptions)=>void,
+ *   createSubjectAsync: (variables: Object)=>Promise<any>,
+ *   updateSubject: (variables: {id: string|number, updates: Object}, options?: import('@tanstack/react-query').MutateOptions)=>void,
+ *   updateSubjectAsync: (variables: {id: string|number, updates: Object})=>Promise<any>,
+ *   deleteSubject: (id: string|number, options?: import('@tanstack/react-query').MutateOptions)=>void,
+ *   deleteSubjectAsync: (id: string|number)=>Promise<any>,
  *   createStatus: import('@tanstack/react-query').UseMutationResult<any, Error, any>,
  *   updateStatus: import('@tanstack/react-query').UseMutationResult<any, Error, {id: string|number, updates: Object}>,
  *   deleteStatus: import('@tanstack/react-query').UseMutationResult<any, Error, string|number>
  * }}
  */
-export default function useTeacherMutations({
+export default function useSubjectMutations({
   createOptions,
   updateOptions,
   deleteOptions,
@@ -131,15 +125,15 @@ export default function useTeacherMutations({
   const queryClient = useQueryClient();
 
   const createStatus = useMutation({
-    mutationFn: insertTeacher,
+    mutationFn: insertSubject,
     onSuccess: async (created, variables, context) => {
       // Update cache optimistically
-      queryClient.setQueryData(queryKeys.teachers.all, (prev) => {
+      queryClient.setQueryData(queryKeys.subjects.all, (prev) => {
         const list = Array.isArray(prev) ? prev : [];
         return [created, ...list];
       });
       // Revalidate to ensure consistency with server
-      await queryClient.invalidateQueries({ queryKey: queryKeys.teachers.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.subjects.all });
       if (createOptions?.onSuccess) {
         createOptions.onSuccess(created, variables, context);
       }
@@ -153,17 +147,17 @@ export default function useTeacherMutations({
   });
 
   const updateStatus = useMutation({
-    mutationFn: updateTeacherById,
+    mutationFn: updateSubjectById,
     onSuccess: async (updated, variables, context) => {
       // Update cache optimistically
-      queryClient.setQueryData(queryKeys.teachers.all, (prev) => {
+      queryClient.setQueryData(queryKeys.subjects.all, (prev) => {
         if (!Array.isArray(prev)) return prev;
-        return prev.map((t) =>
-          t?.id === updated?.id ? { ...t, ...updated } : t,
+        return prev.map((s) =>
+          s?.id === updated?.id ? { ...s, ...updated } : s,
         );
       });
       // Revalidate
-      await queryClient.invalidateQueries({ queryKey: queryKeys.teachers.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.subjects.all });
       if (updateOptions?.onSuccess) {
         updateOptions.onSuccess(updated, variables, context);
       }
@@ -177,16 +171,16 @@ export default function useTeacherMutations({
   });
 
   const deleteStatus = useMutation({
-    mutationFn: deleteTeacherById,
+    mutationFn: deleteSubjectById,
     onSuccess: async (result, variables, context) => {
       const deletedId = result?.id ?? variables;
       // Update cache optimistically
-      queryClient.setQueryData(queryKeys.teachers.all, (prev) => {
+      queryClient.setQueryData(queryKeys.subjects.all, (prev) => {
         if (!Array.isArray(prev)) return prev;
-        return prev.filter((t) => t?.id !== deletedId);
+        return prev.filter((s) => s?.id !== deletedId);
       });
       // Revalidate
-      await queryClient.invalidateQueries({ queryKey: queryKeys.teachers.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.subjects.all });
       if (deleteOptions?.onSuccess) {
         deleteOptions.onSuccess(result, variables, context);
       }
@@ -201,14 +195,14 @@ export default function useTeacherMutations({
 
   return {
     // Create
-    createTeacher: createStatus.mutate,
-    createTeacherAsync: createStatus.mutateAsync,
+    createSubject: createStatus.mutate,
+    createSubjectAsync: createStatus.mutateAsync,
     // Update
-    updateTeacher: updateStatus.mutate,
-    updateTeacherAsync: updateStatus.mutateAsync,
+    updateSubject: updateStatus.mutate,
+    updateSubjectAsync: updateStatus.mutateAsync,
     // Delete
-    deleteTeacher: deleteStatus.mutate,
-    deleteTeacherAsync: deleteStatus.mutateAsync,
+    deleteSubject: deleteStatus.mutate,
+    deleteSubjectAsync: deleteStatus.mutateAsync,
     // Status objects for loading/error state
     createStatus,
     updateStatus,

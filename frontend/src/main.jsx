@@ -28,8 +28,8 @@ const Classes = lazy(() => import("./pages/classes"));
 const Dashboard = lazy(() => import("./pages/dashboard"));
 const MasterTimetable = lazy(() => import("./pages/mastertimetable"));
 const Rooms = lazy(() => import("./pages/rooms"));
-const Subjects = lazy(() => import("./pages/subjects"));
-const Teachers = lazy(() => import("./features/admin-role/teachers/page.jsx"));
+const Subjects = lazy(() => import("./features/admin-role/subjects/page"));
+const Teachers = lazy(() => import("./features/admin-role/teachers/page"));
 const Timetable = lazy(() => import("./pages/timetable"));
 
 function RequireAuth() {

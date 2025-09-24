@@ -23,8 +23,7 @@ import { Button } from "@/components/ui/button";
 import useTeacherMutations from "../hooks/useTeacherMutations";
 
 function TeachersTable({ teachers, loading, onEdit }) {
-  const { createTeacherAsync, updateTeacherAsync, deleteTeacherAsync } =
-    useTeacherMutations();
+  const {  deleteTeacherAsync } = useTeacherMutations();
 
   const handleDelete = async (id) => {
     if (confirm("Are you sure you want to delete this teacher?")) {

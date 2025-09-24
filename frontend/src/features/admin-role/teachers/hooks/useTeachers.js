@@ -6,7 +6,7 @@
  * - Supabase client must be configured and exported from "@/config/supabase".
  *
  * Example:
- *   import useTeachers, { queryKeys } from "./hooks/useTeachers";
+ *   import useTeachers from "./hooks/useTeachers";
  *
  *   function TeachersPage() {
  *     const {
@@ -35,7 +35,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/config/supabase";
-import { queryKeys } from "../constants";
+import { queryKeys } from "@/shared/queryKeys";
 
 /**
  * Query keys for React Query caches related to teachers feature.
@@ -111,14 +111,14 @@ export default function useTeachers(options = {}) {
   const { teachersQueryOptions = {}, departmentsQueryOptions = {} } = options;
 
   const teachersQuery = useQuery({
-    queryKey: queryKeys.teachers,
+    queryKey: queryKeys.teachers.all,
     queryFn: fetchTeachers,
     staleTime: 60_000, // 1 minute
     ...teachersQueryOptions,
   });
 
   const departmentsQuery = useQuery({
-    queryKey: queryKeys.departments,
+    queryKey: queryKeys.departments.all,
     queryFn: fetchDepartments,
     staleTime: 10 * 60_000, // 10 minutes
     ...departmentsQueryOptions,
