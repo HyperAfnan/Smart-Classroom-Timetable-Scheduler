@@ -1,17 +1,24 @@
 import { lazy, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
+import queryClient from "./config/reactQuery";
+import { QueryClientProvider } from "@tanstack/react-query";
+import {
+  createBrowserRouter,
+  Navigate,
+  Outlet,
+  RouterProvider,
+} from "react-router-dom";
 import "./index.css";
 import { Provider, useSelector } from "react-redux";
 import store from "./Store/store.js";
 import AuthInitializer from "./components/auth/authInit.jsx";
 const TeacherAvailability = lazy(
-   () => import("./pages/teacherAvailability.jsx"),
+  () => import("./pages/teacherAvailability.jsx"),
 );
 const TeacherSchedule = lazy(() => import("./pages/teacherSchedule.jsx"));
 const TeacherProfile = lazy(() => import("./pages/teacherProfile.jsx"));
 const TeacherNotifications = lazy(
-   () => import("./pages/teacherNotifications.jsx"),
+  () => import("./pages/teacherNotifications.jsx"),
 );
 const TeacherDashboard = lazy(() => import("./pages/teacherDashboard.jsx"));
 const Layout = lazy(() => import("./Layout"));
@@ -22,12 +29,12 @@ const Dashboard = lazy(() => import("./pages/dashboard"));
 const MasterTimetable = lazy(() => import("./pages/mastertimetable"));
 const Rooms = lazy(() => import("./pages/rooms"));
 const Subjects = lazy(() => import("./pages/subjects"));
-const Teachers = lazy(() => import("./pages/teachers"));
+const Teachers = lazy(() => import("./features/admin-role/teachers/page.jsx"));
 const Timetable = lazy(() => import("./pages/timetable"));
 
 function RequireAuth() {
-   const user = useSelector((state) => state.auth.user);
-   return user ? <Outlet /> : <Navigate to="/auth" replace />;
+  const user = useSelector((state) => state.auth.user);
+  return user ? <Outlet /> : <Navigate to="/auth" replace />;
 }
 
 const router = createBrowserRouter([
@@ -60,11 +67,13 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")).render(
-   <StrictMode>
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-         <AuthInitializer>
-            <RouterProvider router={router} />
-         </AuthInitializer>
+        <AuthInitializer>
+          <RouterProvider router={router} />
+        </AuthInitializer>
       </Provider>
-   </StrictMode>,
+    </QueryClientProvider>
+  </StrictMode>,
 );

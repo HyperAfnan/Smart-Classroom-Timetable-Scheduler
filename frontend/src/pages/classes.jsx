@@ -289,7 +289,7 @@ export default function Classes() {
                                                 className="hover:bg-slate-50"
                                             >
                                                 <TableCell>
-                                                    <div className="font-medium">{classItem.name}</div>
+                                                    <div className="font-medium">{classItem.class_name}</div>
                                                 </TableCell>
                                                 <TableCell>
                                                     <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200">

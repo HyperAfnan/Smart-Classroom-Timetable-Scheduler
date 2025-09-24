@@ -39,8 +39,8 @@ export default function Header() {
             <a href="#how-it-works" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
               How it Works
             </a>
-            <a href="#pricing" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
-              Pricing
+            <a href="#presentation" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
+              Presentation
             </a>
           </nav>
 
