@@ -26,11 +26,11 @@ const Landing = lazy(() => import("./pages/landing"));
 const Auth = lazy(() => import("./pages/auth"));
 const Classes = lazy(() => import("./features/admin-role/classes/page"));
 const Dashboard = lazy(() => import("./pages/dashboard"));
+const Timetable = lazy(() => import("./features/admin-role/timetable/page.jsx"));
 const MasterTimetable = lazy(() => import("./pages/mastertimetable"));
 const Rooms = lazy(() => import("./features/admin-role/rooms/page"));
 const Subjects = lazy(() => import("./features/admin-role/subjects/page"));
 const Teachers = lazy(() => import("./features/admin-role/teachers/page"));
-const Timetable = lazy(() => import("./pages/timetable"));
 
 function RequireAuth() {
   const user = useSelector((state) => state.auth.user);
