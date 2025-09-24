@@ -27,7 +27,7 @@ const Auth = lazy(() => import("./pages/auth"));
 const Classes = lazy(() => import("./pages/classes"));
 const Dashboard = lazy(() => import("./pages/dashboard"));
 const MasterTimetable = lazy(() => import("./pages/mastertimetable"));
-const Rooms = lazy(() => import("./pages/rooms"));
+const Rooms = lazy(() => import("./features/admin-role/rooms/page"));
 const Subjects = lazy(() => import("./features/admin-role/subjects/page"));
 const Teachers = lazy(() => import("./features/admin-role/teachers/page"));
 const Timetable = lazy(() => import("./pages/timetable"));
