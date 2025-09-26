@@ -125,9 +125,7 @@ function makeOrganizer(days = DEFAULT_DAYS, times = DEFAULT_TIMES) {
             const time = times[slotIndex] ?? String(slotIndex);
             if (!slot.is_free) {
               organized[classId][day][time] = {
-                subject_id: slot.subject_id,
-                teacher_id: slot.teacher_id,
-                room_id: slot.room_id,
+                ...slot,
                 class_id: classId,
                 day,
                 start_time: time,
@@ -147,9 +145,7 @@ function makeOrganizer(days = DEFAULT_DAYS, times = DEFAULT_TIMES) {
           if (!organized[classId]) organized[classId] = {};
           if (!organized[classId][day]) organized[classId][day] = {};
           organized[classId][day][time] = {
-            subject_id: assign.subject_id,
-            teacher_id: assign.teacher_id,
-            room_id: assign.room_id,
+            ...assign,
             class_id: classId,
             day,
             start_time: time,
@@ -294,13 +290,37 @@ function makeNameGetters({
   return { getTeacherName, getSubjectName, getRoomNumber };
 }
 
+// Transform backend timetable data to frontend format
+function transformTimetableData(response, days, times) {
+  const result = {};
+  if (!response || !response.student_timetables) return result;
+  for (const classObj of response.student_timetables) {
+    const classId = String(classObj.class_id);
+    result[classId] = {};
+    for (let dayIdx = 0; dayIdx < days.length; dayIdx++) {
+      const dayName = days[dayIdx];
+      result[classId][dayName] = {};
+      for (let slotIdx = 0; slotIdx < times.length; slotIdx++) {
+        // Defensive: check if slot exists
+        const slot =
+          classObj.timetable[dayIdx] &&
+          classObj.timetable[dayIdx][slotIdx]
+            ? classObj.timetable[dayIdx][slotIdx]
+            : null;
+        result[classId][dayName][times[slotIdx]] = slot;
+      }
+    }
+  }
+  return result;
+}
+
 /**
  * Main hook
  */
 export default function useTimetable({
   days = DEFAULT_DAYS,
   times = DEFAULT_TIMES,
-  endpointUrl = "http://localhost:8000/generate-timetable",
+  endpointUrl = "http://localhost:8000/generate-timetable/studentwise",
   // Optional per-query overrides
   classesQueryOptions = {},
   teachersQueryOptions = {},
@@ -435,9 +455,11 @@ export default function useTimetable({
       }
 
       const result = await resp.json();
+      // Transform backend data to frontend format
+      const organized = transformTimetableData(result, days, times);
       return {
         raw: result,
-        organized: organizeTimetable(result),
+        organized,
       };
     },
     onSuccess: async (_, __, ___) => {

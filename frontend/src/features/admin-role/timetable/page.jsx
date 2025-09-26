@@ -54,8 +54,11 @@ export default function Timetable() {
     }
   };
 
-  const getSlotData = (day, time) =>
-    timetableData[selectedClass]?.[day]?.[time] || null;
+  const getSlotData = (day, time) => {
+    const classIndex = classes.findIndex((c) => String(c.id) === selectedClass);
+    if (classIndex === -1) return null;
+    return timetableData[classIndex]?.[day]?.[time] || null;
+  };
 
   if (isLoading) {
     return <LoadingState />;

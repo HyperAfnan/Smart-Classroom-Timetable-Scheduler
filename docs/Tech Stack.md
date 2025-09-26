@@ -11,7 +11,7 @@
 - supabase for most backend with express backend
 - python microservice for the csp algorithm
 - fastapi for python microservice backend
-- bull message queue for microservices jobs ( coz csp algorithms takes time )
+- bull message queue for microservices jobs ( coz csp algorithms takes time ) (for scaling purpose)
 - redis for caching 
 
 #devops 

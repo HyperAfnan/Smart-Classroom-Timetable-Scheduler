@@ -51,7 +51,6 @@ export default function TimetableTable({
       onCellClick({ day, time, slot });
     }
   };
-
   const isClickable = typeof onCellClick === "function";
 
   const defaultRenderSlot = (slot) => {

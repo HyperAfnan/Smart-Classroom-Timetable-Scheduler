@@ -88,6 +88,15 @@ class TimetableResponse(BaseModel):
     combined_view: List[CombinedTimetable]
     statistics: Dict[str, Any]
 
+class StudentTimetableResponse(BaseModel):
+    success: bool
+    fitness_score: float
+    generation_count: int
+    student_timetables: List[StudentTimetable]
+    teacher_timetables: List[TeacherTimetable] = []
+    combined_view: List[CombinedTimetable] = []
+    statistics: Dict[str, Any]
+
 
 # ---------------------------
 # Timetable Generator
@@ -331,7 +340,7 @@ class TimetableGenerator:
 # ---------------------------
 # Routes
 # ---------------------------
-@app.post("/generate-timetable", response_model=TimetableResponse)
+@app.post("/generate-timetable/legecy", response_model=TimetableResponse)
 async def generate_timetable(request: TimetableRequest):
     try:
         gen = TimetableGenerator(request)
@@ -348,7 +357,61 @@ async def generate_timetable(request: TimetableRequest):
     except Exception as e:
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
+@app.post("/generate-timetable/combined", response_model=TimetableResponse)
+async def generate_timetable(request: TimetableRequest):
+    try:
+        gen = TimetableGenerator(request)
+        best, score = gen.run_ga()
+        return TimetableResponse(
+            success=True,
+            fitness_score=float(score),
+            generation_count=request.generations,
+            # student_timetables=gen.generate_student_view(best),
+            # teacher_timetables=gen.generate_teacher_view(best),
+            combined_view=gen.generate_combined_view(best),
+            statistics=gen.calculate_statistics(best)
+        )
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/generate-timetable/teacherwise", response_model=TimetableResponse)
+async def generate_timetable(request: TimetableRequest):
+    try:
+        gen = TimetableGenerator(request)
+        best, score = gen.run_ga()
+        return TimetableResponse(
+            success=True,
+            fitness_score=float(score),
+            generation_count=request.generations,
+            # student_timetables=gen.generate_student_view(best),
+            # teacher_timetables=gen.generate_teacher_view(best),
+            combined_view=gen.generate_combined_view(best),
+            statistics=gen.calculate_statistics(best)
+        )
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/generate-timetable/studentwise", response_model=StudentTimetableResponse)
+async def generate_timetable(request: TimetableRequest):
+    try:
+        gen = TimetableGenerator(request)
+        best, score = gen.run_ga()
+        return StudentTimetableResponse(
+            success=True,
+            fitness_score=float(score),
+            generation_count=request.generations,
+            student_timetables=gen.generate_student_view(best),
+            # teacher_timetables=None,
+            # combined_view=None,
+            teacher_timetables=gen.generate_teacher_view(best),
+            combined_view=gen.generate_combined_view(best),
+            statistics=gen.calculate_statistics(best)
+        )
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/")
 async def root():
