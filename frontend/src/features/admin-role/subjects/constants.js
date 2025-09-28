@@ -7,15 +7,33 @@ const DEFAULT_SUBJECT = {
   type: "Theory",
   hours_per_week: 3,
 };
-  const colors = {
-    Theory: "bg-blue-50 text-blue-700 border-blue-200",
-    Practical: "bg-green-50 text-green-700 border-green-200",
-    Lab: "bg-purple-50 text-purple-700 border-purple-200",
-    Seminar: "bg-orange-50 text-orange-700 border-orange-200",
-    Project: "bg-red-50 text-red-700 border-red-200",
-  };
 
-const subjectTypes = ["Theory", "Practical", "Lab", "Seminar", "Project"];
+const colors = {
+  Theory: "bg-blue-50 text-blue-700 border-blue-200",
+  Lab: "bg-purple-50 text-purple-700 border-purple-200",
+};
 
+const subjectTypes = ["Theory", "Lab"];
 
-export { DEFAULT_SUBJECT , subjectTypes, colors };
+const requiredColumns = [
+  "subject_name",
+  "subject_code",
+  "credits",
+  "department",
+  "semester",
+  "type",
+  "hours_per_week",
+];
+
+const columns = [
+  { key: "subject_name", label: "Name", width: "w-[18%]" },
+  { key: "subject_code", label: "Code", width: "w-[10%]" },
+  { key: "department", label: "Department", width: "w-[14%]" },
+  { key: "semester", label: "Semester", width: "w-[10%]" },
+  { key: "type", label: "Type", width: "w-[12%]" },
+  { key: "credits", label: "Credits", width: "w-[8%]" },
+  { key: "hours_per_week", label: "Hours/Week", width: "w-[12%]" },
+  { key: "actions", label: "", width: "w-[10%]" },
+];
+
+export { DEFAULT_SUBJECT, subjectTypes, colors, requiredColumns, columns };

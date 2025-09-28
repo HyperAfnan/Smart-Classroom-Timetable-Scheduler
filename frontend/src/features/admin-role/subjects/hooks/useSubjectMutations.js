@@ -43,6 +43,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/config/supabase";
 import { queryKeys } from "@/shared/queryKeys";
+import { normalizeSubjectType } from "@/lib/subjectType";
 
 /**
  * Insert a new subject row.
@@ -50,9 +51,19 @@ import { queryKeys } from "@/shared/queryKeys";
  * @returns {Promise<Object>} Inserted subject row.
  */
 async function insertSubject(subject) {
+  // Normalize subject type (accepts subject.type or subject.subject_type)
+  const normalizedType = normalizeSubjectType(
+    subject?.type ?? subject?.subject_type,
+    { fallback: "Theory" },
+  );
+  const prepared = {
+    ...subject,
+    type: normalizedType ?? "Theory", // ensure a valid enum value
+  };
+
   const { data, error } = await supabase
     .from("subjects")
-    .insert([subject])
+    .insert([prepared])
     .select("*")
     .single();
 
@@ -68,9 +79,19 @@ async function insertSubject(subject) {
  * @returns {Promise<Object>} Updated subject row.
  */
 async function updateSubjectById({ id, updates }) {
+  // Normalize only if a type (or alias) is provided; avoid overwriting when absent
+  let prepared = updates;
+  const candidateType = updates?.type ?? updates?.subject_type;
+  if (candidateType !== undefined) {
+    const normalizedType = normalizeSubjectType(candidateType, {
+      fallback: "Theory",
+    });
+    prepared = { ...updates, type: normalizedType ?? "Theory" };
+  }
+
   const { data, error } = await supabase
     .from("subjects")
-    .update(updates)
+    .update(prepared)
     .eq("id", id)
     .select("*")
     .single();

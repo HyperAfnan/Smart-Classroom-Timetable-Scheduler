@@ -1,7 +1,4 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, BookOpen } from "lucide-react";
 import useSubjects from "./hooks/useSubjects";
 import useSubjectMutations from "./hooks/useSubjectMutations";
 import SubjectFormDialog from "./components/SubjectFormDialog";
@@ -104,34 +101,10 @@ export default function Subjects() {
             }
          />
 
-         <Card>
-            <CardHeader>
-               <CardTitle className="flex items-center gap-2">
-                  <div className="flex items-center gap-2">
-                     <BookOpen className="w-5 h-5" />
-                     Subjects ({filteredSubjects.length})
-                  </div>
-                  <div className="ml-auto">
-                     <Button
-                        onClick={() => setIsDialogOpen(true)}
-                        disabled={isSubmitting}
-                     >
-                        <Plus className="w-4 h-4 mr-2" /> Add Subject
-                     </Button>
-                  </div>
-               </CardTitle>
-            </CardHeader>
-            <CardContent>
-               <SubjectsTable
-                  subjects={filteredSubjects}
-                  loading={isLoading}
-                  onEdit={handleEdit}
-                  onDelete={(id) => (!isDeleting ? handleDelete(id) : undefined)}
-               />
-            </CardContent>
-         </Card>
+         <SubjectsTable
+            subjects={filteredSubjects}
+         />
 
-         {/* Form Dialog */}
          <SubjectFormDialog
             isOpen={isDialogOpen}
             onClose={resetForm}

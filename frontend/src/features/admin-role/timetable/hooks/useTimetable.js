@@ -129,7 +129,7 @@ function makeOrganizer(days = DEFAULT_DAYS, times = DEFAULT_TIMES) {
                 class_id: classId,
                 day,
                 start_time: time,
-                type: "theory",
+                type: "Theory",
               };
             }
           });
@@ -149,7 +149,7 @@ function makeOrganizer(days = DEFAULT_DAYS, times = DEFAULT_TIMES) {
             class_id: classId,
             day,
             start_time: time,
-            type: "theory",
+            type: "Theory",
           };
         });
       });
@@ -303,8 +303,7 @@ function transformTimetableData(response, days, times) {
       for (let slotIdx = 0; slotIdx < times.length; slotIdx++) {
         // Defensive: check if slot exists
         const slot =
-          classObj.timetable[dayIdx] &&
-          classObj.timetable[dayIdx][slotIdx]
+          classObj.timetable[dayIdx] && classObj.timetable[dayIdx][slotIdx]
             ? classObj.timetable[dayIdx][slotIdx]
             : null;
         result[classId][dayName][times[slotIdx]] = slot;
