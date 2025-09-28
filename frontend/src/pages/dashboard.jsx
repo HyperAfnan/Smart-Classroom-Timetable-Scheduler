@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import  { useSelector } from 'react-redux';
 import { lazy } from "react";
 const AdminDashboard = lazy(() => import("../features/admin-role/dashboard/page"));
-const TeacherDashboard = lazy(() => import("./teacherDashboard.jsx"));
+const TeacherDashboard = lazy(() => import("../features/teacher-role/dashboard/page"));
 const StudentDashboard = lazy(() => import("../features/student-role/dashboard/page"));
 const HODDashboard = lazy(() => import("./hoddashboard.jsx"));
 

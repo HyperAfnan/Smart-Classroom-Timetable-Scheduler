@@ -12,22 +12,19 @@ import "./index.css";
 import { Provider, useSelector } from "react-redux";
 import store from "./Store/store.js";
 import AuthInitializer from "./components/auth/authInit.jsx";
-const TeacherAvailability = lazy(
-  () => import("./pages/teacherAvailability.jsx"),
-);
-const TeacherSchedule = lazy(() => import("./pages/teacherSchedule.jsx"));
-const TeacherProfile = lazy(() => import("./pages/teacherProfile.jsx"));
+const TeacherSchedule = lazy(() => import("./features/teacher-role/schedule/page.jsx"));
+const TeacherProfile = lazy(() => import("./features/teacher-role/profile/page.jsx"));
 const TeacherNotifications = lazy(
-  () => import("./pages/teacherNotifications.jsx"),
+  () => import("./features/teacher-role/notification/page.jsx"),
 );
-const TeacherDashboard = lazy(() => import("./pages/teacherDashboard.jsx"));
+const TeacherDashboard = lazy(() => import("./features/teacher-role/dashboard/page"));
 const Layout = lazy(() => import("./Layout"));
 const Landing = lazy(() => import("./pages/landing"));
 const Auth = lazy(() => import("./pages/auth"));
 const Classes = lazy(() => import("./features/admin-role/classes/page"));
 const Dashboard = lazy(() => import("./pages/dashboard"));
 const Timetable = lazy(() => import("./features/admin-role/timetable/page.jsx"));
-const MasterTimetable = lazy(() => import("./pages/mastertimetable"));
+// const MasterTimetable = lazy(() => import("./features/admin-role/timetable"));
 const Rooms = lazy(() => import("./features/admin-role/rooms/page"));
 const Subjects = lazy(() => import("./features/admin-role/subjects/page"));
 const Teachers = lazy(() => import("./features/admin-role/teachers/page"));
@@ -50,12 +47,11 @@ const router = createBrowserRouter([
         children: [
           { index: true, element: <Dashboard /> },
           { path: "classes", element: <Classes /> },
-          { path: "timetable", element: <MasterTimetable /> },
+          // { path: "timetable", element: <MasterTimetable /> },
           { path: "rooms", element: <Rooms /> },
           { path: "subjects", element: <Subjects /> },
           { path: "teachers", element: <Teachers /> },
           { path: "timetablegen", element: <Timetable /> },
-          { path: "teacher-availability", element: <TeacherAvailability /> },
           { path: "teacher-schedule", element: <TeacherSchedule /> },
           { path: "teacher-profile", element: <TeacherProfile /> },
           { path: "teacher-notifications", element: <TeacherNotifications /> },

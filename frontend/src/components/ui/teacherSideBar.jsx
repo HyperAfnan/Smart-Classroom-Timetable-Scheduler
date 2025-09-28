@@ -5,24 +5,42 @@ import {
   User,
   LayoutDashboard,
   LogOut,
-  BookOpen
-} from "lucide-react"
-import { useNavigate } from "react-router-dom"
-
+  BookOpen,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const TeacherSidebar = () => {
-   const navigate = useNavigate()
+  const navigate = useNavigate();
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, route: "/dashboard/teacher-dashboard" },
-    { id: "schedule", label: "My Schedule", icon: Calendar, route: "/dashboard/teacher-schedule" },
-    { id: "availability", label: "Availability", icon: Clock, route: "/dashboard/teacher-availability" },
-    { id: "notifications", label: "Notifications", icon: Bell, route: "/dashboard/teacher-notifications" },
-    { id: "profile", label: "Profile", icon: User, route: "/dashboard/teacher-profile" }
-  ]
+    {
+      id: "dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      route: "/dashboard/teacher-dashboard",
+    },
+    {
+      id: "schedule",
+      label: "My Schedule",
+      icon: Calendar,
+      route: "/dashboard/teacher-schedule",
+    },
+    {
+      id: "notifications",
+      label: "Notifications",
+      icon: Bell,
+      route: "/dashboard/teacher-notifications",
+    },
+    {
+      id: "profile",
+      label: "Profile",
+      icon: User,
+      route: "/dashboard/teacher-profile",
+    },
+  ];
 
   const handleMenuClick = (route) => {
-    navigate(route)
-  }
+    navigate(route);
+  };
 
   return (
     <div className="fixed left-0 top-0 h-full w-64 bg-white shadow-lg border-r border-gray-200 z-10">
@@ -40,8 +58,8 @@ const TeacherSidebar = () => {
 
       <nav className="p-4">
         <div className="space-y-2">
-          {menuItems.map(item => {
-            const Icon = item.icon
+          {menuItems.map((item) => {
+            const Icon = item.icon;
             return (
               <button
                 key={item.id}
@@ -55,7 +73,7 @@ const TeacherSidebar = () => {
                 <Icon className="h-5 w-5" />
                 <span className="font-medium">{item.label}</span>
               </button>
-            )
+            );
           })}
         </div>
       </nav>
@@ -75,7 +93,7 @@ const TeacherSidebar = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default TeacherSidebar
+export default TeacherSidebar;
