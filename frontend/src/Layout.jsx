@@ -4,7 +4,7 @@ import SidebarMenu from "./components/ui/customSidebar";
 import { Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import TeacherSidebar from "./components/ui/teacherSideBar.jsx";
-import StudentDashboard from "./pages/studentdashboard.jsx";
+// import StudentDashboard from "./pages/studentdashboard.jsx";
 
 export default function Layout() {
    const location = useLocation();
