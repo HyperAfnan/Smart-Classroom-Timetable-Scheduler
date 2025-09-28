@@ -68,7 +68,7 @@ export default function TimetableTable({
           {getTeacherName?.(slot.teacher_id) ?? String(slot.teacher_id ?? "")}
         </div>
         <div className="text-xs text-blue-500 mt-1">
-          Room: {getRoomNumber?.(slot.room_id) ?? String(slot.room_id ?? "")}
+          {getRoomNumber?.(slot.room_id) ?? "Room:", String(slot.room_id ?? "")}
         </div>
         {slot.type ? (
           <Badge

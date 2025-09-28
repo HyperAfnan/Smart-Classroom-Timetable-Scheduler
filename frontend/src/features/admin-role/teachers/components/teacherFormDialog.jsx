@@ -17,15 +17,8 @@ import {
 } from "@/components/ui/select";
 import {
   Plus,
-  Users,
-  Mail,
-  Edit,
-  Trash2,
-  Search,
-  Upload,
-  FileSpreadsheet,
 } from "lucide-react";
-import {  DESIGNATIONS, REQUIRED_COLUMNS  } from "../constants";
+import {  DESIGNATIONS } from "../constants";
 
 function TeacherFormDialog({ isOpen, onOpenChange, formData, setFormData, onSubmit, resetForm, editingTeacher, departments }) {
   return (

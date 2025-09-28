@@ -1,4 +1,4 @@
-import React from "react";
+import { Suspense } from "react";
 import  { useSelector } from 'react-redux';
 import { lazy } from "react";
 const AdminDashboard = lazy(() => import("../features/admin-role/dashboard/page.jsx"));
@@ -10,11 +10,11 @@ export default function Dashboard() {
   const roles = useSelector((state) => state.auth.roles);
 
   return (
-    <React.Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       {roles.includes('admin') && <AdminDashboard />}
       {roles.includes('teacher') && <TeacherDashboard />}
       {roles.includes('student') && <StudentDashboard />}
       {roles.includes('hod') && <HODDashboard />}
-    </React.Suspense>
+    </Suspense>
   );
 }

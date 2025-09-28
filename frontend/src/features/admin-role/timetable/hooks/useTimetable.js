@@ -273,17 +273,17 @@ function makeNameGetters({
   rooms = EMPTY,
 } = {}) {
   const getTeacherName = (id) => {
-    if (id === undefined || id === null) return "Unknown";
+    if (id === undefined || id === null) return "";
     const teacher = teachers.find((t) => String(t?.id) === String(id));
     return teacher?.name ?? `Teacher ${id}`;
   };
   const getSubjectName = (id) => {
-    if (id === undefined || id === null) return "Unknown";
+    if (id === undefined || id === null) return "Free";
     const subject = subjects.find((s) => String(s?.id) === String(id));
     return subject?.subject_name ?? `Subject ${id}`;
   };
   const getRoomNumber = (id) => {
-    if (id === undefined || id === null) return "Unknown";
+    if (id === undefined || id === null) return "";
     const room = rooms.find((r) => String(r?.id) === String(id));
     return room?.room_number ?? `Room ${id}`;
   };

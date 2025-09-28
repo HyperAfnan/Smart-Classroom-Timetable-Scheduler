@@ -7,9 +7,7 @@ import HeaderSection from "./components/HeaderSection";
 import ControlsCard from "./components/ControlsCard";
 import TimetableTable from "./components/TimetableTable";
 import EmptyStateCard from "./components/EmptyStateCard";
-
-const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
-const times = ["09:00", "10:00", "11:15", "12:15", "14:15", "15:15"];
+import { days, times } from "./constants";
 
 export default function Timetable() {
   const [selectedClass, setSelectedClass] = useState("");
@@ -90,7 +88,7 @@ export default function Timetable() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="w-5 h-5" />
-              Weekly Timetable –{" "}
+              Weekly Timetable –
               {classes.find((c) => String(c.id) === selectedClass)?.name}
             </CardTitle>
           </CardHeader>
