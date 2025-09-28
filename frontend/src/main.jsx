@@ -11,7 +11,7 @@ import {
 import "./index.css";
 import { Provider, useSelector } from "react-redux";
 import store from "./Store/store.js";
-import AuthInitializer from "./components/auth/authInit.jsx";
+import AuthInitializer from "./features/auth/authInit.jsx";
 const TeacherSchedule = lazy(() => import("./features/teacher-role/schedule/page.jsx"));
 const TeacherProfile = lazy(() => import("./features/teacher-role/profile/page.jsx"));
 const TeacherNotifications = lazy(
@@ -19,10 +19,10 @@ const TeacherNotifications = lazy(
 );
 const TeacherDashboard = lazy(() => import("./features/teacher-role/dashboard/page"));
 const Layout = lazy(() => import("./Layout"));
-const Landing = lazy(() => import("./pages/landing"));
-const Auth = lazy(() => import("./pages/auth"));
+const Landing = lazy(() => import("./features/landing/landing.jsx"));
+const Auth = lazy(() => import("./features/auth/auth.jsx"));
 const Classes = lazy(() => import("./features/admin-role/classes/page"));
-const Dashboard = lazy(() => import("./pages/dashboard"));
+const Dashboard = lazy(() => import("./features/auth/dashboard.jsx"));
 const Timetable = lazy(() => import("./features/admin-role/timetable/page.jsx"));
 // const MasterTimetable = lazy(() => import("./features/admin-role/timetable"));
 const Rooms = lazy(() => import("./features/admin-role/rooms/page"));
