@@ -1,4 +1,16 @@
 import React from "react";
+/**
+ * DEPRECATED COMPONENT (RoomFormDialog)
+ *
+ * This dialog-based form was originally used for creating and editing rooms.
+ * The Rooms feature now supports:
+ *   - Inline creation (new row) in RoomsTable
+ *   - Inline editing (row transforms into editable inputs)
+ *   - Excel bulk import via RoomExcelUploader
+ *
+ * This component is retained temporarily for backward compatibility and may be removed
+ * in a future cleanup. Prefer using the inline UX instead of this dialog.
+ */
 import {
   Dialog,
   DialogTrigger,

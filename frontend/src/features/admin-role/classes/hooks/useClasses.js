@@ -46,7 +46,7 @@ const EMPTY_CLASSES = Object.freeze([]);
  * @property {string} department
  * @property {number} semester
  * @property {string} section
- * @property {number} students_count
+ * @property {number} students
  * @property {string} academic_year
  * @property {string=} created_at
  */

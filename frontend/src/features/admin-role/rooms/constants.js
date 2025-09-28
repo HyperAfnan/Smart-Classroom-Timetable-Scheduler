@@ -10,3 +10,5 @@ export const ROOM_DEFAULTS = {
   capacity: 1,
   room_type: "",
 };
+
+export const ROOM_REQUIRED_COLUMNS = ["room_number", "capacity", "room_type"];

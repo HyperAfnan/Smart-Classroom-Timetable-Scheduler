@@ -1,3 +1,10 @@
+/**
+ * DEPRECATED COMPONENT: ClassFormDialog
+ *
+ * Replaced by inline class creation & editing (InlineClassesTable + ClassExcelUploader).
+ * Retained temporarily for backward compatibility. Avoid using in new code and
+ * plan for removal once legacy references are cleaned up.
+ */
 import React from "react";
 import {
   Dialog,
@@ -27,6 +34,12 @@ export default function ClassFormDialog({
   departments,
   isSubmitting,
 }) {
+  if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line no-console
+    console.warn(
+      "ClassFormDialog is deprecated. Use InlineClassesTable instead.",
+    );
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
     onSave(formData);
@@ -103,15 +116,15 @@ export default function ClassFormDialog({
               />
             </div>
             <div className="space-y-2">
-              <Label>Students Count</Label>
+              <Label>Students</Label>
               <Input
                 type="number"
                 min="1"
-                value={formData.students_count}
+                value={formData.students}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    students_count: parseInt(e.target.value),
+                    students: parseInt(e.target.value),
                   })
                 }
                 required
