@@ -3,9 +3,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import AuthSlider from "@/components/auth/authSlider";
-import RegistrationForm from "@/components/auth/registrationpage";
-import LoginForm from "@/components/auth/loginpage";
+import AuthSlider from "./authSlider";
+import RegistrationForm from "./registrationpage";
+import LoginForm from "./loginpage";
 
 // import AuthSlider from "../components/auth/AuthSlider";
 // import RegistrationForm from "../components/auth/RegistrationForm";
@@ -25,7 +25,10 @@ export default function Auth() {
           className="mb-8"
         >
           <Link to={"/"}>
-            <Button variant="ghost" className="text-slate-600 hover:text-slate-900 p-2">
+            <Button
+              variant="ghost"
+              className="text-slate-600 hover:text-slate-900 p-2"
+            >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Home
             </Button>

@@ -12,18 +12,29 @@ import "./index.css";
 import { Provider, useSelector } from "react-redux";
 import store from "./Store/store.js";
 import AuthInitializer from "./features/auth/authInit.jsx";
-const TeacherSchedule = lazy(() => import("./features/teacher-role/schedule/page.jsx"));
-const TeacherProfile = lazy(() => import("./features/teacher-role/profile/page.jsx"));
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const TeacherSchedule = lazy(
+  () => import("./features/teacher-role/schedule/page.jsx"),
+);
+const TeacherProfile = lazy(
+  () => import("./features/teacher-role/profile/page.jsx"),
+);
 const TeacherNotifications = lazy(
   () => import("./features/teacher-role/notification/page.jsx"),
 );
-const TeacherDashboard = lazy(() => import("./features/teacher-role/dashboard/page"));
+const TeacherDashboard = lazy(
+  () => import("./features/teacher-role/dashboard/page"),
+);
 const Layout = lazy(() => import("./Layout"));
 const Landing = lazy(() => import("./features/landing/landing.jsx"));
 const Auth = lazy(() => import("./features/auth/auth.jsx"));
 const Classes = lazy(() => import("./features/admin-role/classes/page"));
 const Dashboard = lazy(() => import("./features/auth/dashboard.jsx"));
-const Timetable = lazy(() => import("./features/admin-role/timetable/page.jsx"));
+const Timetable = lazy(
+  () => import("./features/admin-role/timetable/page.jsx"),
+);
 // const MasterTimetable = lazy(() => import("./features/admin-role/timetable"));
 const Rooms = lazy(() => import("./features/admin-role/rooms/page"));
 const Subjects = lazy(() => import("./features/admin-role/subjects/page"));
@@ -68,6 +79,17 @@ createRoot(document.getElementById("root")).render(
       <Provider store={store}>
         <AuthInitializer>
           <RouterProvider router={router} />
+          <ToastContainer
+            position="top-right"
+            autoClose={4000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
         </AuthInitializer>
       </Provider>
     </QueryClientProvider>

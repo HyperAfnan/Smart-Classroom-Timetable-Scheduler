@@ -1,11 +1,18 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, Users, BookOpen, CheckCircle, ArrowRight } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  Users,
+  BookOpen,
+  CheckCircle,
+  ArrowRight,
+} from "lucide-react";
 import { Link } from "react-router-dom";
-import Header from "@/components/landing/header";
-import Hero from "@/components/landing/hero";
-import Features from "@/components/landing/features";
-import Footer from "@/components/landing/footer";
+import Header from "./header";
+import Hero from "./hero";
+import Features from "./features";
+import Footer from "./footer";
 
 // import Header from "../components/landing/Header";
 // import Hero from "../components/landing/Hero";
