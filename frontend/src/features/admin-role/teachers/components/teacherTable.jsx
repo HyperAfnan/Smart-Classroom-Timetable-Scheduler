@@ -68,21 +68,18 @@ function TeachersTable({ filteredTeacher }) {
    };
 
    const onSubmit = async (data) => {
+      if (errors) toast.error("Please fill all required fields correctly.");
       await createTeacherAsync(data);
       reset();
       setRenderNewRow(false);
    };
 
    const onEditSubmit = async (data) => {
+      if (editErrors) toast.error("Please fill all required fields correctly.");
       await updateTeacherAsync({ id: editingTeacherId, updates: data });
       setEditingTeacherId(null);
       resetEditForm();
    };
-
-   if (errors || editErrors) {
-      console.log(errors, editErrors);
-      toast.error("Please fill all required fields correctly.");
-   }
 
    const EditButton = ({ onClick }) => (
       <Button size="sm" variant="outline" onClick={onClick}>

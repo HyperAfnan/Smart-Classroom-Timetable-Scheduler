@@ -26,11 +26,11 @@ export default function ExcelUploader({
          const rows = await readXlsxFile(file);
          const headers = rows[0];
          const headerLower = headers.map((h) =>
-            h && typeof h === "string" ? h.toLowerCase() : "",
+            h && typeof h === "string" ? h?.toLowerCase() : "",
          );
 
          const missingColumns = requiredColumns.filter(
-            (col) => !headerLower.includes(col.toLowerCase()),
+            (col) => !headerLower?.includes(col?.toLowerCase()),
          );
 
          if (missingColumns.length > 0) {
@@ -60,12 +60,12 @@ export default function ExcelUploader({
                subjects: [],
             };
 
-            if (!teacher.name || !teacher.email || !teacher.emp_id) continue;
+            if (!teacher?.name || !teacher?.email || !teacher?.emp_id) continue;
 
             const existing = teachers.find(
                (t) =>
-                  t.emp_id === teacher.emp_id ||
-                  t.email.toLowerCase() === teacher.email.toLowerCase(),
+                  t?.emp_id === teacher?.emp_id ||
+                  t?.email?.toLowerCase() === teacher?.email?.toLowerCase(),
             );
 
             if (existing) {

@@ -54,15 +54,27 @@ import { queryKeys } from "@/shared/queryKeys";
  * @returns {Promise<Object>} Inserted teacher row.
  */
 async function insertTeacher(teacher) {
-  const { data, error } = await supabase
-    .from("teacher_profile")
-    .insert([teacher])
-    .select("*");
+  if (!teacher || typeof teacher !== "object" || Array.isArray(teacher)) {
+    throw new Error("Invalid teacher payload");
+  }
+  if (!teacher.email) {
+    throw new Error("Teacher must include an email");
+  }
+
+  console.log("Invoking teacher-creation with payload:", teacher);
+
+  // Pass the plain object; supabase-js handles JSON serialization and headers
+  const { data, error } = await supabase.functions.invoke("teacher-creation", {
+    body: teacher,
+  });
 
   if (error) {
+    console.error("Edge function error:", error);
     throw new Error(error.message || "Failed to create teacher");
   }
-  return Array.isArray(data) ? data[0] : data;
+
+  // data should be the row returned by the Edge Function
+  return data;
 }
 
 /**
