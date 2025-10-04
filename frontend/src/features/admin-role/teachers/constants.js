@@ -10,7 +10,7 @@ const REQUIRED_COLUMNS = [
   "name",
   "email",
   "emp_id",
-  "department",
+  "subjects",
   "designation",
 ];
 
@@ -23,7 +23,6 @@ const DEFAULT_TEACHER = {
   name: "",
   email: "",
   emp_id: "",
-  department: "",
   designation: "",
   subjects: [],
   max_hours: 20,
@@ -33,7 +32,7 @@ const requiredColumns = [
   "name",
   "email",
   "emp_id",
-  "department",
+  "subjects",
   "designation",
   "max_hours",
 ];
@@ -41,7 +40,7 @@ const requiredColumns = [
 const columns = [
    { key: "name", label: "Name", width: "w-[20%]" },
    { key: "emp_id", label: "Employee ID", width: "w-[10%]" },
-   { key: "department", label: "Department", width: "w-[15%]" },
+   { key: "subjects", label: "Subjects", width: "w-[15%]" },
    { key: "designation", label: "Designation", width: "w-[15%]" },
    { key: "email", label: "Email", width: "w-[20%]" },
    { key: "max_hours", label: "Max Hours", width: "w-[10%]" },

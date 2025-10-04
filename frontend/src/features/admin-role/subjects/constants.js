@@ -2,7 +2,6 @@ const DEFAULT_SUBJECT = {
   subject_name: "",
   subject_code: "",
   credits: 3,
-  department: "",
   semester: 1,
   type: "Theory",
   hours_per_week: 3,
@@ -19,7 +18,6 @@ const requiredColumns = [
   "subject_name",
   "subject_code",
   "credits",
-  "department",
   "semester",
   "type",
   "hours_per_week",
@@ -28,7 +26,6 @@ const requiredColumns = [
 const columns = [
   { key: "subject_name", label: "Name", width: "w-[18%]" },
   { key: "subject_code", label: "Code", width: "w-[10%]" },
-  { key: "department", label: "Department", width: "w-[14%]" },
   { key: "semester", label: "Semester", width: "w-[10%]" },
   { key: "type", label: "Type", width: "w-[12%]" },
   { key: "credits", label: "Credits", width: "w-[8%]" },

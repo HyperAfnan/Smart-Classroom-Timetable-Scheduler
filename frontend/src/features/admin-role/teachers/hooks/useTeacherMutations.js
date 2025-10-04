@@ -61,9 +61,6 @@ async function insertTeacher(teacher) {
     throw new Error("Teacher must include an email");
   }
 
-  console.log("Invoking teacher-creation with payload:", teacher);
-
-  // Pass the plain object; supabase-js handles JSON serialization and headers
   const { data, error } = await supabase.functions.invoke("teacher-creation", {
     body: teacher,
   });
@@ -73,7 +70,6 @@ async function insertTeacher(teacher) {
     throw new Error(error.message || "Failed to create teacher");
   }
 
-  // data should be the row returned by the Edge Function
   return data;
 }
 

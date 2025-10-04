@@ -34,7 +34,7 @@ import useTeachers from "../../teachers/hooks/useTeachers.js";
 import useSubjects from "../hooks/useSubjects.js";
 import { useState } from "react";
 import useSubjectMutations from "../hooks/useSubjectMutations.js";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import ExcelUploader from "./SubjectsExcelUploader.jsx";
 
 const getTypeColor = (type) => {
@@ -107,7 +107,7 @@ export default function SubjectsTable({ subjects }) {
    };
 
    if (errors || editErrors) {
-      toast.error("Please fill all required fields correctly.");
+      // toast.error("Please fill all required fields correctly.");
    }
 
    return (

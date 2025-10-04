@@ -7,7 +7,16 @@ import {
    TableHeader,
    TableRow,
 } from "@/components/ui/table";
-import { Users, Mail, Edit, Trash2, Plus, Check, X } from "lucide-react";
+import {
+   LoaderPinwheel,
+   Users,
+   Mail,
+   Edit,
+   Trash2,
+   Plus,
+   Check,
+   X,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,61 +31,68 @@ import {
 } from "@/components/ui/select";
 import { DESIGNATIONS, columns } from "../constants";
 import ExcelUploader from "./teacherExcelUploader.jsx";
-import useTeachers from "../hooks/useTeachers.js";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "react-toastify";
+import useTeacherSubjects from "../hooks/useTeacherSubjects";
+import useTeacherSubjectMutations from "../hooks/useTeacherSubjectsMutations";
+import useSubjects from "../../subjects/hooks/useSubjects.js";
 
 function TeachersTable({ filteredTeacher }) {
    const { deleteTeacherAsync, createTeacherAsync, updateTeacherAsync } =
       useTeacherMutations();
-   const { departments, isLoading } = useTeachers();
    const [hoveredRowId, setHoveredRowId] = useState(null);
    const [renderNewRow, setRenderNewRow] = useState(false);
    const [editingTeacherId, setEditingTeacherId] = useState(null);
-
+   const { teacherSubjects, isLoading } = useTeacherSubjects();
+   const { subjects } = useSubjects();
    const {
-      register,
-      handleSubmit,
-      reset,
-      control,
-      formState: { errors },
-   } = useForm();
+      createTeacherSubjectAsync,
+      deleteTeacherSubjectAsync,
+      editTeacherSubjectAsync,
+      createStatus: linkCreateStatus,
+      deleteStatus: linkDeleteStatus,
+      editStatus: editStatus,
+   } = useTeacherSubjectMutations();
 
-   const {
-      register: editRegister,
-      handleSubmit: handleEditSubmit,
-      reset: resetEditForm,
-      control: editControl,
-      setValue,
-      formState: { errors: editErrors },
-   } = useForm();
+   const { register, handleSubmit, reset, control, formState: { errors } } = useForm();
+   const { register: editRegister, handleSubmit: handleEditSubmit, reset: resetEditForm, control: editControl, setValue, formState: { errors: editErrors } } = useForm();
 
-   const handleDelete = async (id) => {
-      if (confirm("Are you sure you want to delete this teacher?")) {
-         await deleteTeacherAsync(id);
-      }
+   const handleDelete = async (teacher) => {
+      if (!confirm(`Delete teacher "${teacher.name}"?`)) return;
+      const link = teacherSubjects.find((ts) => ts.teacher === teacher.name);
+      if (link)
+         await deleteTeacherSubjectAsync({
+            teacher: teacher.name,
+            subject: link.subject,
+         });
+      await deleteTeacherAsync(teacher.id);
    };
 
    const handleEditClick = (teacher) => {
       setEditingTeacherId(teacher.id);
       setValue("name", teacher.name);
       setValue("emp_id", teacher.emp_id);
-      setValue("department", teacher.department);
+      setValue("subjects", teacher.subjects || []);
       setValue("designation", teacher.designation);
       setValue("email", teacher.email);
       setValue("max_hours", teacher.max_hours);
    };
 
    const onSubmit = async (data) => {
+      // eslint-disable-next-line no-unused-vars
+      const { subjects, ...teacherData } = data;
       if (errors) toast.error("Please fill all required fields correctly.");
-      await createTeacherAsync(data);
+      await createTeacherAsync(teacherData);
+      await createTeacherSubjectAsync({ teacher: data.name, subject: subjects });
       reset();
       setRenderNewRow(false);
    };
 
    const onEditSubmit = async (data) => {
       if (editErrors) toast.error("Please fill all required fields correctly.");
-      await updateTeacherAsync({ id: editingTeacherId, updates: data });
+      const { subjects: subject, ...teacherData } = data;
+      await updateTeacherAsync({ id: editingTeacherId, updates: teacherData });
+      await editTeacherSubjectAsync({ teacher: data.name, subject: subject });
       setEditingTeacherId(null);
       resetEditForm();
    };
@@ -178,9 +194,9 @@ function TeachersTable({ filteredTeacher }) {
                                                 className="w-full border px-2 py-1 rounded"
                                              />
                                           )}
-                                          {col.key === "department" && (
+                                          {col.key === "subjects" && (
                                              <Controller
-                                                name="department"
+                                                name="subjects"
                                                 control={editControl}
                                                 rules={{ required: true }}
                                                 render={({ field }) => (
@@ -189,19 +205,25 @@ function TeachersTable({ filteredTeacher }) {
                                                       onValueChange={field.onChange}
                                                    >
                                                       <SelectTrigger className="w-full">
-                                                         <SelectValue placeholder="Department" />
+                                                         <SelectValue placeholder="Select Subject" />
                                                       </SelectTrigger>
                                                       <SelectContent>
-                                                         {departments.map((dept) => (
-                                                            <SelectItem key={dept} value={dept}>
-                                                               <Badge
-                                                                  variant="outline"
-                                                                  className="bg-blue-50 text-blue-700 border-blue-200"
+                                                         {subjects.map(
+                                                            (subject) => (
+                                                               <SelectItem
+                                                                  key={subject.subject_name}
+                                                                  value={subject.subject_name}
                                                                >
-                                                                  {dept}
-                                                               </Badge>
-                                                            </SelectItem>
-                                                         ))}
+                                                                  <Badge
+                                                                     key={subject.subject_name}
+                                                                     variant="outline"
+                                                                     className="border-slate-200 text-slate-500"
+                                                                  >
+                                                                     {subject.subject_name}
+                                                                  </Badge>
+                                                               </SelectItem>
+                                                            ),
+                                                         )}
                                                       </SelectContent>
                                                    </Select>
                                                 )}
@@ -278,13 +300,20 @@ function TeachersTable({ filteredTeacher }) {
                                              </div>
                                           )}
                                           {col.key === "emp_id" && teacher.emp_id}
-                                          {col.key === "department" && (
-                                             <Badge
-                                                variant="outline"
-                                                className="bg-blue-50 text-blue-700 border-blue-200"
-                                             >
-                                                {teacher.department}
-                                             </Badge>
+                                          {col.key === "subjects" && (
+                                             <div className="flex flex-wrap gap-1">
+                                                {teacherSubjects
+                                                   .filter((teacherSubject) => teacher.name === teacherSubject.teacher)
+                                                   .map((teacherSubject, idx) => (
+                                                      <Badge
+                                                         key={idx}
+                                                         variant="outline"
+                                                         className="border-slate-200 text-slate-500"
+                                                      >
+                                                         {teacherSubject.subject}
+                                                      </Badge>
+                                                   ))}
+                                             </div>
                                           )}
                                           {col.key === "designation" && teacher.designation}
                                           {col.key === "email" && (
@@ -303,7 +332,7 @@ function TeachersTable({ filteredTeacher }) {
                                                          onClick={() => handleEditClick(teacher)}
                                                       />
                                                       <DeleteButton
-                                                         onClick={() => handleDelete(teacher.id)}
+                                                         onClick={() => handleDelete(teacher)}
                                                       />
                                                    </>
                                                 ) : (
@@ -323,7 +352,6 @@ function TeachersTable({ filteredTeacher }) {
                               </motion.tr>
                            ))
                         )}
-
                         {renderNewRow && (
                            <motion.tr
                               key="new-row"
@@ -349,9 +377,9 @@ function TeachersTable({ filteredTeacher }) {
                                           {...register("emp_id", { required: true })}
                                        />
                                     )}
-                                    {col.key === "department" && (
+                                    {col.key === "subjects" && (
                                        <Controller
-                                          name="department"
+                                          name="subjects"
                                           control={control}
                                           rules={{ required: true }}
                                           render={({ field }) => (
@@ -360,14 +388,25 @@ function TeachersTable({ filteredTeacher }) {
                                                 onValueChange={field.onChange}
                                              >
                                                 <SelectTrigger className="w-full">
-                                                   <SelectValue placeholder="Department" />
+                                                   <SelectValue placeholder="Subject" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                   {departments.map((dept) => (
-                                                      <SelectItem key={dept} value={dept}>
-                                                         {dept}
-                                                      </SelectItem>
-                                                   ))}
+                                                         {subjects.map(
+                                                            (subject) => (
+                                                               <SelectItem
+                                                                  key={subject.subject_name}
+                                                                  value={subject.subject_name}
+                                                               >
+                                                                  <Badge
+                                                                     key={subject.subject_name}
+                                                                     variant="outline"
+                                                                     className="border-slate-200 text-slate-500"
+                                                                  >
+                                                                     {subject.subject_name}
+                                                                  </Badge>
+                                                               </SelectItem>
+                                                            ),
+                                                         )}
                                                 </SelectContent>
                                              </Select>
                                           )}
