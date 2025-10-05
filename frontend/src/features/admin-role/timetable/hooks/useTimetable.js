@@ -319,7 +319,7 @@ function transformTimetableData(response, days, times) {
 export default function useTimetable({
   days = DEFAULT_DAYS,
   times = DEFAULT_TIMES,
-  endpointUrl = "http://localhost:8000/generate-timetable/studentwise",
+  endpointUrl = `${import.meta.env.VITE_BACKEND_URL}generate-timetable/studentwise`,
   // Optional per-query overrides
   classesQueryOptions = {},
   teachersQueryOptions = {},
