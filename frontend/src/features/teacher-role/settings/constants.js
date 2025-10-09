@@ -1,0 +1,5 @@
+const EMPTY_TEACHERSSUBJECT= Object.freeze([]);
+const EMPTY_TEACHERSPROFILE = Object.freeze([]);
+
+
+export { EMPTY_TEACHERSSUBJECT, EMPTY_TEACHERSPROFILE };

@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Building2, MapPin, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 export default function RegistrationForm() {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     universityName: "",
     universityLocation: ""
@@ -26,17 +24,9 @@ export default function RegistrationForm() {
     if (!formData.universityName || !formData.universityLocation) {
       return;
     }
-
     setIsSubmitting(true);
-    
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Store university data for next step (you can use local storage or context)
     localStorage.setItem('universityData', JSON.stringify(formData));
-    
-    // Navigate to next step (departments setup page - we'll create this later)
-    
     setIsSubmitting(false);
   };
 

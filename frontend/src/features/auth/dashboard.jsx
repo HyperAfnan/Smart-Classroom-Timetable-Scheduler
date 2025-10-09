@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import  { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 import { lazy } from "react";
 const AdminDashboard = lazy(() => import("../admin-role/dashboard/page"));
 const TeacherDashboard = lazy(() => import("../teacher-role/dashboard/page"));

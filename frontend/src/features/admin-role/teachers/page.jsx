@@ -5,15 +5,21 @@ import TeachersTable from "./components/teacherTable";
 import useTeachers from "./hooks/useTeachers";
 import useTeacherNotifications from "./hooks/useTeacherNotifications";
 import useFilteredTeachers from "./hooks/useFilteredTeachers";
+import useTeacherSubjects from "./hooks/useTeacherSubjects.js";
 
 export default function Teachers() {
    const { teachers } = useTeachers();
+   const { teacherSubjects } = useTeacherSubjects();
+   const allTeachersWithSubjects = teachers.map(teacher => {
+      const subject = teacherSubjects.find(sub => sub.teacher === teacher.name);
+      return { ...teacher, subject: subject ? subject.subject : "Unknown" };
+   })
    const { createStatus, updateStatus, deleteStatus, } = useTeacherMutations();
    const [searchTerm, setSearchTerm] = useState("");
-   const [filterDept, setFilterDept] = useState(null);
+   const [filterSubject, setFilterSubject] = useState(null);
 
    useTeacherNotifications({ createStatus, updateStatus, deleteStatus });
-   const filteredTeachers = useFilteredTeachers( teachers, searchTerm, filterDept);
+   const filteredTeachers = useFilteredTeachers( allTeachersWithSubjects, searchTerm, filterSubject);
 
    return (
       <div className="p-6 space-y-6">
@@ -30,7 +36,7 @@ export default function Teachers() {
 
          <Filters
             onSearchChange={setSearchTerm}
-            onDepartmentChange={setFilterDept}
+            onSubjectChange={setFilterSubject}
          />
 
          <TeachersTable

@@ -10,11 +10,12 @@ import {
 import { Search } from "lucide-react";
 import { useState } from "react";
 import useTeachers from "../hooks/useTeachers.js";
+import useSubjects from "../../subjects/hooks/useSubjects.js";
 
-function Filters({ onSearchChange, onDepartmentChange }) {
-   const { departments } = useTeachers();
+function Filters({ onSearchChange, onSubjectChange }) {
+   const { subjects } = useSubjects();
    const [searchTerm, setSearchTerm] = useState("");
-   const [selectedDepartment, setSelectedDepartment] = useState("all");
+   const [selectedSubject, setSelectedSubject] = useState("all");
 
    const handleSearch = (e) => {
       const value = e.target.value;
@@ -22,9 +23,9 @@ function Filters({ onSearchChange, onDepartmentChange }) {
       onSearchChange(value);
    };
 
-   const handleDepartmentChange = (value) => {
-      setSelectedDepartment(value);
-      onDepartmentChange(value === "all" ? null : value);
+   const handleSubjectChange = (value) => {
+      setSelectedSubject(value);
+      onSubjectChange(value === "all" ? null : value);
    };
 
    return (
@@ -43,17 +44,17 @@ function Filters({ onSearchChange, onDepartmentChange }) {
                </div>
 
                <Select
-                  value={selectedDepartment}
-                  onValueChange={handleDepartmentChange}
+                  value={selectedSubject}
+                  onValueChange={handleSubjectChange}
                >
                   <SelectTrigger className="w-[200px]">
-                     <SelectValue placeholder="All Departments" />
+                     <SelectValue placeholder="All Subjects" />
                   </SelectTrigger>
                   <SelectContent>
-                     <SelectItem value="all">All Departments</SelectItem>
-                     {departments.map((dept) => (
-                        <SelectItem key={dept} value={dept}>
-                           {dept}
+                     <SelectItem value="all">All Subjects</SelectItem>
+                     {subjects.map((subject) => (
+                        <SelectItem key={subject.subject_name} value={subject.subject_name}>
+                           {subject.subject_name}
                         </SelectItem>
                      ))}
                   </SelectContent>

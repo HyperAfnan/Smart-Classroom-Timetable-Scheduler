@@ -1,15 +1,3 @@
-// const { regdata, regerror } = await supabase.auth.signUp({
-//    email: formData.email,
-//    password: formData.password,
-// });
-//
-// if (regdata) {
-//    console.log("Registration success:", regdata);
-// } else if (regerror) {
-//    console.log("Registration error:", regerror.message);
-// }
-//
-import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +8,7 @@ import { jwtDecode } from "jwt-decode";
 import { useDispatch } from "react-redux";
 import { setAuth } from "@/Store/auth.js";
 import { useNavigate } from "react-router-dom";
-
+import { useState } from "react";
 
 export default function LoginForm() {
    const dispatch = useDispatch();
@@ -48,8 +36,8 @@ export default function LoginForm() {
       setIsSubmitting(true);
 
       const { data, error } = await supabase.auth.signInWithPassword({
-         email: formData.email,
-         password: formData.password,
+         email: String(formData.email),
+         password: String(formData.password),
       });
 
       if (error) {

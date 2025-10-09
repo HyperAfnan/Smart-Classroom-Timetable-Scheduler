@@ -1,15 +1,13 @@
 import React from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import SidebarMenu from "./components/ui/customSidebar";
+import SidebarMenu from "./components/ui/SideBar";
 import { Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
-import TeacherSidebar from "./components/ui/teacherSideBar.jsx";
-// import StudentDashboard from "./pages/studentdashboard.jsx";
 
 export default function Layout() {
    const location = useLocation();
    const roles = useSelector((state) => state.auth.roles) || [];
-   const adminSidebarRoutes = [
+   const sidebarRoutes = [
       "/dashboard",
       "/dashboard/teachers",
       "/dashboard/subjects",
@@ -17,28 +15,21 @@ export default function Layout() {
       "/dashboard/classes",
       "/dashboard/timetablegen",
       "/dashboard/timetable",
-   ];
-   const isAdminSidebarVisible = adminSidebarRoutes.includes(location.pathname);
-   const teacherSidebarRoutes = [
-      "/dashboard",
       "/dashboard/teacher-dashboard",
       "/dashboard/teacher-schedule",
       "/dashboard/teacher-availability",
       "/dashboard/teacher-profile",
       "/dashboard/teacher-notifications",
+      "/dashboard/teacher-settings",
    ];
-   const isTeacherSidebarVisible = teacherSidebarRoutes.includes(
-      location.pathname,
-   );
-
+   const isSidebarVisible = sidebarRoutes.includes(location.pathname);
    if (roles.includes("admin")) {
       return (
          <SidebarProvider>
             <div className="min-h-screen flex w-full bg-slate-50">
-               {isAdminSidebarVisible && <SidebarMenu />}
+               {isSidebarVisible && <SidebarMenu />}
 
                <main className="flex-1 flex flex-col">
-                  {/* Mobile header */}
                   <header className="bg-white border-b border-slate-200 px-6 py-4 md:hidden">
                      <div className="flex items-center gap-4">
                         <SidebarTrigger className="hover:bg-slate-100 p-2 rounded-lg transition-colors duration-200" />
@@ -46,7 +37,6 @@ export default function Layout() {
                      </div>
                   </header>
 
-                  {/* Content */}
                   <div className="flex-1 overflow-auto bg-gradient-to-br from-slate-50 to-slate-100">
                      <Outlet />
                   </div>
@@ -58,32 +48,74 @@ export default function Layout() {
 
    if (roles.includes("teacher")) {
       return (
-         <div className="min-h-screen flex w-full bg-slate-50">
-            {isTeacherSidebarVisible && (
-               <div className="w-64 shrink-0">
-                  <TeacherSidebar />
-               </div>
-            )}
+         <SidebarProvider>
+            <div className="min-h-screen flex w-full bg-slate-50">
+               {isSidebarVisible && <SidebarMenu />}
 
-            <main className="flex-1 flex flex-col">
-               <header className="bg-white border-b border-slate-200 px-6 py-4 md:hidden">
-                  <div className="flex items-center gap-4">
-                     <h1 className="text-xl font-semibold text-slate-900">
-                        Teacher Portal
-                     </h1>
+               <main className="flex-1 flex flex-col">
+                  <header className="bg-white border-b border-slate-200 px-6 py-4 md:hidden">
+                     <div className="flex items-center gap-4">
+                        <h1 className="text-xl font-semibold text-slate-900">
+                           Teacher Portal
+                        </h1>
+                     </div>
+                  </header>
+
+                  <div className="flex-1 overflow-auto bg-gradient-to-br from-slate-50 to-slate-100 px-5 py-6">
+                     <Outlet />
                   </div>
-               </header>
+               </main>
+            </div>
+         </SidebarProvider>
+      );
+   }
 
-               <div className="flex-1 overflow-auto bg-gradient-to-br from-slate-50 to-slate-100 px-5 py-6">
-                  <Outlet />
-               </div>
-            </main>
-         </div>
+   if (roles.includes("hod")) {
+      return (
+         <SidebarProvider>
+            <div className="min-h-screen flex w-full bg-slate-50">
+               {isSidebarVisible && <SidebarMenu />}
+
+               <main className="flex-1 flex flex-col">
+                  <header className="bg-white border-b border-slate-200 px-6 py-4 md:hidden">
+                     <div className="flex items-center gap-4">
+                        <h1 className="text-xl font-semibold text-slate-900">
+                           HOD Portal
+                        </h1>
+                     </div>
+                  </header>
+
+                  <div className="flex-1 overflow-auto bg-gradient-to-br from-slate-50 to-slate-100 px-5 py-6">
+                     <Outlet />
+                  </div>
+               </main>
+            </div>
+         </SidebarProvider>
       );
    }
 
    if (roles.includes("student")) {
-      return <Outlet />;
+      return (
+         <SidebarProvider>
+            <div className="min-h-screen flex w-full bg-slate-50">
+               {isSidebarVisible && <SidebarMenu />}
+
+               <main className="flex-1 flex flex-col">
+                  <header className="bg-white border-b border-slate-200 px-6 py-4 md:hidden">
+                     <div className="flex items-center gap-4">
+                        <h1 className="text-xl font-semibold text-slate-900">
+                           Student Portal
+                        </h1>
+                     </div>
+                  </header>
+
+                  <div className="flex-1 overflow-auto bg-gradient-to-br from-slate-50 to-slate-100 px-5 py-6">
+                     <Outlet />
+                  </div>
+               </main>
+            </div>
+         </SidebarProvider>
+      );
    }
 
    return (

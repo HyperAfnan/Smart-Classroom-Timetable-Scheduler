@@ -47,7 +47,7 @@ function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <StudentHeader studentName={studentName} notifications={notifications.length} />
+      {/* <StudentHeader studentName={studentName} notifications={notifications.length} /> */}
 
       <StudentNotificationBanner
         notifications={notifications}

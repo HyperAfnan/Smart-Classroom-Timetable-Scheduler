@@ -37,30 +37,10 @@ import useClasses from "../hooks/useClasses";
 import { semesters as defaultSemesters } from "../constants";
 import ClassExcelUploader from "./ClassExcelUploader";
 
-/**
- * InlineClassesTable
- *
- * Feature parity with Teachers / Rooms inline tables:
- * - Inline creation row
- * - Inline editing per row
- * - Hover-revealed action buttons (space preserved to avoid layout shift)
- * - Bulk Excel import button
- * - react-hook-form validation
- *
- * Expects filtered classes list via props so that external filters (search, department)
- * can be applied at a higher level without coupling this component to filter state.
- *
- * Required props:
- *  - classes: filtered array of class entities
- *  - loading: boolean (loading state of parent fetch)
- *  - departments: string[] list for department select
- * Optional props:
- *  - semesters: number[] override (defaults to constants)
- */
 export default function InlineClassesTable({
   classes,
   loading,
-  departments = [],
+  // departments = [],
   semesters = defaultSemesters,
 }) {
   const { createClassAsync, updateClassAsync, deleteClassAsync } = useClasses();
@@ -69,7 +49,6 @@ export default function InlineClassesTable({
   const [renderNewRow, setRenderNewRow] = useState(false);
   const [editingClassId, setEditingClassId] = useState(null);
 
-  // Creation form
   const {
     register,
     handleSubmit,
@@ -79,7 +58,7 @@ export default function InlineClassesTable({
   } = useForm({
     defaultValues: {
       class_name: "",
-      department: "",
+      // department: "",
       semester: undefined,
       section: "A",
       students: 30,
@@ -87,7 +66,6 @@ export default function InlineClassesTable({
     },
   });
 
-  // Editing form
   const {
     register: editRegister,
     handleSubmit: handleEditSubmit,
@@ -100,7 +78,7 @@ export default function InlineClassesTable({
   const handleEditClick = (cls) => {
     setEditingClassId(cls.id);
     setEditValue("class_name", cls.class_name || "");
-    setEditValue("department", cls.department || "");
+    // setEditValue("department", cls.department || "");
     setEditValue("semester", cls.semester?.toString() || "");
     setEditValue("section", cls.section || "");
     setEditValue("students", cls.students || 0);
@@ -121,7 +99,7 @@ export default function InlineClassesTable({
     try {
       await createClassAsync({
         class_name: data.class_name.trim(),
-        department: data.department,
+        // department: data.department,
         semester: parseInt(data.semester, 10),
         section: data.section.trim(),
         students: parseInt(data.students, 10),
@@ -141,7 +119,7 @@ export default function InlineClassesTable({
         id: editingClassId,
         updates: {
           class_name: data.class_name.trim(),
-          department: data.department,
+          // department: data.department,
           semester: parseInt(data.semester, 10),
           section: data.section.trim(),
           students: parseInt(data.students, 10),
@@ -156,12 +134,10 @@ export default function InlineClassesTable({
     }
   };
 
-  // Optional: surface a single validation toast (avoid spamming)
   if (
     (errors && Object.keys(errors).length > 0) ||
     (editErrors && Object.keys(editErrors).length > 0)
   ) {
-    // Intentionally silent (pattern followed in other tables)
   }
 
   const EditButton = ({ onClick }) => (
@@ -206,7 +182,7 @@ export default function InlineClassesTable({
         <TableHeader>
           <TableRow>
             <TableHead className="w-[20%]">Class Name</TableHead>
-            <TableHead className="w-[16%]">Department</TableHead>
+            {/* <TableHead className="w-[16%]">Department</TableHead> */}
             <TableHead className="w-[10%]">Semester</TableHead>
             <TableHead className="w-[10%]">Section</TableHead>
             <TableHead className="w-[12%]">Students</TableHead>
@@ -248,35 +224,35 @@ export default function InlineClassesTable({
                           placeholder="Class Name"
                         />
                       </TableCell>
-                      <TableCell>
-                        <Controller
-                          name="department"
-                          control={editControl}
-                          rules={{ required: true }}
-                          render={({ field }) => (
-                            <Select
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Department" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {departments.map((d) => (
-                                  <SelectItem key={d} value={d}>
-                                    <Badge
-                                      variant="outline"
-                                      className="bg-orange-50 text-orange-700 border-orange-200"
-                                    >
-                                      {d}
-                                    </Badge>
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          )}
-                        />
-                      </TableCell>
+                      {/* <TableCell> */}
+                      {/*   <Controller */}
+                      {/*     name="department" */}
+                      {/*     control={editControl} */}
+                      {/*     rules={{ required: true }} */}
+                      {/*     render={({ field }) => ( */}
+                      {/*       <Select */}
+                      {/*         value={field.value} */}
+                      {/*         onValueChange={field.onChange} */}
+                      {/*       > */}
+                      {/*         <SelectTrigger> */}
+                      {/*           <SelectValue placeholder="Department" /> */}
+                      {/*         </SelectTrigger> */}
+                      {/*         <SelectContent> */}
+                      {/*           {departments.map((d) => ( */}
+                      {/*             <SelectItem key={d} value={d}> */}
+                      {/*               <Badge */}
+                      {/*                 variant="outline" */}
+                      {/*                 className="bg-orange-50 text-orange-700 border-orange-200" */}
+                      {/*               > */}
+                      {/*                 {d} */}
+                      {/*               </Badge> */}
+                      {/*             </SelectItem> */}
+                      {/*           ))} */}
+                      {/*         </SelectContent> */}
+                      {/*       </Select> */}
+                      {/*     )} */}
+                      {/*   /> */}
+                      {/* </TableCell> */}
                       <TableCell>
                         <Controller
                           name="semester"
@@ -356,14 +332,14 @@ export default function InlineClassesTable({
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className="bg-orange-50 text-orange-700 border-orange-200"
-                        >
-                          {cls.department}
-                        </Badge>
-                      </TableCell>
+                      {/* <TableCell> */}
+                      {/*   <Badge */}
+                      {/*     variant="outline" */}
+                      {/*     className="bg-orange-50 text-orange-700 border-orange-200" */}
+                      {/*   > */}
+                      {/*     {cls.department} */}
+                      {/*   </Badge> */}
+                      {/* </TableCell> */}
                       <TableCell>
                         <div className="flex items-center gap-1">
                           <Building2 className="w-3 h-3 text-slate-400" />
@@ -431,30 +407,30 @@ export default function InlineClassesTable({
                     {...register("class_name", { required: true })}
                   />
                 </TableCell>
-                <TableCell>
-                  <Controller
-                    name="department"
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Department" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {departments.map((d) => (
-                            <SelectItem key={d} value={d}>
-                              {d}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </TableCell>
+                {/* <TableCell> */}
+                {/*   <Controller */}
+                {/*     name="department" */}
+                {/*     control={control} */}
+                {/*     rules={{ required: true }} */}
+                {/*     render={({ field }) => ( */}
+                {/*       <Select */}
+                {/*         value={field.value} */}
+                {/*         onValueChange={field.onChange} */}
+                {/*       > */}
+                {/*         <SelectTrigger> */}
+                {/*           <SelectValue placeholder="Department" /> */}
+                {/*         </SelectTrigger> */}
+                {/*         <SelectContent> */}
+                {/*           {departments.map((d) => ( */}
+                {/*             <SelectItem key={d} value={d}> */}
+                {/*               {d} */}
+                {/*             </SelectItem> */}
+                {/*           ))} */}
+                {/*         </SelectContent> */}
+                {/*       </Select> */}
+                {/*     )} */}
+                {/*   /> */}
+                {/* </TableCell> */}
                 <TableCell>
                   <Controller
                     name="semester"

@@ -1,48 +1,38 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useDashboardStats from "./hooks/useDashboardStats";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import StatCard from "./components/StatCard";
 import QuickActions from "./components/QuickActions";
 import SystemStatus from "./components/SystemStatus";
-import { Users, MapPin, BookOpen, GraduationCap, Calendar } from "lucide-react";
+import { Users, MapPin, BookOpen, GraduationCap } from "lucide-react";
 
 export default function AdminDashboard() {
   const { stats, isLoading } = useDashboardStats();
 
   const statCards = [
     {
-      title: "Total Teachers",
+      label: "Total Teachers",
       value: stats.teachers,
       icon: Users,
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-700",
-      link: "/dashboard/teachers",
+      color: "bg-blue-500",
     },
     {
-      title: "Active Rooms",
+      label: "Active Rooms",
       value: stats.rooms,
       icon: MapPin,
-      bgColor: "bg-green-50",
-      textColor: "text-green-700",
-      link: "/dashboard/rooms",
+      color: "bg-green-500",
     },
     {
-      title: "Subjects",
+      label: "Subjects",
       value: stats.subjects,
       icon: BookOpen,
-      bgColor: "bg-purple-50",
-      textColor: "text-purple-700",
-      link: "/dashboard/subjects",
+      color: "bg-purple-500",
     },
     {
-      title: "Classes",
+      label: "Classes",
       value: stats.classes,
       icon: GraduationCap,
-      bgColor: "bg-orange-50",
-      textColor: "text-orange-700",
-      link: "/dashboard/classes",
+      color: "bg-orange-500",
     },
   ];
 
@@ -51,20 +41,18 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-          <p className="text-slate-600 mt-1">
-            University Timetable Management System
-          </p>
+          <h1 className="text-3xl font-bold text-slate-900">Welcome Back $timetable-coordinator-name</h1>
         </div>
-        <div className="flex gap-3">
-          <Link to="/dashboard/timetable">
-            <Card className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white cursor-pointer p-0">
-              <CardContent className="flex items-center gap-1 px-6 py-3">
-                <Calendar className="w-3 h-3" />
-                <span className="text-base">View Timetable</span>
-              </CardContent>
-            </Card>
-          </Link>
+        <div className="text-right">
+          <p className="text-sm text-gray-600">Today</p>
+          <p className="text-lg font-semibold text-gray-800">
+            {new Date().toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric"
+            })}
+          </p>
         </div>
       </div>
 

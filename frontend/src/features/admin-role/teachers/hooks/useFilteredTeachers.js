@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 
-export default function useFilteredTeachers(teachers, searchTerm, filterDept) {
+export default function useFilteredTeachers(teachers, searchTerm, filterSubject) {
   return useMemo(() => {
     return teachers?.filter((t) => {
       const matchesSearch = t.name?.toLowerCase()?.includes(searchTerm?.toLowerCase());
-      const matchesDept = !filterDept || t?.department === filterDept;
-      return matchesSearch && matchesDept;
+      const matchesSubject = !filterSubject || t?.subject=== filterSubject;
+      return matchesSearch && matchesSubject;
     });
-  }, [teachers, searchTerm, filterDept]);
+  }, [teachers, searchTerm, filterSubject]);
 }

@@ -15,26 +15,16 @@ import AuthInitializer from "./features/auth/authInit.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const TeacherSchedule = lazy(
-  () => import("./features/teacher-role/schedule/page.jsx"),
-);
-const TeacherProfile = lazy(
-  () => import("./features/teacher-role/profile/page.jsx"),
-);
-const TeacherNotifications = lazy(
-  () => import("./features/teacher-role/notification/page.jsx"),
-);
-const TeacherDashboard = lazy(
-  () => import("./features/teacher-role/dashboard/page"),
-);
+const TeacherSchedule = lazy( () => import("./features/teacher-role/schedule/page.jsx"),);
+const TeacherNotifications = lazy( () => import("./features/teacher-role/notification/page.jsx"),);
+const TeacherDashboard = lazy( () => import("./features/teacher-role/dashboard/page"),);
 const Layout = lazy(() => import("./Layout"));
 const Landing = lazy(() => import("./features/landing/landing.jsx"));
 const Auth = lazy(() => import("./features/auth/auth.jsx"));
 const Classes = lazy(() => import("./features/admin-role/classes/page"));
 const Dashboard = lazy(() => import("./features/auth/dashboard.jsx"));
-const Timetable = lazy(
-  () => import("./features/admin-role/timetable/page.jsx"),
-);
+const Timetable = lazy( () => import("./features/admin-role/timetable/page.jsx"));
+const TeacherSettings = lazy( () => import("./features/teacher-role/settings/page.jsx"));
 // const MasterTimetable = lazy(() => import("./features/admin-role/timetable"));
 const Rooms = lazy(() => import("./features/admin-role/rooms/page"));
 const Subjects = lazy(() => import("./features/admin-role/subjects/page"));
@@ -52,6 +42,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Landing /> },
       { path: "auth", element: <Auth /> },
+      { path: "teacher-settings", element: <TeacherSettings /> },
       {
         path: "dashboard",
         element: <RequireAuth />,
@@ -64,9 +55,9 @@ const router = createBrowserRouter([
           { path: "teachers", element: <Teachers /> },
           { path: "timetablegen", element: <Timetable /> },
           { path: "teacher-schedule", element: <TeacherSchedule /> },
-          { path: "teacher-profile", element: <TeacherProfile /> },
           { path: "teacher-notifications", element: <TeacherNotifications /> },
           { path: "teacher-dashboard", element: <TeacherDashboard /> },
+          { path: "teacher-settings", element: <TeacherSettings /> },
         ],
       },
     ],
