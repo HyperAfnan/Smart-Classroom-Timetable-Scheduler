@@ -12,7 +12,7 @@ import {
    Bell,
    Settings,
    LogOut,
-   User
+   User,
 } from "lucide-react";
 import {
    Sidebar,
@@ -74,7 +74,8 @@ export default function SidebarMenuComponent() {
    const location = useLocation();
    const navigate = useNavigate();
    const dispatch = useDispatch();
-   const roles = useSelector((state) => state.auth.roles) || [];
+   const user = useSelector((state) => state.auth);
+   console.log(user.user)
 
    const handleLogout = async () => {
       try {
@@ -110,7 +111,7 @@ export default function SidebarMenuComponent() {
             <SidebarGroup>
                <SidebarGroupContent>
                   <SidebarMenu className="space-y-1">
-                     {roles.includes("admin") &&
+                     {user.roles.includes("admin") &&
                         adminNavigationOptions.map((item) => (
                            <SidebarMenuItem key={item.title}>
                               <SidebarMenuButton
@@ -127,7 +128,7 @@ export default function SidebarMenuComponent() {
                               </SidebarMenuButton>
                            </SidebarMenuItem>
                         ))}
-                     {roles.includes("teacher") &&
+                     {user.roles.includes("teacher") &&
                         teacherNavigationOptions.map((item) => (
                            <SidebarMenuItem key={item.title}>
                               <SidebarMenuButton
@@ -151,45 +152,24 @@ export default function SidebarMenuComponent() {
 
          <SidebarFooter className="border-t border-slate-200 p-4">
             <div className="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gray-50 w-full">
-               {roles.includes("admin") && (
+               {(user.roles.includes("admin") || user.roles.includes("teacher") || user.roles.includes("hod")) && (
                   <>
                      <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
-                        <span className="text-slate-700 font-medium text-sm">A</span>
-                     </div>
-                     <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-800">Admin</p>
-                        <p className="text-xs text-gray-600"> System Administrator</p>
-                     </div>
-                  </>
-               )}
-
-               {roles.includes("teacher") && (
-                  <>
-                     <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-medium text-sm">JD</span>
+                        <span className="text-slate-700 font-medium text-sm">
+                           {user?.user?.first_name?.charAt(0)}
+                        </span>
                      </div>
                      <div className="flex-1">
                         <p className="text-sm font-medium text-gray-800">
-                           Dr. Jane Doe
+                           {[user?.user?.first_name, user?.user?.last_name].filter(Boolean).join(" ")} </p>
+                        <p className="text-xs text-gray-600">
+                           {user?.roles?.[0]?.charAt(0)?.toUpperCase()}
+                           {user?.roles?.[0]?.slice(1)?.toLowerCase()}
                         </p>
-                        <p className="text-xs text-gray-600">Mathematics Dept.</p>
                      </div>
                   </>
                )}
-               {roles.includes("hod") && (
-                  <>
-                     <div className="h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span className="text-white font-medium text-sm">HD</span>
-                     </div>
-                     <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-800">
-                           Dr. Thompson
-                        </p>
-                        <p className="text-xs text-gray-600">Emerging Technology HOD</p>
-                     </div>
-                  </>
-               )}
-               {roles.includes("student") && (
+               {user.roles.includes("student") && (
                   <>
                      <div className="bg-gray-200 p-2 rounded-full">
                         <User className="w-4 h-4 text-gray-600" />

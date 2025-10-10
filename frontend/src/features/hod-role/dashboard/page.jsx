@@ -1,111 +1,113 @@
-import React from "react";
-import DashboardHeader from "./components/header.jsx";
-import StatsCards from "./components/statsCards.jsx";
 import PendingRequestsList from "./components/pendingRequestsList.jsx";
 import ConflictsList from "./components/conflictsList.jsx";
 import QuickActions from "./components/quickActions.jsx";
 import ActivityFeed from "./components/activityFeed.jsx";
 import { useHODDashboard } from "./hooks/useHODDashboard.js";
+import { useSelector } from "react-redux";
+import { AlertTriangle, Users, BookOpen } from "lucide-react";
+import { MetricCard } from "./components/statsCards.jsx";
+import useTeachers from "@/features/admin-role/teachers/hooks/useTeachers.js";
+import useClasses from "@/features/admin-role/classes/hooks/useClasses.js";
 
-/**
- * HODDashboard
- *
- * Refactored Head Of Department dashboard page composed from
- * modular components + a dedicated state/logic hook.
- *
- * Visual design intentionally mirrors the original monolithic implementation.
- * All Tailwind classes preserved so there should be no UI regression.
- *
- * Future enhancements (hook already prepared for):
- *  - API integration (fetch pending requests / conflicts / activity)
- *  - Toast notifications on approve / deny
- *  - Modals for deeper inspection / resolution of conflicts
- *  - Filtering & sorting for requests
- */
 const HODDashboard = () => {
-  const {
-    // State
-    pendingRequests,
-    conflicts,
-    activity,
+   const {
+      conflicts,
+      activity,
+      sortedPendingRequests,
+      approveRequest,
+      denyRequest,
+      priorityBadgeClass,
+      conflictSeverityClass,
+   } = useHODDashboard();
 
-    // Derived
-    metrics,
-    sortedPendingRequests,
+   const { user } = useSelector((state) => state.auth);
+   const { teachers } = useTeachers();
+   const { classes } = useClasses();
 
-    // Actions
-    approveRequest,
-    denyRequest,
+   return (
+      <div className="min-h-screen bg-gray-50">
+         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <section className="mb-8">
+               <h2 className="text-2xl font-bold text-gray-900">
+                  Welcome back, Dr. {user?.name || user?.first_name}!
+               </h2>
+               <p className="text-gray-600">
+                  Here's your department overview for today
+               </p>
+               <p className="text-sm text-gray-500 mt-1">
+                  {new Date().toLocaleDateString("en-US", {
+                     weekday: "long",
+                     year: "numeric",
+                     month: "long",
+                     day: "numeric",
+                  })}
+               </p>
+            </section>
 
-    // Style helpers
-    priorityBadgeClass,
-    conflictSeverityClass,
-  } = useHODDashboard();
+            <section className="mb-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <MetricCard
+                     key="pending"
+                     label="Pending Requests"
+                     value="3"
+                     description="Requires attention"
+                     icon={<AlertTriangle className="w-6 h-6 text-red-600" />}
+                     accentColorClasses="text-red-600"
+                     iconBgClasses="bg-red-100"
+                  />
 
-  // Placeholder notification count (could derive from pending / conflicts)
-  const notificationCount = pendingRequests.length;
+                  <MetricCard
+                     key="teachers"
+                     label="Active Teachers"
+                     value={teachers.length.toString()}
+                     description="Currently teaching"
+                     icon={<Users className="w-6 h-6 text-blue-600" />}
+                     accentColorClasses="text-blue-600"
+                     iconBgClasses="bg-blue-100"
+                  />
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* <DashboardHeader */}
-      {/*   notificationCount={notificationCount} */}
-      {/*   onNotificationsClick={() => { */}
-      {/*   }} */}
-      {/* /> */}
+                  <MetricCard
+                     key="classes"
+                     label="Classes Today"
+                     value={classes.length.toString()}
+                     description="Across all subjects"
+                     icon={<BookOpen className="w-6 h-6 text-green-600" />}
+                     accentColorClasses="text-green-600"
+                     iconBgClasses="bg-green-100"
+                  />
+               </div>
+            </section>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Welcome back, Dr. Thompson!
-          </h2>
-          <p className="text-gray-600">
-            Here's your department overview for today
-          </p>
-          <p className="text-sm text-gray-500 mt-1">
-            Monday, September 15, 2025
-          </p>
-        </section>
+            <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+               <div className="lg:col-span-2">
+                  <PendingRequestsList
+                     requests={sortedPendingRequests}
+                     onApprove={approveRequest}
+                     onDeny={denyRequest}
+                     priorityBadgeClass={priorityBadgeClass}
+                  />
+               </div>
 
-        {/* Stats Cards */}
-        <section className="mb-8">
-          <StatsCards metrics={metrics} />
-        </section>
+               <div className="space-y-6">
+                  <ConflictsList
+                     conflicts={conflicts}
+                     severityClass={conflictSeverityClass}
+                  />
+                  <QuickActions
+                     onMarkUnavailable={() => { }}
+                     onRequestSubstitution={() => { }}
+                     onViewFullSchedule={() => { }}
+                     onGenerateReport={() => { }}
+                  />
+               </div>
+            </section>
 
-        {/* Main Grid */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Pending Requests */}
-          <div className="lg:col-span-2">
-            <PendingRequestsList
-              requests={sortedPendingRequests}
-              onApprove={approveRequest}
-              onDeny={denyRequest}
-              priorityBadgeClass={priorityBadgeClass}
-            />
-          </div>
-
-          {/* Right Column: Conflicts + Quick Actions */}
-          <div className="space-y-6">
-            <ConflictsList
-              conflicts={conflicts}
-              severityClass={conflictSeverityClass}
-            />
-            <QuickActions
-              onMarkUnavailable={() => {}}
-              onRequestSubstitution={() => {}}
-              onViewFullSchedule={() => {}}
-              onGenerateReport={() => {}}
-            />
-          </div>
-        </section>
-
-        {/* Activity Feed */}
-        <section className="mt-8">
-          <ActivityFeed activities={activity} />
-        </section>
-      </main>
-    </div>
-  );
+            <section className="mt-8">
+               <ActivityFeed activities={activity} />
+            </section>
+         </main>
+      </div>
+   );
 };
 
 export default HODDashboard;

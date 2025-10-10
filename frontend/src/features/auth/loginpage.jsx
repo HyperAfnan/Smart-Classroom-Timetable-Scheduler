@@ -46,7 +46,6 @@ export default function LoginForm() {
          return;
       }
 
-      // Fetch user roles from DB
       let roles = [];
       const { data: rolesData, error: rolesError } = await supabase
          .from("user_roles")
@@ -59,13 +58,67 @@ export default function LoginForm() {
          roles = rolesData?.map((r) => r.roles?.role_name).filter(Boolean);
       }
 
-      // Decode JWT token
       let jwtClaims = {};
       try {
          jwtClaims = jwtDecode(data.session.access_token);
       } catch { }
 
-      // Set user info and roles in Redux
+
+      // const { data: userData, error: userDataError } = await supabase
+      //    .from("users")
+      //    .select("roles(role_name)")
+      //    .eq("user_id", data.user.id);
+
+      if (roles.includes("admin") || roles.includes("teacher")) {
+         const {data: profileData, error: profileError } = await supabase
+            .from("teacher_profile")
+            .select("*")
+            .eq("email", data.user.email)
+            .single();
+
+         if (profileError) {
+            setError(profileError.message);
+         } else {
+            data.user = { ...data.user, ...profileData };
+         }
+
+         const { data: subjectsData, error: subjectsError } = await supabase
+            .from("teacher_subjects")
+            .select("subject")
+            .eq("teacher", profileData.name);
+
+         if (subjectsError) {
+            setError(subjectsError.message);
+         } else {
+            data.user = { ...data.user, subjects: subjectsData.map(s => s.subject) };
+         }
+      }
+
+      if (roles.includes("hod")) {
+         const {data: profileData, error: profileError } = await supabase
+            .from("hod_profile")
+            .select("*")
+            .eq("userId", data.user.id)
+            .single();
+
+         if (profileError) {
+            setError(profileError.message);
+         } else {
+            data.user = { ...data.user, ...profileData };
+         }
+
+         // const { data: subjectsData, error: subjectsError } = await supabase
+         //    .from("teacher_subjects")
+         //    .select("subject")
+         //    .eq("teacher", profileData?.name);
+         //
+         // if (subjectsError) {
+         //    setError(subjectsError.message);
+         // } else {
+         //    data.user = { ...data.user, subjects: subjectsData.map(s => s.subject) };
+         // }
+      }
+
       dispatch(
          setAuth({
             user: data.user,

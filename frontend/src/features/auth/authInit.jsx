@@ -15,16 +15,14 @@ export default function AuthInitializer({ children }) {
         setLoading(false);
         return;
       }
-      const user = session.user;
+      let user = session.user;
       const token = session.access_token;
 
-      // Decode JWT for quick claims (optional)
       let jwtClaims = {};
       try {
         jwtClaims = jwtDecode(token);
       } catch {}
 
-      // Fetch roles from DB
       let roles = [];
       const { data: rolesData } = await supabase
         .from("user_roles")
@@ -35,16 +33,39 @@ export default function AuthInitializer({ children }) {
         roles = rolesData.map((r) => r.roles?.role_name).filter(Boolean);
       }
 
+      if (roles.includes("admin") || roles.includes("teacher")) {
+         const {data: profileData } = await supabase
+            .from("teacher_profile")
+            .select("*")
+            .eq("email", user.email)
+            .single();
+
+         user = { ...user, ...profileData };
+
+         const { data: subjectsData } = await supabase
+            .from("teacher_subjects")
+            .select("subject")
+            .eq("teacher", profileData.name);
+
+         user = { ...user, subjects: subjectsData.map(s => s.subject) };
+      } else if (roles.includes("hod")) {
+         const {data: profileData } = await supabase
+            .from("hod_profile")
+            .select("*")
+            .eq("email", user.email)
+            .single();
+
+         user = { ...user, ...profileData };
+      }
+
       dispatch(setAuth({ user, token, roles }));
       setLoading(false);
     };
 
-    // Initial check
     supabase.auth.getSession().then(({ data }) => {
       getUserAndRoles(data?.session);
     });
 
-    // Listen for auth state changes
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       getUserAndRoles(session);
     });

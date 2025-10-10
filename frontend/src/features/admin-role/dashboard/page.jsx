@@ -5,9 +5,12 @@ import StatCard from "./components/StatCard";
 import QuickActions from "./components/QuickActions";
 import SystemStatus from "./components/SystemStatus";
 import { Users, MapPin, BookOpen, GraduationCap } from "lucide-react";
+import { useSelector } from "react-redux";
 
 export default function AdminDashboard() {
   const { stats, isLoading } = useDashboardStats();
+   const adminData = useSelector(state => state.auth.user);
+   console.log(adminData)
 
   const statCards = [
     {
@@ -41,7 +44,7 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Welcome Back $timetable-coordinator-name</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Welcome Back {adminData.name}</h1>
         </div>
         <div className="text-right">
           <p className="text-sm text-gray-600">Today</p>
@@ -65,7 +68,7 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
           >
-            <StatCard {...stat} loading={isLoading} />
+         <StatCard {...stat} loading={isLoading} statKey={stat.title} />
           </motion.div>
         ))}
       </div>

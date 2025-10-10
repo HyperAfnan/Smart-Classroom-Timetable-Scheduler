@@ -13,46 +13,18 @@ import ScheduleCard from "./components/schedulecard.jsx";
 import UpdateItem from "./components/updateitem.jsx";
 import QuickAction from "./components/quickActions.jsx";
 import { recentChanges, todaySchedule } from "./constants";
-
-const stats = [
-   {
-      label: "Classes This Week",
-      value: "24",
-      icon: Calendar,
-      color: "bg-blue-500",
-      change: "+2 from last week",
-   },
-   {
-      label: "Teaching Hours",
-      value: "18",
-      icon: Clock,
-      color: "bg-indigo-500",
-      change: "Within optimal range",
-   },
-   {
-      label: "Subjects",
-      value: "3",
-      icon: BookOpen,
-      color: "bg-green-500",
-      change: "Calculus, Algebra, Statistics",
-   },
-   {
-      label: "Students",
-      value: "127",
-      icon: Users,
-      color: "bg-purple-500",
-      change: "Across all classes",
-   },
-];
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
+   const { user } = useSelector((state) => state.auth);
+
    return (
       <div className="space-y-6">
          {/* Header */}
          <div className="flex justify-between items-center">
             <div>
                <h1 className="text-3xl font-bold text-gray-800">
-                  Welcome back, Dr. Jane!
+                  Welcome back, Dr. {user?.name || "Educator"}!
                </h1>
                <p className="text-gray-600 mt-1">
                   Here's your teaching overview for today
@@ -71,11 +43,36 @@ const Dashboard = () => {
             </div>
          </div>
 
-         {/* Stats */}
+         {/* Stats Section (no loops) */}
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((s, i) => (
-               <StatCard key={i} {...s} Icon={s.icon} />
-            ))}
+            <StatCard
+               label="Classes This Week"
+               value="24"
+               Icon={Calendar}
+               color="bg-blue-500"
+               change="+2 from last week"
+            />
+            <StatCard
+               label="Teaching Hours"
+               value={user.max_hours || "69"}
+               Icon={Clock}
+               color="bg-indigo-500"
+               change="Within optimal range"
+            />
+            <StatCard
+               label="Subjects"
+               value={user.subjects ? user.subjects.length : "3"}
+               Icon={BookOpen}
+               color="bg-green-500"
+               change="Calculus, Algebra, Statistics"
+            />
+            <StatCard
+               label="Students"
+               value="127"
+               Icon={Users}
+               color="bg-purple-500"
+               change="Across all classes"
+            />
          </div>
 
          {/* Schedule + Updates */}
