@@ -2,8 +2,8 @@ import { useState, useEffect } from "react"
 import StudentNotificationBanner from "./components/notificationBanner.jsx";
 import StudentTodaySchedule from "./components/studentTodaySchedule.jsx";
 import StudentWeeklyTimetable from "./components/StudentWeeklyTimetable.jsx";
-import StudentHeader from "./components/studentHeader.jsx";
 import { mockSchedule } from "./constants.js";
+import { useSelector } from "react-redux";
 
 const mockNotifications = [ ]
 
@@ -20,11 +20,11 @@ const getCurrentDayClasses = () => {
 }
 
 function StudentDashboard() {
+   const { user } = useSelector((state) => state.auth);
   const [notifications, setNotifications] = useState(mockNotifications)
   const [currentTime, setCurrentTime] = useState("10:30 AM")
   const [currentDay] = useState("Monday")
 
-  const studentName = "Alex Johnson"
   const todayClasses = getCurrentDayClasses()
 
   useEffect(() => {
@@ -47,7 +47,6 @@ function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* <StudentHeader studentName={studentName} notifications={notifications.length} /> */}
 
       <StudentNotificationBanner
         notifications={notifications}
@@ -57,7 +56,7 @@ function StudentDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">
-            Welcome back, {studentName}!
+            Welcome back, {user?.first_name}!
           </h1>
           <p className="text-gray-600">Here's your schedule for today</p>
         </div>

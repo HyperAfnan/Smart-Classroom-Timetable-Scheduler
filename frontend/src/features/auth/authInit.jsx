@@ -56,11 +56,18 @@ export default function AuthInitializer({ children }) {
             .single();
 
          user = { ...user, ...profileData };
+      } else if (roles.includes("student")) {
+         const {data: profileData } = await supabase
+            .from("student_profile")
+            .select("*")
+            .eq("userId", user.id)
+            .single();
+         user = { ...user, ...profileData };
       }
 
       dispatch(setAuth({ user, token, roles }));
       setLoading(false);
-    };
+    } 
 
     supabase.auth.getSession().then(({ data }) => {
       getUserAndRoles(data?.session);

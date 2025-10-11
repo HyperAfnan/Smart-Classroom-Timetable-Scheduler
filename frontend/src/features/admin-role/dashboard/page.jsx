@@ -10,7 +10,6 @@ import { useSelector } from "react-redux";
 export default function AdminDashboard() {
   const { stats, isLoading } = useDashboardStats();
    const adminData = useSelector(state => state.auth.user);
-   console.log(adminData)
 
   const statCards = [
     {

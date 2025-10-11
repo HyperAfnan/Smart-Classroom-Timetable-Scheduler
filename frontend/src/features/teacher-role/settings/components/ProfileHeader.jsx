@@ -16,7 +16,6 @@ export default function ProfileHeader(user) {
 
   const handleFileSelect = async (e) => {
     const file = e.target.files?.[0];
-    console.log(file);
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {

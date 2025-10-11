@@ -76,7 +76,6 @@ export default function ExcelUploader() {
             }
          }
 
-         console.log(subjectsToAdd);
          if (subjectsToAdd.length === 0 && subjectsToUpdate.length === 0) {
             setUploadError("No valid subject data found in the file");
             setIsUploading(false);

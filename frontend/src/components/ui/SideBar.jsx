@@ -12,7 +12,6 @@ import {
    Bell,
    Settings,
    LogOut,
-   User,
 } from "lucide-react";
 import {
    Sidebar,
@@ -75,7 +74,6 @@ export default function SidebarMenuComponent() {
    const navigate = useNavigate();
    const dispatch = useDispatch();
    const user = useSelector((state) => state.auth);
-   console.log(user.user)
 
    const handleLogout = async () => {
       try {
@@ -152,35 +150,22 @@ export default function SidebarMenuComponent() {
 
          <SidebarFooter className="border-t border-slate-200 p-4">
             <div className="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gray-50 w-full">
-               {(user.roles.includes("admin") || user.roles.includes("teacher") || user.roles.includes("hod")) && (
-                  <>
-                     <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
-                        <span className="text-slate-700 font-medium text-sm">
-                           {user?.user?.first_name?.charAt(0)}
-                        </span>
-                     </div>
-                     <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-800">
-                           {[user?.user?.first_name, user?.user?.last_name].filter(Boolean).join(" ")} </p>
-                        <p className="text-xs text-gray-600">
-                           {user?.roles?.[0]?.charAt(0)?.toUpperCase()}
-                           {user?.roles?.[0]?.slice(1)?.toLowerCase()}
-                        </p>
-                     </div>
-                  </>
-               )}
-               {user.roles.includes("student") && (
-                  <>
-                     <div className="bg-gray-200 p-2 rounded-full">
-                        <User className="w-4 h-4 text-gray-600" />
-                     </div>
-                     <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-800">
-                           Alex Johnson
-                        </p>
-                     </div>
-                  </>
-               )}
+               <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center">
+                  <span className="text-slate-700 font-medium text-sm">
+                     {user?.user?.first_name?.charAt(0)}
+                  </span>
+               </div>
+               <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-800">
+                     {[user?.user?.first_name, user?.user?.last_name]
+                        .filter(Boolean)
+                        .join(" ")}
+                  </p>
+                  <p className="text-xs text-gray-600">
+                     {user?.roles?.[0]?.charAt(0)?.toUpperCase()}
+                     {user?.roles?.[0]?.slice(1)?.toLowerCase()}
+                  </p>
+               </div>
                <button
                   onClick={handleLogout}
                   className="text-gray-400 hover:text-gray-600 ml-auto"

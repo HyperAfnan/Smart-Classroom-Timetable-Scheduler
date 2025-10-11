@@ -119,6 +119,21 @@ export default function LoginForm() {
          // }
       }
 
+
+      if (roles.includes("student")) {
+         const {data: profileData, error: profileError } = await supabase
+            .from("student_profile")
+            .select("*")
+            .eq("userId", data.user.id)
+            .single();
+
+         if (profileError) {
+            setError(profileError.message);
+         } else {
+            data.user = { ...data.user, ...profileData };
+         }
+      }
+
       dispatch(
          setAuth({
             user: data.user,
