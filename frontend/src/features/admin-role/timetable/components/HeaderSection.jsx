@@ -1,15 +1,5 @@
 import React from "react";
 
-/**
- * HeaderSection
- * Reusable header component for page title, subtitle, and optional action area.
- *
- * Props:
- * - title: string - Main page title
- * - subtitle?: string - Optional subtitle/description
- * - className?: string - Optional extra classes for the container
- * - children?: React.ReactNode - Right-aligned action area (buttons, links, etc.)
- */
 export default function HeaderSection({
   title,
   subtitle,

@@ -32,7 +32,7 @@ export default function SystemStatus({ timeSlots }) {
             {timeSlots} Active
           </Badge>
         </div>
-        <Link to="/dashboard/timetable">
+        <Link to="/dashboard/timetablegen">
           <Button className="w-full mt-4 bg-gradient-to-r from-indigo-500 to-indigo-600">
             Generate New Timetable
           </Button>

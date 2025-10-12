@@ -62,8 +62,8 @@ export default function ControlsCard({
               <SelectContent>
                 {classes.map((c) => (
                   <SelectItem key={c.id} value={String(c.id)}>
-                    {c.name}
-                    {c.department ? ` - ${c.department}` : ""}{" "}
+                    {c.class_name}
+                    {c.department ? ` - ${c.department}` : ""}
                     {c.semester ? `(Sem ${c.semester})` : ""}
                   </SelectItem>
                 ))}

@@ -2,12 +2,7 @@ import { lazy, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import queryClient from "./config/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
-import {
-  createBrowserRouter,
-  Navigate,
-  Outlet,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet, RouterProvider } from "react-router-dom";
 import "./index.css";
 import { Provider, useSelector } from "react-redux";
 import store from "./Store/store.js";
@@ -73,7 +68,7 @@ createRoot(document.getElementById("root")).render(
           <ToastContainer
             position="top-right"
             autoClose={4000}
-            hideProgressBar={false}
+            hideProgressBar={true}
             newestOnTop
             closeOnClick
             pauseOnFocusLoss
