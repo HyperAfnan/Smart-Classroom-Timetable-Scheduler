@@ -14,7 +14,7 @@ import store from "./Store/store.js";
 import AuthInitializer from "./features/auth/authInit.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ThemeProvider from "./shared/components/ThemeProvider.jsx";
+// import ThemeProvider from "./shared/components/ThemeProvider.jsx";
 
 const TeacherSchedule = lazy(
    () => import("./features/teacher-role/schedule/page.jsx"),
@@ -83,7 +83,7 @@ createRoot(document.getElementById("root")).render(
    <StrictMode>
       <QueryClientProvider client={queryClient}>
          <Provider store={store}>
-            <ThemeProvider>
+            {/* <ThemeProvider> */}
                <AuthInitializer>
                   <RouterProvider router={router} />
                   <ToastContainer
@@ -98,7 +98,7 @@ createRoot(document.getElementById("root")).render(
                      theme="light"
                   />
                </AuthInitializer>
-            </ThemeProvider>
+            {/* </ThemeProvider> */}
          </Provider>
       </QueryClientProvider>
    </StrictMode>,
