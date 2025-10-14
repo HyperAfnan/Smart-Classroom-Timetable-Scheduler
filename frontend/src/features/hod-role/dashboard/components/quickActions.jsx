@@ -1,5 +1,5 @@
-import React from "react"
-import { UserCheck, Clock, Calendar, FileText, Plus } from "lucide-react"
+import React from "react";
+import { UserCheck, Clock, Calendar, FileText, Plus } from "lucide-react";
 
 /**
  * QuickActions Component
@@ -90,35 +90,41 @@ const QuickActions = ({
       accent: "amber",
       onClick: onGenerateReport,
     },
-  ]
+  ];
 
-  const resolved = Array.isArray(actions) && actions.length > 0 ? actions : defaultActions
+  const resolved =
+    Array.isArray(actions) && actions.length > 0 ? actions : defaultActions;
 
-  const gridCols = {
-    2: "grid-cols-2",
-    3: "grid-cols-3",
-    4: "grid-cols-2 md:grid-cols-4",
-  }[columns] || "grid-cols-2"
+  const gridCols =
+    {
+      2: "grid-cols-2",
+      3: "grid-cols-3",
+      4: "grid-cols-2 md:grid-cols-4",
+    }[columns] || "grid-cols-2";
 
   return (
     <div className={`bg-white rounded-xl shadow-sm border ${className}`}>
       <div className="p-6 border-b">
-        <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+        <h3 className="text-lg font-semibold text-card-foreground">
+          Quick Actions
+        </h3>
       </div>
       <div className={`p-6 grid ${gridCols} gap-3`}>
-        {loading
-          ? <ActionSkeletons count={resolved.length} />
-          : resolved.map(action => (
-              <ActionCard
-                key={action.key}
-                action={action}
-                cardClassName={cardClassName}
-              />
-            ))}
+        {loading ? (
+          <ActionSkeletons count={resolved.length} />
+        ) : (
+          resolved.map((action) => (
+            <ActionCard
+              key={action.key}
+              action={action}
+              cardClassName={cardClassName}
+            />
+          ))
+        )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 /* -------------------------------------------------------------------------- */
 /* Action Card                                                                */
@@ -142,21 +148,15 @@ const accentMap = {
     bg: "hover:bg-amber-50",
   },
   default: {
-    border: "hover:border-gray-300",
+    border: "hover: border-border-300",
     bg: "hover:bg-gray-50",
   },
-}
+};
 
 const ActionCard = ({ action, cardClassName }) => {
-  const {
-    label,
-    icon,
-    onClick,
-    accent = "default",
-    disabled = false,
-  } = action
+  const { label, icon, onClick, accent = "default", disabled = false } = action;
 
-  const accentTokens = accentMap[accent] || accentMap.default
+  const accentTokens = accentMap[accent] || accentMap.default;
 
   return (
     <button
@@ -164,12 +164,12 @@ const ActionCard = ({ action, cardClassName }) => {
       onClick={onClick}
       disabled={disabled}
       className={[
-        "flex flex-col items-center p-4 border-2 border-dashed border-gray-200 rounded-lg",
+        "flex flex-col items-center p-4 border-2 border-dashed  border-border-200 rounded-lg",
         accentTokens.border,
         accentTokens.bg,
         "transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
         disabled
-          ? "opacity-50 cursor-not-allowed hover:bg-transparent hover:border-gray-200"
+          ? "opacity-50 cursor-not-allowed hover:bg-transparent hover: border-border-200"
           : "cursor-pointer",
         cardClassName,
       ].join(" ")}
@@ -179,8 +179,8 @@ const ActionCard = ({ action, cardClassName }) => {
         {label}
       </span>
     </button>
-  )
-}
+  );
+};
 
 /* -------------------------------------------------------------------------- */
 /* Skeletons                                                                  */
@@ -190,13 +190,13 @@ const ActionSkeletons = ({ count = 4 }) => (
     {Array.from({ length: count }).map((_, i) => (
       <div
         key={i}
-        className="flex flex-col items-center p-4 border-2 border-dashed border-gray-200 rounded-lg animate-pulse"
+        className="flex flex-col items-center p-4 border-2 border-dashed  border-border-200 rounded-lg animate-pulse"
       >
         <div className="w-6 h-6 rounded-md bg-gray-200 mb-2" />
         <div className="h-3 w-20 bg-gray-200 rounded" />
       </div>
     ))}
   </>
-)
+);
 
-export default QuickActions
+export default QuickActions;

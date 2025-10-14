@@ -61,11 +61,11 @@ const WeekNavigator = ({
       </div>
 
       <div className="text-center px-2">
-        <h2 className="text-lg font-semibold text-gray-800 select-none">
+        <h2 className="text-lg font-semibold text-card-foreground select-none">
           {weekLabel}
         </h2>
         {dateRange && (
-          <p className="text-sm text-gray-600 mt-0.5 select-none">
+          <p className="text-sm  text-muted-foreground mt-0.5 select-none">
             {dateRange}
           </p>
         )}
@@ -114,7 +114,7 @@ const NavButton = ({
     disabled={disabled}
     className={[
       "p-2 rounded-lg border border-transparent bg-white",
-      "text-gray-600 hover:text-gray-900 hover:bg-gray-50",
+      " text-muted-foreground hover:text-card-foreground hover:bg-gray-50",
       "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
       "disabled:opacity-40 disabled:cursor-not-allowed",
       "transition-colors",

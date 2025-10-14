@@ -50,7 +50,9 @@ const PendingRequestsList = ({
     <div className="bg-white rounded-xl shadow-sm border">
       <div className="p-6 border-b">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-lg font-semibold text-card-foreground">
+            {title}
+          </h3>
           {showCountBadge && !loading && (
             <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
               {requests.length} {requests.length === 1 ? "pending" : "pending"}
@@ -88,16 +90,8 @@ const PendingRequestsList = ({
 /* -------------------------------------------------------------------------- */
 
 const RequestCard = ({ request, onApprove, onDeny, priorityBadgeClass }) => {
-  const {
-    id,
-    type,
-    teacher,
-    subject,
-    date,
-    reason,
-    priority,
-    submittedAt,
-  } = request;
+  const { id, type, teacher, subject, date, reason, priority, submittedAt } =
+    request;
 
   const badgeClasses =
     (priorityBadgeClass && priorityBadgeClass(priority)) ||
@@ -108,14 +102,14 @@ const RequestCard = ({ request, onApprove, onDeny, priorityBadgeClass }) => {
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-1">
-            <h4 className="text-sm font-medium text-gray-900">{type}</h4>
+            <h4 className="text-sm font-medium text-card-foreground">{type}</h4>
             <span
               className={`text-xs px-2 py-1 rounded-full border ${badgeClasses}`}
             >
               {priority}
             </span>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm  text-muted-foreground">
             {teacher} - {subject}
           </p>
           <p className="text-sm text-gray-500">
@@ -173,7 +167,7 @@ const SkeletonList = ({ count = 3 }) => (
           <div className="h-3 w-16 bg-gray-200 rounded" />
         </div>
         <div className="flex space-x-2">
-            <div className="h-8 w-24 bg-gray-200 rounded-md" />
+          <div className="h-8 w-24 bg-gray-200 rounded-md" />
           <div className="h-8 w-20 bg-gray-200 rounded-md" />
         </div>
       </div>
@@ -194,7 +188,7 @@ const defaultPriorityClass = (priority) => {
     case "low":
       return "bg-green-100 text-green-800 border-green-200";
     default:
-      return "bg-gray-100 text-gray-800 border-gray-200";
+      return "bg-gray-100 text-card-foreground  border-border-200";
   }
 };
 

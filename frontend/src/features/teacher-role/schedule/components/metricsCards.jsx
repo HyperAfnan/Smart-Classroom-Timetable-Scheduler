@@ -1,5 +1,5 @@
-import React from "react"
-import { Clock, Calendar, Users, Activity } from "lucide-react"
+import React from "react";
+import { Clock, Calendar, Users, Activity } from "lucide-react";
 
 /**
  * MetricsCards
@@ -50,11 +50,11 @@ const MetricsCards = ({
     teachingHours = 0,
     sessionCount = 0,
     totalStudents = 0,
-  } = metrics || {}
+  } = metrics || {};
 
   // Derived - average students per teaching session (avoid division by zero)
   const avgStudents =
-    sessionCount > 0 ? Math.round(totalStudents / sessionCount) : 0
+    sessionCount > 0 ? Math.round(totalStudents / sessionCount) : 0;
 
   const defaultCards = [
     {
@@ -89,9 +89,9 @@ const MetricsCards = ({
       accentClasses: "text-amber-600",
       description: "Average students per session",
     },
-  ]
+  ];
 
-  const finalCards = cards && Array.isArray(cards) ? cards : defaultCards
+  const finalCards = cards && Array.isArray(cards) ? cards : defaultCards;
 
   return (
     <div
@@ -100,16 +100,12 @@ const MetricsCards = ({
         className,
       ].join(" ")}
     >
-      {finalCards.map(card => (
-        <MetricCard
-          key={card.key}
-          {...card}
-          loading={loading}
-        />
+      {finalCards.map((card) => (
+        <MetricCard key={card.key} {...card} loading={loading} />
       ))}
     </div>
-  )
-}
+  );
+};
 
 /* -------------------------------------------------------------------------- */
 /* MetricCard                                                                 */
@@ -124,7 +120,7 @@ const MetricCard = ({
   loading = false,
 }) => {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200 relative overflow-hidden">
+    <div className="bg-white p-6 rounded-xl shadow-sm border  border-border-200 relative overflow-hidden">
       {/* Decorative accent ring */}
       <div
         aria-hidden="true"
@@ -134,7 +130,7 @@ const MetricCard = ({
         <div className="flex items-center justify-center p-2 bg-gray-50 rounded-lg">
           {icon}
         </div>
-        <h3 className="text-lg font-semibold text-gray-800">{label}</h3>
+        <h3 className="text-lg font-semibold text-card-foreground">{label}</h3>
       </div>
       {loading ? (
         <SkeletonValue />
@@ -149,20 +145,20 @@ const MetricCard = ({
             {isEmptyValue(value) ? "—" : value}
           </p>
           {description && (
-            <p className="text-sm text-gray-600 mt-1">{description}</p>
+            <p className="text-sm  text-muted-foreground mt-1">{description}</p>
           )}
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
 /* -------------------------------------------------------------------------- */
 /* Helpers                                                                    */
 /* -------------------------------------------------------------------------- */
 
-const isEmptyValue = v =>
-  v === null || v === undefined || (typeof v === "number" && isNaN(v))
+const isEmptyValue = (v) =>
+  v === null || v === undefined || (typeof v === "number" && isNaN(v));
 
 /* -------------------------------------------------------------------------- */
 /* Skeleton                                                                   */
@@ -173,6 +169,6 @@ const SkeletonValue = () => (
     <div className="h-9 w-20 bg-gray-200 rounded-md mb-2" />
     <div className="h-3 w-32 bg-gray-200 rounded" />
   </div>
-)
+);
 
-export default MetricsCards
+export default MetricsCards;

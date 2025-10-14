@@ -1,5 +1,10 @@
 import React from "react";
-import { AlertTriangle, Lightbulb, CheckCircle2, ShieldAlert } from "lucide-react";
+import {
+  AlertTriangle,
+  Lightbulb,
+  CheckCircle2,
+  ShieldAlert,
+} from "lucide-react";
 
 /**
  * ConflictsList
@@ -42,10 +47,12 @@ const ConflictsList = ({
   onResolve,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border">
+    <div className="bg-card text-card-foreground rounded-xl shadow-sm border">
       {showHeader && (
         <div className="p-6 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-lg font-semibold text-card-foreground">
+            {title}
+          </h3>
         </div>
       )}
 
@@ -74,13 +81,8 @@ const ConflictsList = ({
 /* -------------------------------------------------------------------------- */
 
 const ConflictCard = ({ conflict, severityClass, onResolve }) => {
-  const {
-    id,
-    description,
-    severity,
-    affectedClasses,
-    suggestedAction,
-  } = conflict;
+  const { id, description, severity, affectedClasses, suggestedAction } =
+    conflict;
 
   const classes =
     (severityClass && severityClass(severity)) ||
@@ -93,28 +95,28 @@ const ConflictCard = ({ conflict, severityClass, onResolve }) => {
       {/* Decorative subtle accent */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-4 -top-4 w-16 h-16 rounded-full bg-gradient-to-br from-white/40 to-transparent"
+        className="pointer-events-none absolute -right-4 -top-4 w-16 h-16 rounded-full bg-muted/30"
       />
 
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center space-x-2">
           <SeverityIcon severity={severity} />
-          <span className="text-xs font-medium uppercase tracking-wide text-gray-500">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {severity}
           </span>
         </div>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-muted-foreground">
           {affectedClasses} class{affectedClasses === 1 ? "" : "es"}
         </span>
       </div>
 
-      <p className="text-sm text-gray-800 mb-2 leading-snug">
+      <p className="text-sm text-card-foreground mb-2 leading-snug">
         {description}
       </p>
 
       <div className="flex items-start space-x-2">
         <Lightbulb className="w-3.5 h-3.5 mt-0.5 text-amber-600 flex-shrink-0" />
-        <p className="text-xs text-gray-600">
+        <p className="text-xs text-muted-foreground">
           Suggestion: <span className="font-medium">{suggestedAction}</span>
         </p>
       </div>
@@ -124,7 +126,7 @@ const ConflictCard = ({ conflict, severityClass, onResolve }) => {
           <button
             type="button"
             onClick={() => onResolve(id)}
-            className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs font-medium rounded-md bg-green-600 text-white hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition-colors"
+            className="inline-flex items-center space-x-1 px-2.5 py-1.5 text-xs font-medium rounded-md bg-primary text-primary-foreground hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Resolve</span>
@@ -155,7 +157,10 @@ const SeverityIcon = ({ severity }) => {
       );
     default:
       return (
-        <AlertTriangle className="w-4 h-4 text-gray-500" aria-hidden="true" />
+        <AlertTriangle
+          className="w-4 h-4 text-muted-foreground"
+          aria-hidden="true"
+        />
       );
   }
 };
@@ -166,10 +171,10 @@ const SeverityIcon = ({ severity }) => {
 
 const EmptyState = ({ message }) => (
   <div className="py-8 flex flex-col items-center justify-center text-center">
-    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-      <AlertTriangle className="w-6 h-6 text-gray-400" />
+    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+      <AlertTriangle className="w-6 h-6 text-muted-foreground" />
     </div>
-    <p className="text-sm font-medium text-gray-700">{message}</p>
+    <p className="text-sm font-medium text-muted-foreground">{message}</p>
   </div>
 );
 
@@ -182,14 +187,14 @@ const SkeletonList = ({ count = 3 }) => (
     {Array.from({ length: count }).map((_, i) => (
       <div
         key={i}
-        className="border rounded-lg p-3 bg-white animate-pulse space-y-3"
+        className="border rounded-lg p-3 bg-card animate-pulse space-y-3"
       >
         <div className="flex items-center justify-between">
-          <div className="h-4 w-24 bg-gray-200 rounded" />
-          <div className="h-3 w-12 bg-gray-200 rounded" />
+          <div className="h-4 w-24 bg-muted/60 rounded" />
+          <div className="h-3 w-12 bg-muted/60 rounded" />
         </div>
-        <div className="h-3 w-64 bg-gray-200 rounded" />
-        <div className="h-3 w-40 bg-gray-200 rounded" />
+        <div className="h-3 w-64 bg-muted/60 rounded" />
+        <div className="h-3 w-40 bg-muted/60 rounded" />
       </div>
     ))}
   </>
@@ -202,13 +207,13 @@ const SkeletonList = ({ count = 3 }) => (
 const fallbackSeverityClass = (severity) => {
   switch (severity) {
     case "critical":
-      return "bg-red-50 border-red-200";
+      return "bg-destructive/10 border-destructive/30";
     case "moderate":
-      return "bg-amber-50 border-amber-200";
+      return "bg-accent/10 border-accent/30";
     case "low":
-      return "bg-blue-50 border-blue-200";
+      return "bg-primary/10 border-primary/30";
     default:
-      return "bg-gray-50 border-gray-200";
+      return "bg-muted border-border";
   }
 };
 

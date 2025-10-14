@@ -1,8 +1,8 @@
-import FilterTabs from "./components/filterTabs.jsx"
-import Header from "./components/header.jsx"
-import NotificationList from "./components/notificationList.jsx"
-import StatsGrid from "./components/statsGrid.jsx"
-import { useNotifications } from "./hooks/useNotifications"
+import FilterTabs from "./components/filterTabs.jsx";
+import Header from "./components/header.jsx";
+import NotificationList from "./components/notificationList.jsx";
+import StatsGrid from "./components/statsGrid.jsx";
+import { useNotifications } from "./hooks/useNotifications";
 
 const TeacherNotifications = () => {
   const {
@@ -14,12 +14,12 @@ const TeacherNotifications = () => {
     deleteNotification,
     filteredNotifications,
     unreadCount,
-  } = useNotifications()
+  } = useNotifications();
 
   return (
     <div className="space-y-6">
       <Header unreadCount={unreadCount} markAllAsRead={markAllAsRead} />
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="bg-white rounded-xl shadow-sm border  border-border-200">
         <FilterTabs
           filter={filter}
           setFilter={setFilter}
@@ -37,7 +37,7 @@ const TeacherNotifications = () => {
       </div>
       <StatsGrid notifications={notifications} unreadCount={unreadCount} />
     </div>
-  )
-}
+  );
+};
 
-export default TeacherNotifications
+export default TeacherNotifications;

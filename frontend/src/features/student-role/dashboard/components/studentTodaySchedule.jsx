@@ -1,11 +1,13 @@
-import React from "react"
-import { Clock, MapPin, User, BookOpen } from "lucide-react"
+import React from "react";
+import { Clock, MapPin, User, BookOpen } from "lucide-react";
 
 export default function StudentTodaySchedule({ classes, currentTime }) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900">Today's Classes</h2>
+    <div className="bg-white rounded-xl shadow-sm border  border-border-200">
+      <div className="p-6 border-b  border-border-200">
+        <h2 className="text-xl font-semibold text-card-foreground">
+          Today's Classes
+        </h2>
         <p className="text-sm text-gray-500 mt-1">
           Current time: {currentTime}
         </p>
@@ -19,21 +21,21 @@ export default function StudentTodaySchedule({ classes, currentTime }) {
           </div>
         ) : (
           <div className="space-y-4">
-            {classes.map(classItem => (
+            {classes.map((classItem) => (
               <div
                 key={classItem.id}
                 className={`p-4 rounded-lg border-l-4 transition-all duration-200 ${
                   classItem.isNext
                     ? "bg-blue-50 border-blue-500 ring-2 ring-blue-100"
                     : classItem.isCompleted
-                    ? "bg-gray-50 border-gray-300 opacity-75"
-                    : classItem.color
+                      ? "bg-gray-50  border-border-300 opacity-75"
+                      : classItem.color
                 } hover:shadow-md`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-card-foreground">
                         {classItem.subject}
                       </h3>
                       <span
@@ -41,8 +43,8 @@ export default function StudentTodaySchedule({ classes, currentTime }) {
                           classItem.type === "lab"
                             ? "bg-purple-100 text-purple-800"
                             : classItem.type === "tutorial"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-blue-100 text-blue-800"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-blue-100 text-blue-800"
                         }`}
                       >
                         {classItem.type.charAt(0).toUpperCase() +
@@ -55,7 +57,7 @@ export default function StudentTodaySchedule({ classes, currentTime }) {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm text-gray-600">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm  text-muted-foreground">
                       <div className="flex items-center space-x-2">
                         <Clock className="w-4 h-4" />
                         <span>
@@ -79,5 +81,5 @@ export default function StudentTodaySchedule({ classes, currentTime }) {
         )}
       </div>
     </div>
-  )
+  );
 }

@@ -1,53 +1,52 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import StudentNotificationBanner from "./components/notificationBanner.jsx";
 import StudentTodaySchedule from "./components/studentTodaySchedule.jsx";
 import StudentWeeklyTimetable from "./components/StudentWeeklyTimetable.jsx";
 import { mockSchedule } from "./constants.js";
 import { useSelector } from "react-redux";
 
-const mockNotifications = [ ]
+const mockNotifications = [];
 
 const getCurrentDayClasses = () => {
-  const today = "Monday"
-  const currentSchedule = mockSchedule.find(day => day.day === today)
-  if (!currentSchedule) return []
+  const today = "Monday";
+  const currentSchedule = mockSchedule.find((day) => day.day === today);
+  if (!currentSchedule) return [];
 
   return currentSchedule.classes.map((cls, index) => ({
     ...cls,
     isNext: index === 1,
-    isCompleted: index === 0
-  }))
-}
+    isCompleted: index === 0,
+  }));
+};
 
 function StudentDashboard() {
-   const { user } = useSelector((state) => state.auth);
-  const [notifications, setNotifications] = useState(mockNotifications)
-  const [currentTime, setCurrentTime] = useState("10:30 AM")
-  const [currentDay] = useState("Monday")
+  const { user } = useSelector((state) => state.auth);
+  const [notifications, setNotifications] = useState(mockNotifications);
+  const [currentTime, setCurrentTime] = useState("10:30 AM");
+  const [currentDay] = useState("Monday");
 
-  const todayClasses = getCurrentDayClasses()
+  const todayClasses = getCurrentDayClasses();
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const now = new Date()
+      const now = new Date();
       const timeString = now.toLocaleTimeString("en-US", {
         hour: "numeric",
         minute: "2-digit",
-        hour12: true
-      })
-      setCurrentTime(timeString)
-    }, 60000)
+        hour12: true,
+      });
+      setCurrentTime(timeString);
+    }, 60000);
 
-    return () => clearInterval(timer)
-  }, [])
+    return () => clearInterval(timer);
+  }, []);
 
-  const handleDismissNotification = id => {
-    setNotifications(prev => prev.filter(notif => notif.id !== id))
-  }
+  const handleDismissNotification = (id) => {
+    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-
       <StudentNotificationBanner
         notifications={notifications}
         onDismiss={handleDismissNotification}
@@ -55,24 +54,32 @@ function StudentDashboard() {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-card-foreground">
             Welcome back, {user?.first_name}!
           </h1>
-          <p className="text-gray-600">Here's your schedule for today</p>
+          <p className=" text-muted-foreground">
+            Here's your schedule for today
+          </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 mb-8">
           <div className="lg:col-span-1">
-            <StudentTodaySchedule classes={todayClasses} currentTime={currentTime} />
+            <StudentTodaySchedule
+              classes={todayClasses}
+              currentTime={currentTime}
+            />
           </div>
 
           <div className="lg:col-span-2">
-            <StudentWeeklyTimetable schedule={mockSchedule} currentDay={currentDay} />
+            <StudentWeeklyTimetable
+              schedule={mockSchedule}
+              currentDay={currentDay}
+            />
           </div>
         </div>
       </main>
     </div>
-  )
+  );
 }
 
 export default StudentDashboard;

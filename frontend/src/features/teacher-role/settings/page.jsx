@@ -7,7 +7,7 @@ import SecuritySection from "./components/SecuritySection";
 import useTeacherProfile from "../shared/hooks/useTeacherProfile.js";
 
 export default function Settings() {
-   const { isLoading } = useTeacherProfile();
+  const { isLoading } = useTeacherProfile();
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
@@ -31,11 +31,11 @@ export default function Settings() {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">
+            <h1 className="text-3xl md:text-4xl font-bold text-card-foreground">
               Account Settings
             </h1>
           </div>
-          <p className="text-gray-600">
+          <p className=" text-muted-foreground">
             Manage your profile, contact information, and security preferences
           </p>
         </motion.div>
@@ -43,7 +43,7 @@ export default function Settings() {
         {/* Settings Sections */}
         <div className="space-y-6">
           <ProfileHeader />
-          
+
           <div className="grid lg:grid-cols-2 gap-6">
             <PersonalInfoSection />
             <ContactInfoSection />

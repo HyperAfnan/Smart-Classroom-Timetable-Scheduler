@@ -47,7 +47,7 @@ export const INITIAL_PENDING_REQUESTS = [
     priority: "low",
     submittedAt: "1 day ago",
   },
-]
+];
 
 /**
  * Initial schedule conflicts mock dataset.
@@ -67,7 +67,7 @@ export const INITIAL_CONFLICTS = [
     affectedClasses: 1,
     suggestedAction: "Request substitution",
   },
-]
+];
 
 /**
  * System activity feed (static placeholder).
@@ -92,7 +92,7 @@ export const INITIAL_ACTIVITY = [
     message: "Substitute teacher assigned for Chemistry Lab",
     time: "1 day ago",
   },
-]
+];
 
 /* -------------------------------------------------------------------------- */
 /* Visual Token Maps                                                          */
@@ -105,8 +105,8 @@ export const PRIORITY_STYLES = {
   high: "bg-red-100 text-red-800 border-red-200",
   medium: "bg-amber-100 text-amber-800 border-amber-200",
   low: "bg-green-100 text-green-800 border-green-200",
-  default: "bg-gray-100 text-gray-800 border-gray-200",
-}
+  default: "bg-gray-100 text-card-foreground  border-border-200",
+};
 
 /**
  * Severity → Tailwind container style mapping.
@@ -115,8 +115,8 @@ export const SEVERITY_STYLES = {
   critical: "bg-red-50 border-red-200",
   moderate: "bg-amber-50 border-amber-200",
   low: "bg-blue-50 border-blue-200",
-  default: "bg-gray-50 border-gray-200",
-}
+  default: "bg-gray-50  border-border-200",
+};
 
 /* -------------------------------------------------------------------------- */
 /* Helper Functions                                                           */
@@ -128,7 +128,7 @@ export const SEVERITY_STYLES = {
  * @returns {string}
  */
 export const getPriorityColor = (priority) =>
-  PRIORITY_STYLES[priority] || PRIORITY_STYLES.default
+  PRIORITY_STYLES[priority] || PRIORITY_STYLES.default;
 
 /**
  * Get container classes for a conflict severity.
@@ -136,7 +136,7 @@ export const getPriorityColor = (priority) =>
  * @returns {string}
  */
 export const getSeverityColor = (severity) =>
-  SEVERITY_STYLES[severity] || SEVERITY_STYLES.default
+  SEVERITY_STYLES[severity] || SEVERITY_STYLES.default;
 
 /**
  * Derive stats from current state (for cards).
@@ -147,7 +147,7 @@ export const deriveDashboardMetrics = (pendingRequests) => ({
   activeTeachers: 24, // placeholder
   classesToday: 42, // placeholder
   systemEfficiency: 94, // placeholder percent
-})
+});
 
 /* -------------------------------------------------------------------------- */
 /* Exports Aggregation (optional convenience)                                 */
@@ -162,4 +162,4 @@ export default {
   getPriorityColor,
   getSeverityColor,
   deriveDashboardMetrics,
-}
+};

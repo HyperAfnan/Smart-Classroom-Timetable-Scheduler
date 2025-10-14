@@ -72,10 +72,10 @@ const ViewToggle = ({
               "relative px-4 py-2 rounded-md text-sm font-medium transition-colors outline-none",
               "focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-1",
               active
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900",
+                ? "bg-white text-card-foreground shadow-sm"
+                : " text-muted-foreground hover:text-card-foreground",
               disabled
-                ? "opacity-50 cursor-not-allowed hover:text-gray-600"
+                ? "opacity-50 cursor-not-allowed hover: text-muted-foreground"
                 : "",
             ].join(" ")}
           >

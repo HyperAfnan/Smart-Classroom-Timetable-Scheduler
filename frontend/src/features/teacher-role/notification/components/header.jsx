@@ -1,10 +1,10 @@
-import { CheckCircle } from "lucide-react"
+import { CheckCircle } from "lucide-react";
 
 const Header = ({ unreadCount, markAllAsRead }) => (
   <div className="flex justify-between items-center">
     <div>
-      <h1 className="text-3xl font-bold text-gray-800">Notifications</h1>
-      <p className="text-gray-600 mt-1">
+      <h1 className="text-3xl font-bold text-card-foreground">Notifications</h1>
+      <p className=" text-muted-foreground mt-1">
         Stay updated with schedule changes and important announcements
         {unreadCount > 0 && (
           <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
@@ -23,6 +23,6 @@ const Header = ({ unreadCount, markAllAsRead }) => (
       </button>
     )}
   </div>
-)
+);
 
-export default Header
+export default Header;

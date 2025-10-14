@@ -5,19 +5,19 @@ const FilterTabs = ({ filter, setFilter, notifications, unreadCount }) => {
     {
       key: "schedule",
       label: "Schedule",
-      count: notifications.filter(n => n.type === "schedule").length,
+      count: notifications.filter((n) => n.type === "schedule").length,
     },
     {
       key: "system",
       label: "System",
-      count: notifications.filter(n => n.type === "system").length,
+      count: notifications.filter((n) => n.type === "system").length,
     },
-  ]
+  ];
 
   return (
-    <div className="border-b border-gray-200">
+    <div className="border-b  border-border-200">
       <nav className="flex space-x-8 px-6">
-        {tabs.map(tab => (
+        {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key)}
@@ -32,7 +32,7 @@ const FilterTabs = ({ filter, setFilter, notifications, unreadCount }) => {
               className={`inline-flex items-center justify-center px-2 py-0.5 text-xs rounded-full ${
                 filter === tab.key
                   ? "bg-blue-100 text-blue-600"
-                  : "bg-gray-100 text-gray-600"
+                  : "bg-gray-100  text-muted-foreground"
               }`}
             >
               {tab.count}
@@ -41,7 +41,7 @@ const FilterTabs = ({ filter, setFilter, notifications, unreadCount }) => {
         ))}
       </nav>
     </div>
-  )
-}
+  );
+};
 
-export default FilterTabs
+export default FilterTabs;

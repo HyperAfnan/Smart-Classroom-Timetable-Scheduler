@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 
 export default function AdminDashboard() {
   const { stats, isLoading } = useDashboardStats();
-   const adminData = useSelector(state => state.auth.user);
+  const adminData = useSelector((state) => state.auth.user);
 
   const statCards = [
     {
@@ -43,16 +43,18 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Welcome Back {adminData.name}</h1>
+          <h1 className="text-3xl font-bold text-slate-900">
+            Welcome Back {adminData.name}
+          </h1>
         </div>
         <div className="text-right">
-          <p className="text-sm text-gray-600">Today</p>
-          <p className="text-lg font-semibold text-gray-800">
+          <p className="text-sm  text-muted-foreground">Today</p>
+          <p className="text-lg font-semibold text-card-foreground">
             {new Date().toLocaleDateString("en-US", {
               weekday: "long",
               year: "numeric",
               month: "long",
-              day: "numeric"
+              day: "numeric",
             })}
           </p>
         </div>
@@ -67,7 +69,7 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
           >
-         <StatCard {...stat} loading={isLoading} statKey={stat.title} />
+            <StatCard {...stat} loading={isLoading} statKey={stat.title} />
           </motion.div>
         ))}
       </div>

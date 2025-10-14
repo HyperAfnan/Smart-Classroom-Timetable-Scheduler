@@ -87,7 +87,7 @@ const TeacherSchedule = () => {
       />
 
       {/* Week Navigator */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+      <div className="bg-white rounded-xl shadow-sm border  border-border-200 p-4">
         <WeekNavigator
           currentWeek={currentWeek}
           weekLabel={weekLabel}
@@ -110,7 +110,6 @@ const TeacherSchedule = () => {
         onEntryClick={handleEntryClick}
         emptyCellRenderer={renderEmptyCell}
       />
-
     </div>
   );
 };

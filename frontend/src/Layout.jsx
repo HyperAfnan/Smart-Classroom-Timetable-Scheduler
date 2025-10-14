@@ -9,6 +9,7 @@ export default function Layout() {
    const roles = useSelector((state) => state.auth.roles) || [];
    const sidebarRoutes = [
       "/dashboard",
+      "/settings",
       "/dashboard/teachers",
       "/dashboard/subjects",
       "/dashboard/rooms",

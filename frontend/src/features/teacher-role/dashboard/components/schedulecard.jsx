@@ -5,13 +5,15 @@ const ScheduleCard = ({ time, subject, room, students }) => (
         <p className="text-sm font-semibold text-blue-600">{time}</p>
       </div>
       <div>
-        <p className="font-medium text-gray-800">{subject}</p>
-        <p className="text-sm text-gray-600">{room} • {students} students</p>
+        <p className="font-medium text-card-foreground">{subject}</p>
+        <p className="text-sm  text-muted-foreground">
+          {room} • {students} students
+        </p>
       </div>
     </div>
     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
       Confirmed
     </span>
   </div>
-)
-export default ScheduleCard
+);
+export default ScheduleCard;

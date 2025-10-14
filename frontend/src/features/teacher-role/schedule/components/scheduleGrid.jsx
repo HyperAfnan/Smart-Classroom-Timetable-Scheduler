@@ -1,11 +1,11 @@
-import React, { useMemo } from "react"
-import { MapPin, Users } from "lucide-react"
+import React, { useMemo } from "react";
+import { MapPin, Users } from "lucide-react";
 import {
   DAYS as DEFAULT_DAYS,
   TIME_SLOTS as DEFAULT_TIME_SLOTS,
   getEntryStyles,
   findClassAtTime,
-} from "../constants"
+} from "../constants";
 
 /**
  * ScheduleGrid
@@ -52,22 +52,22 @@ const ScheduleGrid = ({
 }) => {
   // Filter days if single-day (day view) is active
   const visibleDays = useMemo(() => {
-    if (activeDay && days.includes(activeDay)) return [activeDay]
-    return days
-  }, [activeDay, days])
+    if (activeDay && days.includes(activeDay)) return [activeDay];
+    return days;
+  }, [activeDay, days]);
 
-  const dateColumnCount = visibleDays.length + 1 // +1 for the time column
+  const dateColumnCount = visibleDays.length + 1; // +1 for the time column
 
   return (
     <div
       className={[
-        "bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden",
+        "bg-white rounded-xl shadow-sm border  border-border-200 overflow-hidden",
         className,
       ].join(" ")}
     >
       <GridHeader visibleDays={visibleDays} dateColumnCount={dateColumnCount} />
       <div role="rowgroup" className="divide-y divide-gray-200">
-        {timeSlots.map(timeSlot => (
+        {timeSlots.map((timeSlot) => (
           <TimeRow
             key={timeSlot}
             timeSlot={timeSlot}
@@ -79,8 +79,8 @@ const ScheduleGrid = ({
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
 /* -------------------------------------------------------------------------- */
 /* Subcomponents                                                              */
@@ -91,26 +91,31 @@ const GridHeader = ({ visibleDays }) => {
     <div
       role="row"
       className="grid"
-      style={{ gridTemplateColumns: `160px repeat(${visibleDays.length}, 1fr)` }}
+      style={{
+        gridTemplateColumns: `160px repeat(${visibleDays.length}, 1fr)`,
+      }}
     >
-      <div className="p-4 bg-gray-50 border-r border-gray-200" role="columnheader">
-        <span className="text-sm font-medium text-gray-600">Time</span>
+      <div
+        className="p-4 bg-gray-50 border-r  border-border-200"
+        role="columnheader"
+      >
+        <span className="text-sm font-medium  text-muted-foreground">Time</span>
       </div>
-      {visibleDays.map(day => (
+      {visibleDays.map((day) => (
         <div
           key={day}
           role="columnheader"
-          className="p-4 bg-gray-50 border-r border-gray-200 last:border-r-0"
+          className="p-4 bg-gray-50 border-r  border-border-200 last:border-r-0"
         >
           <div className="text-center">
-            <p className="text-sm font-medium text-gray-800">{day}</p>
+            <p className="text-sm font-medium text-card-foreground">{day}</p>
             {/* Date labels intentionally omitted; parent page can inject if needed */}
           </div>
         </div>
       ))}
     </div>
-  )
-}
+  );
+};
 
 const TimeRow = ({
   timeSlot,
@@ -123,16 +128,20 @@ const TimeRow = ({
     <div
       role="row"
       className="grid min-h-16"
-      style={{ gridTemplateColumns: `160px repeat(${visibleDays.length}, 1fr)` }}
+      style={{
+        gridTemplateColumns: `160px repeat(${visibleDays.length}, 1fr)`,
+      }}
     >
       <div
         role="rowheader"
-        className="p-4 bg-gray-50 border-r border-gray-200 flex items-center"
+        className="p-4 bg-gray-50 border-r  border-border-200 flex items-center"
       >
-        <span className="text-sm font-medium text-gray-600">{timeSlot}</span>
+        <span className="text-sm font-medium  text-muted-foreground">
+          {timeSlot}
+        </span>
       </div>
-      {visibleDays.map(day => {
-        const entry = findClassAtTime(schedule, day, timeSlot)
+      {visibleDays.map((day) => {
+        const entry = findClassAtTime(schedule, day, timeSlot);
         return (
           <Cell
             key={`${day}-${timeSlot}`}
@@ -142,45 +151,37 @@ const TimeRow = ({
             onEntryClick={onEntryClick}
             emptyCellRenderer={emptyCellRenderer}
           />
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-const Cell = ({
-  day,
-  timeSlot,
-  entry,
-  onEntryClick,
-  emptyCellRenderer,
-}) => {
+const Cell = ({ day, timeSlot, entry, onEntryClick, emptyCellRenderer }) => {
   const handleClick = () => {
     if (entry && onEntryClick) {
-      onEntryClick(entry, { day, timeSlot })
+      onEntryClick(entry, { day, timeSlot });
     }
-  }
+  };
 
   if (!entry) {
     return (
       <div
         role="gridcell"
-        className="border-r border-gray-200 last:border-r-0 p-2"
+        className="border-r  border-border-200 last:border-r-0 p-2"
         data-empty="true"
       >
-        {emptyCellRenderer
-          ? emptyCellRenderer({ day, timeSlot })
-          : null}
+        {emptyCellRenderer ? emptyCellRenderer({ day, timeSlot }) : null}
       </div>
-    )
+    );
   }
 
-  const styles = getEntryStyles(entry)
+  const styles = getEntryStyles(entry);
 
   return (
     <div
       role="gridcell"
-      className="border-r border-gray-200 last:border-r-0 p-2"
+      className="border-r  border-border-200 last:border-r-0 p-2"
     >
       <button
         type="button"
@@ -205,18 +206,18 @@ const Cell = ({
         </div>
       </button>
     </div>
-  )
-}
+  );
+};
 
 const Detail = ({ icon: Icon, text }) => (
-  <div className="flex items-center space-x-1 text-xs text-gray-600">
+  <div className="flex items-center space-x-1 text-xs  text-muted-foreground">
     <Icon className="h-3 w-3" />
     <span className="truncate">{text}</span>
   </div>
-)
+);
 
 /* -------------------------------------------------------------------------- */
 /* Exports                                                                    */
 /* -------------------------------------------------------------------------- */
 
-export default ScheduleGrid
+export default ScheduleGrid;

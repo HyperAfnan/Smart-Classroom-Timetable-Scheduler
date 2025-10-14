@@ -290,7 +290,7 @@ export function RoomsTable({ rooms, loading }) {
                               variant="outline"
                               className={
                                 TYPE_COLORS[room.room_type] ||
-                                "bg-gray-50 text-gray-700 border-gray-200"
+                                "bg-gray-50 text-gray-700  border-border-200"
                               }
                             >
                               {room.room_type}

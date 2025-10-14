@@ -1,11 +1,11 @@
-import { Clock, Trash2 } from "lucide-react"
-import { getIcon, getPriorityColor } from "../constants.jsx"
+import { Clock, Trash2 } from "lucide-react";
+import { getIcon, getPriorityColor } from "../constants.jsx";
 
 const NotificationItem = ({ notification, markAsRead, deleteNotification }) => (
   <div
     className={`p-4 rounded-lg border transition-colors hover:shadow-sm ${getPriorityColor(
       notification.priority,
-      notification.read
+      notification.read,
     )}`}
   >
     <div className="flex items-start justify-between">
@@ -15,7 +15,7 @@ const NotificationItem = ({ notification, markAsRead, deleteNotification }) => (
           <div className="flex items-center space-x-2">
             <h3
               className={`text-sm font-medium ${
-                notification.read ? "text-gray-700" : "text-gray-900"
+                notification.read ? "text-gray-700" : "text-card-foreground"
               }`}
             >
               {notification.title}
@@ -41,8 +41,8 @@ const NotificationItem = ({ notification, markAsRead, deleteNotification }) => (
                 notification.priority === "high"
                   ? "bg-red-100 text-red-700"
                   : notification.priority === "medium"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : "bg-blue-100 text-blue-700"
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-blue-100 text-blue-700"
               }`}
             >
               {notification.priority}
@@ -68,6 +68,6 @@ const NotificationItem = ({ notification, markAsRead, deleteNotification }) => (
       </div>
     </div>
   </div>
-)
+);
 
-export default NotificationItem
+export default NotificationItem;

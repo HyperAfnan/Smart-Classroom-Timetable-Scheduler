@@ -97,7 +97,7 @@ export default function ProfileHeader(user) {
 
           <div className="flex-1 text-center md:text-left">
             <motion.h1
-              className="text-3xl font-bold text-gray-900 mb-2"
+              className="text-3xl font-bold text-card-foreground mb-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
@@ -113,7 +113,7 @@ export default function ProfileHeader(user) {
               {user?.position || "Teacher"}
             </motion.p>
             <motion.p
-              className="text-gray-600"
+              className=" text-muted-foreground"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4 }}

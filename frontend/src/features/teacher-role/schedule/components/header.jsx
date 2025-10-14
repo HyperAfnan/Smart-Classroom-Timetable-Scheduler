@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 
 /**
  * ScheduleHeader Component
@@ -29,8 +29,8 @@ const ScheduleHeader = ({
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
-        <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
-        <p className="text-gray-600 mt-1">{subtitle}</p>
+        <h1 className="text-3xl font-bold text-card-foreground">{title}</h1>
+        <p className=" text-muted-foreground mt-1">{subtitle}</p>
         {(weekLabel || dateRange) && (
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3">
             {weekLabel && (
@@ -52,7 +52,7 @@ const ScheduleHeader = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ScheduleHeader
+export default ScheduleHeader;
