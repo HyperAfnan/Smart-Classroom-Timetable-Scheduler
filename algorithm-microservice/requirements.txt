@@ -1,0 +1,10 @@
+# Runtime dependencies for the Timetable API package
+# Note: Pinned to Pydantic v1-compatible FastAPI to match current models (class Config usage).
+
+fastapi>=0.95.2,<0.100
+pydantic>=1.10.2,<2
+uvicorn[standard]>=0.20.0,<1.0
+numpy>=1.23,<2.0
+
+# Optional (uncomment if running tests)
+# pytest>=7.0
