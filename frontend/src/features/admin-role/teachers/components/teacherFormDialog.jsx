@@ -15,23 +15,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Plus,
-} from "lucide-react";
-import {  DESIGNATIONS } from "../constants";
+import { Plus } from "lucide-react";
+import { DESIGNATIONS } from "../constants";
 
-function TeacherFormDialog({ isOpen, onOpenChange, formData, setFormData, onSubmit, resetForm, editingTeacher, departments }) {
+function TeacherFormDialog({
+  isOpen,
+  onOpenChange,
+  formData,
+  setFormData,
+  onSubmit,
+  resetForm,
+  editingTeacher,
+  departments,
+}) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700">
+        <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-500 dark:hover:to-blue-600">
           <Plus className="w-4 h-4 mr-2" />
           Add Teacher
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground border border-border">
         <DialogHeader>
-          <DialogTitle>
+          <DialogTitle className="text-foreground">
             {editingTeacher ? "Edit Teacher" : "Add New Teacher"}
           </DialogTitle>
         </DialogHeader>
@@ -76,10 +83,10 @@ function TeacherFormDialog({ isOpen, onOpenChange, formData, setFormData, onSubm
                   setFormData({ ...formData, department: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-background text-foreground border-border">
                   <SelectValue placeholder="Select department" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover text-popover-foreground border border-border">
                   {departments.map((dept) => (
                     <SelectItem key={dept} value={dept}>
                       {dept}
@@ -96,10 +103,10 @@ function TeacherFormDialog({ isOpen, onOpenChange, formData, setFormData, onSubm
                   setFormData({ ...formData, designation: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="bg-background text-foreground border-border">
                   <SelectValue placeholder="Select designation" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover text-popover-foreground border border-border">
                   {DESIGNATIONS.map((designation) => (
                     <SelectItem key={designation} value={designation}>
                       {designation}
@@ -123,7 +130,12 @@ function TeacherFormDialog({ isOpen, onOpenChange, formData, setFormData, onSubm
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={resetForm}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={resetForm}
+              className="hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
               Cancel
             </Button>
             <Button type="submit">

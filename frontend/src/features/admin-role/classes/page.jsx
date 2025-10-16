@@ -31,34 +31,40 @@ export default function Classes() {
   });
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Classes Management</h1>
-        <p className="text-slate-600">Manage student classes and sections</p>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background">
+      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+            Classes Management
+          </h1>
+          <p className="text-muted-foreground">
+            Manage student classes and sections
+          </p>
+        </div>
+
+        <ClassFilters
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          selectedDepartment={selectedDepartment}
+          setSelectedDepartment={setSelectedDepartment}
+          departments={departments}
+        />
+
+        <Card className="bg-card text-card-foreground border border-border shadow-sm">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-foreground">
+              Classes ({filteredClasses.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <InlineClassesTable
+              classes={filteredClasses}
+              loading={isLoading}
+              departments={departments}
+            />
+          </CardContent>
+        </Card>
       </div>
-
-      <ClassFilters
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        selectedDepartment={selectedDepartment}
-        setSelectedDepartment={setSelectedDepartment}
-        departments={departments}
-      />
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            Classes ({filteredClasses.length})
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <InlineClassesTable
-            classes={filteredClasses}
-            loading={isLoading}
-            departments={departments}
-          />
-        </CardContent>
-      </Card>
     </div>
   );
 }

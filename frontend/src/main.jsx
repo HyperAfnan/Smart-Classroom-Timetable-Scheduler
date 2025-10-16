@@ -14,7 +14,7 @@ import store from "./Store/store.js";
 import AuthInitializer from "./features/auth/authInit.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import ThemeProvider from "./shared/components/ThemeProvider.jsx";
+import ThemeProvider from "./shared/components/ThemeProvider.jsx";
 
 const TeacherSchedule = lazy(
    () => import("./features/teacher-role/schedule/page.jsx"),
@@ -41,7 +41,6 @@ const Rooms = lazy(() => import("./features/admin-role/rooms/page"));
 const Subjects = lazy(() => import("./features/admin-role/subjects/page"));
 const Teachers = lazy(() => import("./features/admin-role/teachers/page"));
 const Settings = lazy(() => import("./features/settings/page.jsx"));
-const New = lazy(() => import("./new-page.jsx"));
 
 function RequireAuth() {
    const user = useSelector((state) => state.auth.user);
@@ -57,7 +56,6 @@ const router = createBrowserRouter([
          { path: "auth", element: <Auth /> },
          { path: "teacher-settings", element: <TeacherSettings /> },
          { path: "settings", element: <Settings /> },
-         { path: "new", element: <New /> },
          {
             path: "dashboard",
             element: <RequireAuth />,
@@ -83,7 +81,7 @@ createRoot(document.getElementById("root")).render(
    <StrictMode>
       <QueryClientProvider client={queryClient}>
          <Provider store={store}>
-            {/* <ThemeProvider> */}
+            <ThemeProvider>
                <AuthInitializer>
                   <RouterProvider router={router} />
                   <ToastContainer
@@ -98,7 +96,7 @@ createRoot(document.getElementById("root")).render(
                      theme="light"
                   />
                </AuthInitializer>
-            {/* </ThemeProvider> */}
+            </ThemeProvider>
          </Provider>
       </QueryClientProvider>
    </StrictMode>,

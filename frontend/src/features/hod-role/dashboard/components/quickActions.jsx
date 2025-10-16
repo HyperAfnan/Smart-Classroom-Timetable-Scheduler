@@ -65,28 +65,36 @@ const QuickActions = ({
     {
       key: "mark-unavailable",
       label: "Mark Unavailable",
-      icon: <UserCheck className="w-6 h-6 text-blue-600 mb-2" />,
+      icon: (
+        <UserCheck className="w-6 h-6 text-blue-600 dark:text-blue-400 mb-2" />
+      ),
       accent: "blue",
       onClick: onMarkUnavailable,
     },
     {
       key: "request-substitution",
       label: "Request Substitution",
-      icon: <Clock className="w-6 h-6 text-green-600 mb-2" />,
+      icon: (
+        <Clock className="w-6 h-6 text-green-600 dark:text-green-400 mb-2" />
+      ),
       accent: "green",
       onClick: onRequestSubstitution,
     },
     {
       key: "view-full-schedule",
       label: "View Full Schedule",
-      icon: <Calendar className="w-6 h-6 text-purple-600 mb-2" />,
+      icon: (
+        <Calendar className="w-6 h-6 text-purple-600 dark:text-purple-400 mb-2" />
+      ),
       accent: "purple",
       onClick: onViewFullSchedule,
     },
     {
       key: "generate-report",
       label: "Generate Report",
-      icon: <FileText className="w-6 h-6 text-amber-600 mb-2" />,
+      icon: (
+        <FileText className="w-6 h-6 text-amber-600 dark:text-amber-400 mb-2" />
+      ),
       accent: "amber",
       onClick: onGenerateReport,
     },
@@ -103,7 +111,9 @@ const QuickActions = ({
     }[columns] || "grid-cols-2";
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm border ${className}`}>
+    <div
+      className={`bg-card text-card-foreground rounded-xl shadow-sm border ${className}`}
+    >
       <div className="p-6 border-b">
         <h3 className="text-lg font-semibold text-card-foreground">
           Quick Actions
@@ -132,24 +142,24 @@ const QuickActions = ({
 
 const accentMap = {
   blue: {
-    border: "hover:border-blue-300",
-    bg: "hover:bg-blue-50",
+    border: "hover:border-blue-300 dark:hover:border-blue-800",
+    bg: "hover:bg-blue-50 dark:hover:bg-blue-950/30",
   },
   green: {
-    border: "hover:border-green-300",
-    bg: "hover:bg-green-50",
+    border: "hover:border-green-300 dark:hover:border-green-800",
+    bg: "hover:bg-green-50 dark:hover:bg-green-950/30",
   },
   purple: {
-    border: "hover:border-purple-300",
-    bg: "hover:bg-purple-50",
+    border: "hover:border-purple-300 dark:hover:border-purple-800",
+    bg: "hover:bg-purple-50 dark:hover:bg-purple-950/30",
   },
   amber: {
-    border: "hover:border-amber-300",
-    bg: "hover:bg-amber-50",
+    border: "hover:border-amber-300 dark:hover:border-amber-800",
+    bg: "hover:bg-amber-50 dark:hover:bg-amber-950/30",
   },
   default: {
-    border: "hover: border-border-300",
-    bg: "hover:bg-gray-50",
+    border: "hover:border-border",
+    bg: "hover:bg-muted/50 dark:hover:bg-muted/30",
   },
 };
 
@@ -164,18 +174,18 @@ const ActionCard = ({ action, cardClassName }) => {
       onClick={onClick}
       disabled={disabled}
       className={[
-        "flex flex-col items-center p-4 border-2 border-dashed  border-border-200 rounded-lg",
+        "flex flex-col items-center p-4 border-2 border-dashed border-border rounded-lg",
         accentTokens.border,
         accentTokens.bg,
         "transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
         disabled
-          ? "opacity-50 cursor-not-allowed hover:bg-transparent hover: border-border-200"
+          ? "opacity-50 cursor-not-allowed hover:bg-transparent hover:border-border"
           : "cursor-pointer",
         cardClassName,
       ].join(" ")}
     >
       {icon || <Plus className="w-6 h-6 text-gray-500 mb-2" />}
-      <span className="text-sm text-gray-700 font-medium text-center leading-tight">
+      <span className="text-sm text-foreground font-medium text-center leading-tight">
         {label}
       </span>
     </button>
@@ -192,8 +202,8 @@ const ActionSkeletons = ({ count = 4 }) => (
         key={i}
         className="flex flex-col items-center p-4 border-2 border-dashed  border-border-200 rounded-lg animate-pulse"
       >
-        <div className="w-6 h-6 rounded-md bg-gray-200 mb-2" />
-        <div className="h-3 w-20 bg-gray-200 rounded" />
+        <div className="w-6 h-6 rounded-md bg-muted/60 mb-2" />
+        <div className="h-3 w-20 bg-muted/60 rounded" />
       </div>
     ))}
   </>

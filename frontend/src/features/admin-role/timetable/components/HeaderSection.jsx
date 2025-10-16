@@ -13,12 +13,12 @@ export default function HeaderSection({
     >
       <div>
         {title ? (
-          <h1 id="page-title" className="text-3xl font-bold text-slate-900">
+          <h1 id="page-title" className="text-3xl font-bold text-foreground">
             {title}
           </h1>
         ) : null}
         {subtitle ? (
-          <p className="text-slate-600 mt-1">{subtitle}</p>
+          <p className="text-muted-foreground mt-1">{subtitle}</p>
         ) : null}
       </div>
 

@@ -25,7 +25,7 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30 dark:bg-black dark:bg-none">
       <Header onSignUp={handleGetStarted} />
       <Hero onGetStarted={handleGetStarted} />
       <Features />

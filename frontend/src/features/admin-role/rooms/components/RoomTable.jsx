@@ -142,14 +142,14 @@ export function RoomsTable({ rooms, loading }) {
   );
 
   return (
-    <Card>
+    <Card className="bg-card text-card-foreground border border-border shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MapPin className="w-5 h-5" />
+        <CardTitle className="flex items-center gap-2 text-foreground">
+          <MapPin className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
           Rooms ({rooms.length})
           <div className="flex gap-2 ml-auto">
             <Button
-              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white dark:from-green-600 dark:to-green-700 dark:hover:from-green-500 dark:hover:to-green-600"
               onClick={() => {
                 setRenderNewRow(true);
                 setEditingRoomId(null);
@@ -177,13 +177,19 @@ export function RoomsTable({ rooms, loading }) {
               <AnimatePresence>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
+                    <TableCell
+                      colSpan={4}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       Loading rooms...
                     </TableCell>
                   </TableRow>
                 ) : rooms.length === 0 && !renderNewRow ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-8">
+                    <TableCell
+                      colSpan={4}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       No rooms found
                     </TableCell>
                   </TableRow>
@@ -195,7 +201,7 @@ export function RoomsTable({ rooms, loading }) {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ delay: index * 0.05 }}
-                      className="hover:bg-slate-50"
+                      className="hover:bg-accent hover:text-accent-foreground transition-colors"
                       onMouseEnter={() => setHoveredRowId(room.id)}
                       onMouseLeave={() => setHoveredRowId(null)}
                     >
@@ -206,7 +212,7 @@ export function RoomsTable({ rooms, loading }) {
                               {...editRegister("room_number", {
                                 required: true,
                               })}
-                              className="w-full border px-2 py-1 rounded"
+                              className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                               placeholder="Room Number"
                             />
                           </TableCell>
@@ -220,7 +226,7 @@ export function RoomsTable({ rooms, loading }) {
                                   value={field.value}
                                   onValueChange={field.onChange}
                                 >
-                                  <SelectTrigger className="w-full">
+                                  <SelectTrigger className="w-full bg-background text-foreground border-border">
                                     <SelectValue placeholder="Type" />
                                   </SelectTrigger>
                                   <SelectContent>
@@ -228,7 +234,7 @@ export function RoomsTable({ rooms, loading }) {
                                       <SelectItem key={t} value={t}>
                                         <Badge
                                           variant="outline"
-                                          className="bg-blue-50 text-blue-700 border-blue-200"
+                                          className="bg-muted text-muted-foreground border-border"
                                         >
                                           {t}
                                         </Badge>
@@ -247,7 +253,7 @@ export function RoomsTable({ rooms, loading }) {
                                 required: true,
                                 min: 1,
                               })}
-                              className="w-full border px-2 py-1 rounded"
+                              className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                               placeholder="Capacity"
                             />
                           </TableCell>
@@ -265,7 +271,7 @@ export function RoomsTable({ rooms, loading }) {
                               </Button>
                               <Button
                                 size="sm"
-                                className="bg-green-500 text-white"
+                                className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-600 dark:hover:bg-green-500"
                                 onClick={handleEditSubmit(onEditSubmit)}
                               >
                                 <Check className="w-3 h-3" />
@@ -280,7 +286,7 @@ export function RoomsTable({ rooms, loading }) {
                               {room.room_number}
                             </div>
                             {room.name && (
-                              <div className="text-xs text-slate-500 mt-1">
+                              <div className="text-xs text-muted-foreground mt-1">
                                 {room.name}
                               </div>
                             )}
@@ -290,7 +296,7 @@ export function RoomsTable({ rooms, loading }) {
                               variant="outline"
                               className={
                                 TYPE_COLORS[room.room_type] ||
-                                "bg-gray-50 text-gray-700  border-border-200"
+                                "bg-muted text-muted-foreground border-border"
                               }
                             >
                               {room.room_type}
@@ -298,7 +304,7 @@ export function RoomsTable({ rooms, loading }) {
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-1">
-                              <Users className="w-3 h-3 text-slate-400" />{" "}
+                              <Users className="w-3 h-3 text-muted-foreground" />{" "}
                               {room.capacity}
                             </div>
                           </TableCell>
@@ -342,7 +348,7 @@ export function RoomsTable({ rooms, loading }) {
                       <input
                         type="text"
                         placeholder="Room Number"
-                        className="w-full border px-2 py-1 rounded"
+                        className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                         {...register("room_number", { required: true })}
                       />
                     </TableCell>
@@ -356,7 +362,7 @@ export function RoomsTable({ rooms, loading }) {
                             value={field.value}
                             onValueChange={field.onChange}
                           >
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full bg-background text-foreground border-border">
                               <SelectValue placeholder="Type" />
                             </SelectTrigger>
                             <SelectContent>
@@ -364,7 +370,7 @@ export function RoomsTable({ rooms, loading }) {
                                 <SelectItem key={t} value={t}>
                                   <Badge
                                     variant="outline"
-                                    className="bg-blue-50 text-blue-700 border-blue-200"
+                                    className="bg-muted text-muted-foreground border-border"
                                   >
                                     {t}
                                   </Badge>
@@ -379,7 +385,7 @@ export function RoomsTable({ rooms, loading }) {
                       <input
                         type="number"
                         placeholder="Capacity"
-                        className="w-full border px-2 py-1 rounded"
+                        className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                         {...register("capacity", { required: true, min: 1 })}
                         min="1"
                       />
@@ -398,7 +404,7 @@ export function RoomsTable({ rooms, loading }) {
                         </Button>
                         <Button
                           size="sm"
-                          className="bg-green-500 text-white"
+                          className="bg-green-600 hover:bg-green-700 text-white dark:bg-green-600 dark:hover:bg-green-500"
                           onClick={handleSubmit(onCreateSubmit)}
                         >
                           <Check className="w-3 h-3" />

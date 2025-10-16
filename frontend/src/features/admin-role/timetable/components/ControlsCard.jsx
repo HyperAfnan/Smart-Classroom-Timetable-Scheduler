@@ -44,10 +44,10 @@ export default function ControlsCard({
   const canExport = !!selectedClass && !disableExport;
 
   return (
-    <Card>
+    <Card className="bg-card text-card-foreground border border-border shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Zap className="w-5 h-5 text-indigo-600" />
+        <CardTitle className="flex items-center gap-2 text-foreground">
+          <Zap className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
           {title}
         </CardTitle>
       </CardHeader>
@@ -56,10 +56,13 @@ export default function ControlsCard({
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <Select value={selectedClass ?? ""} onValueChange={onSelectClass}>
-              <SelectTrigger aria-label="Select class">
+              <SelectTrigger
+                aria-label="Select class"
+                className="bg-background text-foreground border-border"
+              >
                 <SelectValue placeholder="Select a class..." />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-popover text-popover-foreground border border-border shadow-md">
                 {classes.map((c) => (
                   <SelectItem key={c.id} value={String(c.id)}>
                     {c.class_name}
@@ -74,7 +77,7 @@ export default function ControlsCard({
             <Button
               onClick={onGenerate}
               disabled={!canGenerate}
-              className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700"
+              className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white dark:from-indigo-600 dark:to-indigo-700 dark:hover:from-indigo-500 dark:hover:to-indigo-600"
             >
               {generating ? (
                 <>
@@ -89,7 +92,12 @@ export default function ControlsCard({
               )}
             </Button>
 
-            <Button variant="outline" disabled={!canExport} onClick={onExport}>
+            <Button
+              variant="outline"
+              disabled={!canExport}
+              onClick={onExport}
+              className="hover:bg-accent hover:text-accent-foreground transition-colors"
+            >
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
@@ -97,7 +105,11 @@ export default function ControlsCard({
         </div>
 
         {errorMessage ? (
-          <Alert variant="destructive" role="alert">
+          <Alert
+            variant="destructive"
+            role="alert"
+            className="bg-destructive/10 text-destructive border border-destructive/30 dark:bg-destructive/20"
+          >
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{String(errorMessage)}</AlertDescription>
           </Alert>

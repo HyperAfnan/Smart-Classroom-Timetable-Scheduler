@@ -25,10 +25,10 @@ const HODDashboard = () => {
   const { classes } = useClasses();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background dark:bg-gradient-to-br dark:from-background dark:via-background dark:to-background">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <section className="mb-8">
-          <h2 className="text-2xl font-bold text-card-foreground">
+          <h2 className="text-2xl font-bold text-card-foreground dark:text-foreground">
             Welcome back, Dr. {user?.name || user?.first_name}!
           </h2>
           <p className="text-muted-foreground">

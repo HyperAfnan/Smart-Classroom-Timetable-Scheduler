@@ -38,7 +38,7 @@ import useSubjectMutations from "../hooks/useSubjectMutations.js";
 import ExcelUploader from "./SubjectsExcelUploader.jsx";
 
 const getTypeColor = (type) => {
-  return colors[type] || "bg-gray-50 text-gray-700  border-border-200";
+  return colors[type] || "bg-muted text-muted-foreground border-border";
 };
 
 export default function SubjectsTable({ subjects }) {
@@ -111,15 +111,19 @@ export default function SubjectsTable({ subjects }) {
   }
 
   return (
-    <Card>
+    <Card className="bg-card text-card-foreground border border-border shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 text-foreground">
           <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5" />
+            <BookOpen className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             Subjects ({subjects.length})
           </div>
           <div className="ml-auto flex items-center gap-2">
-            <Button onClick={() => setRenderNewRow(true)} disabled={false}>
+            <Button
+              className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white dark:from-indigo-600 dark:to-indigo-700 dark:hover:from-indigo-500 dark:hover:to-indigo-600"
+              onClick={() => setRenderNewRow(true)}
+              disabled={false}
+            >
               <Plus className="w-4 h-4 mr-2" /> Add Subject
             </Button>
             <ExcelUploader />
@@ -142,13 +146,19 @@ export default function SubjectsTable({ subjects }) {
               <AnimatePresence>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
+                    <TableCell
+                      colSpan={8}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       Loading subjects...
                     </TableCell>
                   </TableRow>
                 ) : subjects.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
+                    <TableCell
+                      colSpan={8}
+                      className="text-center py-8 text-muted-foreground"
+                    >
                       No subjects found
                     </TableCell>
                   </TableRow>
@@ -160,7 +170,7 @@ export default function SubjectsTable({ subjects }) {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ delay: index * 0.05 }}
-                      className="hover:bg-slate-50"
+                      className="hover:bg-accent hover:text-accent-foreground transition-colors"
                       onMouseEnter={() => setHoveredRowId(subject.id)}
                       onMouseLeave={() => setHoveredRowId(null)}
                     >
@@ -205,7 +215,7 @@ export default function SubjectsTable({ subjects }) {
                                           <SelectItem key={dept} value={dept}>
                                             <Badge
                                               variant="outline"
-                                              className="bg-blue-50 text-blue-700 border-blue-200"
+                                              className="bg-muted text-muted-foreground border-border"
                                             >
                                               {dept}
                                             </Badge>
@@ -244,7 +254,7 @@ export default function SubjectsTable({ subjects }) {
                                           <SelectItem key={type} value={type}>
                                             <Badge
                                               variant="outline"
-                                              className="bg-blue-50 text-blue-700 border-blue-200"
+                                              className="bg-muted text-muted-foreground border-border"
                                             >
                                               {type}
                                             </Badge>
@@ -287,7 +297,7 @@ export default function SubjectsTable({ subjects }) {
                                   </Button>
                                   <Button
                                     size="sm"
-                                    className="bg-blue-500 text-white"
+                                    className="bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500"
                                     onClick={handleEditSubmit(onEditSubmit)}
                                   >
                                     <Check className="w-3 h-3" />
@@ -308,14 +318,14 @@ export default function SubjectsTable({ subjects }) {
                               {col.key === "department" && (
                                 <Badge
                                   variant="outline"
-                                  className="bg-blue-50 text-blue-700 border-blue-200"
+                                  className="bg-muted text-muted-foreground border-border"
                                 >
                                   {subject.department}
                                 </Badge>
                               )}
                               {col.key === "semester" && (
                                 <div className="flex items-center gap-1">
-                                  <Mail className="w-3 h-3 text-slate-400" />
+                                  <Mail className="w-3 h-3 text-muted-foreground" />
                                   {subject.semester}
                                 </div>
                               )}
@@ -331,7 +341,7 @@ export default function SubjectsTable({ subjects }) {
                               {col.key === "credits" && subject.credits}
                               {col.key === "hours_per_week" && (
                                 <div className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-slate-400" />
+                                  <Clock className="w-3 h-3 text-muted-foreground" />
                                   {subject.hours_per_week}h
                                 </div>
                               )}
@@ -407,7 +417,7 @@ export default function SubjectsTable({ subjects }) {
                                   <SelectItem key={dept} value={dept}>
                                     <Badge
                                       variant="outline"
-                                      className="bg-blue-50 text-blue-700 border-blue-200"
+                                      className="bg-muted text-muted-foreground border-border"
                                     >
                                       {dept}
                                     </Badge>
@@ -485,7 +495,7 @@ export default function SubjectsTable({ subjects }) {
                           </Button>
                           <Button
                             size="sm"
-                            className="bg-blue-500 text-white"
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500"
                             onClick={handleSubmit(onSubmit)}
                           >
                             <Check className="w-3 h-3" />

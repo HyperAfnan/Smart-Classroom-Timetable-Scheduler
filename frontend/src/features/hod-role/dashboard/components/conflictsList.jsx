@@ -90,33 +90,33 @@ const ConflictCard = ({ conflict, severityClass, onResolve }) => {
 
   return (
     <div
-      className={`border rounded-lg p-3 transition-colors ${classes} relative overflow-hidden`}
+      className={`border rounded-lg p-3 transition-colors ${classes} relative overflow-hidden dark:text-white/90`}
     >
       {/* Decorative subtle accent */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-4 -top-4 w-16 h-16 rounded-full bg-muted/30"
+        className="pointer-events-none absolute -right-4 -top-4 w-16 h-16 rounded-full bg-muted/30 dark:bg-muted/70"
       />
 
       <div className="flex items-start justify-between mb-2">
         <div className="flex items-center space-x-2">
           <SeverityIcon severity={severity} />
-          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground dark:text-gray-300">
             {severity}
           </span>
         </div>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-xs text-muted-foreground dark:text-gray-300">
           {affectedClasses} class{affectedClasses === 1 ? "" : "es"}
         </span>
       </div>
 
-      <p className="text-sm text-card-foreground mb-2 leading-snug">
+      <p className="text-sm text-card-foreground dark:text-white mb-2 leading-snug">
         {description}
       </p>
 
       <div className="flex items-start space-x-2">
-        <Lightbulb className="w-3.5 h-3.5 mt-0.5 text-amber-600 flex-shrink-0" />
-        <p className="text-xs text-muted-foreground">
+        <Lightbulb className="w-3.5 h-3.5 mt-0.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+        <p className="text-xs text-muted-foreground dark:text-gray-300">
           Suggestion: <span className="font-medium">{suggestedAction}</span>
         </p>
       </div>
@@ -145,15 +145,24 @@ const SeverityIcon = ({ severity }) => {
   switch (severity) {
     case "critical":
       return (
-        <ShieldAlert className="w-4 h-4 text-red-600" aria-hidden="true" />
+        <ShieldAlert
+          className="w-4 h-4 text-red-600 dark:text-red-400"
+          aria-hidden="true"
+        />
       );
     case "moderate":
       return (
-        <AlertTriangle className="w-4 h-4 text-amber-600" aria-hidden="true" />
+        <AlertTriangle
+          className="w-4 h-4 text-amber-600 dark:text-amber-400"
+          aria-hidden="true"
+        />
       );
     case "low":
       return (
-        <AlertTriangle className="w-4 h-4 text-blue-600" aria-hidden="true" />
+        <AlertTriangle
+          className="w-4 h-4 text-blue-600 dark:text-blue-400"
+          aria-hidden="true"
+        />
       );
     default:
       return (
@@ -207,13 +216,13 @@ const SkeletonList = ({ count = 3 }) => (
 const fallbackSeverityClass = (severity) => {
   switch (severity) {
     case "critical":
-      return "bg-destructive/10 border-destructive/30";
+      return "bg-red-100 border-red-200 dark:bg-red-950/50 dark:border-red-800";
     case "moderate":
-      return "bg-accent/10 border-accent/30";
+      return "bg-amber-100 border-amber-200 dark:bg-amber-950/50 dark:border-amber-800";
     case "low":
-      return "bg-primary/10 border-primary/30";
+      return "bg-blue-100 border-blue-200 dark:bg-blue-950/50 dark:border-blue-800";
     default:
-      return "bg-muted border-border";
+      return "bg-muted border-border dark:bg-muted/70";
   }
 };
 

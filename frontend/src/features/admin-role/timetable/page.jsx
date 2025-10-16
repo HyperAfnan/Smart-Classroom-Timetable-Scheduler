@@ -39,7 +39,6 @@ export default function Timetable() {
     includeTimeSlot: false,
     queryOptions: { enabled: !!selectedClass },
   });
-   
 
   const generating = generationStatus.isPending || insertEntries.isPending;
 
@@ -96,15 +95,15 @@ export default function Timetable() {
   if (isLoading)
     return (
       <div
-        className="p-6 flex items-center justify-center"
+        className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background flex items-center justify-center"
         style={{ minHeight: 400 }}
         role="status"
         aria-live="polite"
         aria-busy="true"
       >
-        <div className="flex items-center gap-2 text-slate-700">
+        <div className="flex items-center gap-2 text-foreground">
           <Loader2
-            className="animate-spin text-slate-600"
+            className="animate-spin text-muted-foreground"
             style={{ width: 24, height: 24 }}
             aria-hidden="true"
           />
@@ -114,64 +113,72 @@ export default function Timetable() {
     );
 
   return (
-    <div className="p-6 space-y-6">
-      <HeaderSection
-        title="Timetable Generator"
-        subtitle="Generate and view individual class schedules"
-      />
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background">
+      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-6">
+        <HeaderSection
+          title="Timetable Generator"
+          subtitle="Generate and view individual class schedules"
+        />
 
-      {/* Controls */}
-      <ControlsCard
-        classes={classes}
-        selectedClass={selectedClass}
-        onSelectClass={setSelectedClass}
-        onGenerate={generateTimetable}
-        generating={generating}
-        errorMessage={
-          error ||
-          (isError && loadError ? String(loadError?.message || loadError) : "")
-        }
-      />
+        {/* Controls */}
+        <ControlsCard
+          classes={classes}
+          selectedClass={selectedClass}
+          onSelectClass={setSelectedClass}
+          onGenerate={generateTimetable}
+          generating={generating}
+          errorMessage={
+            error ||
+            (isError && loadError
+              ? String(loadError?.message || loadError)
+              : "")
+          }
+        />
 
-      {/* Timetable Display */}
-      {selectedClass ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5" />
-              Weekly Timetable –
-              {classes.find((c) => String(c.id) === selectedClass)?.name}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <TimetableTable
-                days={days}
-                times={times}
-                getSlotData={getSlotData}
-                getSubjectName={getSubjectName}
-                getTeacherName={getTeacherName}
-                getRoomNumber={getRoomNumber}
+        {/* Timetable Display */}
+        {selectedClass ? (
+          <Card className="bg-card text-card-foreground border border-border shadow-sm">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-foreground">
+                <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                Weekly Timetable –
+                {classes.find((c) => String(c.id) === selectedClass)?.name}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <TimetableTable
+                  days={days}
+                  times={times}
+                  getSlotData={getSlotData}
+                  getSubjectName={getSubjectName}
+                  getTeacherName={getTeacherName}
+                  getRoomNumber={getRoomNumber}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card
+            role="region"
+            aria-label="Empty state"
+            className="bg-card text-card-foreground border border-border shadow-sm"
+          >
+            <CardContent className="p-8 text-center">
+              <Calendar
+                className="w-16 h-16 text-muted-foreground mx-auto mb-4"
+                aria-hidden="true"
               />
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <Card role="region" aria-label="Empty state">
-          <CardContent className="p-8 text-center">
-            <Calendar
-              className="w-16 h-16 text-slate-300 mx-auto mb-4"
-              aria-hidden="true"
-            />
-            <h3 className="text-lg font-medium text-slate-900 mb-2">
-              No Class Selected
-            </h3>
-            <p className="text-slate-500 mb-4">
-              Please select a class to view or generate its timetable.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+              <h3 className="text-lg font-medium text-foreground mb-2">
+                No Class Selected
+              </h3>
+              <p className="text-muted-foreground mb-4">
+                Please select a class to view or generate its timetable.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }

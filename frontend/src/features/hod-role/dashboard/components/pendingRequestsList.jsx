@@ -47,19 +47,19 @@ const PendingRequestsList = ({
   emptyMessage = "No pending requests 🎉",
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border">
+    <div className="bg-card text-card-foreground rounded-xl shadow-sm border">
       <div className="p-6 border-b">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-card-foreground">
             {title}
           </h3>
           {showCountBadge && !loading && (
-            <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+            <span className="bg-destructive/10 text-destructive border border-destructive/30 dark:bg-destructive/20 text-xs font-medium px-2.5 py-0.5 rounded-full">
               {requests.length} {requests.length === 1 ? "pending" : "pending"}
             </span>
           )}
           {loading && (
-            <span className="h-5 w-16 rounded-full bg-gray-200 animate-pulse" />
+            <span className="h-5 w-16 rounded-full bg-muted/60 animate-pulse" />
           )}
         </div>
       </div>
@@ -98,7 +98,7 @@ const RequestCard = ({ request, onApprove, onDeny, priorityBadgeClass }) => {
     defaultPriorityClass(priority);
 
   return (
-    <div className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
+    <div className="border border-border rounded-lg p-4 bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-1">
@@ -112,23 +112,25 @@ const RequestCard = ({ request, onApprove, onDeny, priorityBadgeClass }) => {
           <p className="text-sm  text-muted-foreground">
             {teacher} - {subject}
           </p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             {date} • {reason}
           </p>
         </div>
-        <p className="text-xs text-gray-400 whitespace-nowrap">{submittedAt}</p>
+        <p className="text-xs text-muted-foreground whitespace-nowrap">
+          {submittedAt}
+        </p>
       </div>
       <div className="flex items-center space-x-2">
         <button
           onClick={() => onApprove && onApprove(id)}
-          className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
+          className="flex items-center space-x-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500"
         >
           <CheckCircle className="w-4 h-4" />
           <span>Approve</span>
         </button>
         <button
           onClick={() => onDeny && onDeny(id)}
-          className="flex items-center space-x-1 px-3 py-1.5 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+          className="flex items-center space-x-1 px-3 py-1.5 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-500 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
         >
           <XCircle className="w-4 h-4" />
           <span>Deny</span>
@@ -140,10 +142,10 @@ const RequestCard = ({ request, onApprove, onDeny, priorityBadgeClass }) => {
 
 const EmptyState = ({ message }) => (
   <div className="flex flex-col items-center justify-center py-8 text-center">
-    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-3">
-      <Inbox className="w-6 h-6 text-gray-400" />
+    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+      <Inbox className="w-6 h-6 text-muted-foreground" />
     </div>
-    <p className="text-sm font-medium text-gray-700">{message}</p>
+    <p className="text-sm font-medium text-muted-foreground">{message}</p>
   </div>
 );
 
@@ -156,19 +158,19 @@ const SkeletonList = ({ count = 3 }) => (
     {Array.from({ length: count }).map((_, i) => (
       <div
         key={i}
-        className="border rounded-lg p-4 animate-pulse bg-white space-y-4"
+        className="border border-border rounded-lg p-4 animate-pulse bg-card space-y-4"
       >
         <div className="flex items-start justify-between">
           <div className="flex-1 space-y-2">
-            <div className="h-4 w-40 bg-gray-200 rounded" />
-            <div className="h-3 w-56 bg-gray-200 rounded" />
-            <div className="h-3 w-48 bg-gray-200 rounded" />
+            <div className="h-4 w-40 bg-muted/60 rounded" />
+            <div className="h-3 w-56 bg-muted/60 rounded" />
+            <div className="h-3 w-48 bg-muted/60 rounded" />
           </div>
-          <div className="h-3 w-16 bg-gray-200 rounded" />
+          <div className="h-3 w-16 bg-muted/60 rounded" />
         </div>
         <div className="flex space-x-2">
-          <div className="h-8 w-24 bg-gray-200 rounded-md" />
-          <div className="h-8 w-20 bg-gray-200 rounded-md" />
+          <div className="h-8 w-24 bg-muted/60 rounded-md" />
+          <div className="h-8 w-20 bg-muted/60 rounded-md" />
         </div>
       </div>
     ))}
@@ -182,13 +184,13 @@ const SkeletonList = ({ count = 3 }) => (
 const defaultPriorityClass = (priority) => {
   switch (priority) {
     case "high":
-      return "bg-red-100 text-red-800 border-red-200";
+      return "bg-red-100 text-red-800 border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800";
     case "medium":
-      return "bg-amber-100 text-amber-800 border-amber-200";
+      return "bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800";
     case "low":
-      return "bg-green-100 text-green-800 border-green-200";
+      return "bg-green-100 text-green-800 border-green-200 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800";
     default:
-      return "bg-gray-100 text-card-foreground  border-border-200";
+      return "bg-muted text-muted-foreground border-border";
   }
 };
 

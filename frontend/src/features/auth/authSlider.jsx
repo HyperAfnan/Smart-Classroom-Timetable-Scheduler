@@ -4,13 +4,13 @@ import { Building2, LogIn } from "lucide-react";
 
 export default function AuthSlider({ activeMode, setActiveMode }) {
   return (
-    <div className="relative bg-slate-100 rounded-2xl p-2 mb-8">
+    <div className="relative bg-slate-100 dark:bg-[#12121a] rounded-2xl p-2 mb-8">
       {/* Sliding Background */}
       <motion.div
-        className="absolute top-2 bottom-2 bg-white rounded-xl shadow-lg border border-slate-200/50"
+        className="absolute top-2 bottom-2 bg-white dark:bg-[#1e1e29] rounded-xl shadow-lg border border-slate-200/50 dark:border-[#2a2a36]"
         animate={{
           left: activeMode === "register" ? "0.5rem" : "50%",
-          right: activeMode === "register" ? "50%" : "0.5rem"
+          right: activeMode === "register" ? "50%" : "0.5rem",
         }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
       />
@@ -20,9 +20,9 @@ export default function AuthSlider({ activeMode, setActiveMode }) {
         <motion.button
           onClick={() => setActiveMode("register")}
           className={`relative z-10 flex items-center justify-center gap-3 py-4 px-6 rounded-xl font-semibold transition-colors duration-300 ${
-            activeMode === "register" 
-              ? "text-purple-700" 
-              : "text-slate-600 hover:text-slate-800"
+            activeMode === "register"
+              ? "text-purple-700 dark:text-[#a78bfa]"
+              : "text-slate-600 hover:text-slate-800 dark:text-[#c0c0c9] dark:hover:text-[#f4f4f5]"
           }`}
           whileHover={{ scale: activeMode !== "register" ? 1.02 : 1 }}
           whileTap={{ scale: 0.98 }}
@@ -34,9 +34,9 @@ export default function AuthSlider({ activeMode, setActiveMode }) {
         <motion.button
           onClick={() => setActiveMode("login")}
           className={`relative z-10 flex items-center justify-center gap-3 py-4 px-6 rounded-xl font-semibold transition-colors duration-300 ${
-            activeMode === "login" 
-              ? "text-purple-700" 
-              : "text-slate-600 hover:text-slate-800"
+            activeMode === "login"
+              ? "text-purple-700 dark:text-[#a78bfa]"
+              : "text-slate-600 hover:text-slate-800 dark:text-[#c0c0c9] dark:hover:text-[#f4f4f5]"
           }`}
           whileHover={{ scale: activeMode !== "login" ? 1.02 : 1 }}
           whileTap={{ scale: 0.98 }}

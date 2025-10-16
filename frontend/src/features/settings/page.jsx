@@ -1,22 +1,25 @@
 import { motion } from "framer-motion";
 import { Loader2, Settings as SettingsIcon } from "lucide-react";
+import ThemeSection from "./components/ThemeSection";
 
 export default function Settings() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background">
       <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-        {/* Header */}
         <motion.div
           className="mb-8"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl md:text-4xl font-bold text-card-foreground">
-              Account Settings
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              Settings
             </h1>
           </div>
         </motion.div>
+        <div className="grid gap-6">
+          <ThemeSection />
+        </div>
       </div>
     </div>
   );

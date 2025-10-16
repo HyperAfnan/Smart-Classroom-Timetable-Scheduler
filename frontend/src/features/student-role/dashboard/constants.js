@@ -11,7 +11,7 @@ const mockSchedule = [
         startTime: "9:00",
         endTime: "10:00",
         type: "lecture",
-        color: "bg-blue-50 border-blue-500"
+        color: "bg-accent border-primary",
       },
       {
         id: "2",
@@ -21,7 +21,7 @@ const mockSchedule = [
         startTime: "10:00",
         endTime: "12:00",
         type: "lab",
-        color: "bg-purple-50 border-purple-500"
+        color: "bg-accent border-destructive",
       },
       {
         id: "3",
@@ -31,9 +31,9 @@ const mockSchedule = [
         startTime: "2:00",
         endTime: "3:00",
         type: "lecture",
-        color: "bg-green-50 border-green-500"
-      }
-    ]
+        color: "bg-accent border-primary",
+      },
+    ],
   },
   {
     day: "Tuesday",
@@ -47,7 +47,7 @@ const mockSchedule = [
         startTime: "9:00",
         endTime: "10:00",
         type: "lecture",
-        color: "bg-orange-50 border-orange-500"
+        color: "bg-accent border-primary",
       },
       {
         id: "5",
@@ -57,9 +57,9 @@ const mockSchedule = [
         startTime: "11:00",
         endTime: "12:00",
         type: "lecture",
-        color: "bg-red-50 border-red-500"
-      }
-    ]
+        color: "bg-accent border-primary",
+      },
+    ],
   },
   {
     day: "Wednesday",
@@ -73,7 +73,7 @@ const mockSchedule = [
         startTime: "10:00",
         endTime: "11:00",
         type: "lecture",
-        color: "bg-indigo-50 border-indigo-500"
+        color: "bg-accent border-primary",
       },
       {
         id: "7",
@@ -83,9 +83,9 @@ const mockSchedule = [
         startTime: "1:00",
         endTime: "3:00",
         type: "lab",
-        color: "bg-purple-50 border-purple-500"
-      }
-    ]
+        color: "bg-accent border-destructive",
+      },
+    ],
   },
   {
     day: "Thursday",
@@ -99,7 +99,7 @@ const mockSchedule = [
         startTime: "9:00",
         endTime: "10:00",
         type: "lecture",
-        color: "bg-pink-50 border-pink-500"
+        color: "bg-accent border-primary",
       },
       {
         id: "9",
@@ -109,9 +109,9 @@ const mockSchedule = [
         startTime: "3:00",
         endTime: "4:00",
         type: "tutorial",
-        color: "bg-green-50 border-green-500"
-      }
-    ]
+        color: "bg-accent border-primary",
+      },
+    ],
   },
   {
     day: "Friday",
@@ -125,10 +125,10 @@ const mockSchedule = [
         startTime: "10:00",
         endTime: "12:00",
         type: "lab",
-        color: "bg-purple-50 border-purple-500"
-      }
-    ]
-  }
-]
+        color: "bg-accent border-destructive",
+      },
+    ],
+  },
+];
 
-export { mockSchedule }
+export { mockSchedule };

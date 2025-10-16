@@ -18,23 +18,23 @@ export function RoomFilters({
   setSelectedType,
 }) {
   return (
-    <Card>
+    <Card className="bg-card text-card-foreground border border-border shadow-sm">
       <CardContent className="p-4">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
               placeholder="Search rooms..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="pl-10 bg-background text-foreground placeholder:text-muted-foreground border-border"
             />
           </div>
           <Select value={selectedType} onValueChange={setSelectedType}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-[200px] bg-background text-foreground border-border">
               <SelectValue placeholder="All Room Types" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-popover text-popover-foreground border border-border shadow-md">
               <SelectItem value="all">All Room Types</SelectItem>
               {ROOM_TYPES.map((type) => (
                 <SelectItem key={type} value={type}>

@@ -15,7 +15,7 @@ export default function Auth() {
   const [activeMode, setActiveMode] = useState("register"); // "register" or "login"
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50/30 dark:from-background dark:via-background dark:to-background flex items-center justify-center p-6">
       <div className="w-full max-w-2xl">
         {/* Back Button */}
         <motion.div
@@ -27,7 +27,7 @@ export default function Auth() {
           <Link to={"/"}>
             <Button
               variant="ghost"
-              className="text-slate-600 hover:text-slate-900 p-2"
+              className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white p-2"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Home
@@ -40,20 +40,20 @@ export default function Auth() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="bg-white/80 backdrop-blur-sm rounded-3xl border border-slate-200/50 shadow-2xl overflow-hidden"
+          className="bg-white/80 dark:bg-background/70 backdrop-blur-sm rounded-3xl border border-slate-200/50 dark:border-white/10 shadow-2xl overflow-hidden"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-slate-100 to-slate-50 px-8 py-6 border-b border-slate-200/50">
+          <div className="bg-gradient-to-r from-slate-100 to-slate-50 dark:from-white/5 dark:to-white/0 px-8 py-6 border-b border-slate-200/50 dark:border-white/10">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-center"
             >
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-2">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-2">
                 Welcome to Calvio
               </h1>
-              <p className="text-slate-600">
+              <p className="text-slate-600 dark:text-muted-foreground">
                 Get started with intelligent university scheduling
               </p>
             </motion.div>

@@ -39,45 +39,47 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="p-6 space-y-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900">
-            Welcome Back {adminData.name}
-          </h1>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background">
+      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+              Welcome Back {adminData.name}
+            </h1>
+          </div>
+          <div className="text-right">
+            <p className="text-sm  text-muted-foreground">Today</p>
+            <p className="text-lg font-semibold text-card-foreground">
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+          </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm  text-muted-foreground">Today</p>
-          <p className="text-lg font-semibold text-card-foreground">
-            {new Date().toLocaleDateString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {statCards.map((stat, idx) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+            >
+              <StatCard {...stat} loading={isLoading} statKey={stat.label} />
+            </motion.div>
+          ))}
         </div>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statCards.map((stat, idx) => (
-          <motion.div
-            key={stat.title}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-          >
-            <StatCard {...stat} loading={isLoading} statKey={stat.title} />
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Quick Actions & System Status */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <QuickActions />
-        <SystemStatus timeSlots={stats.timeSlots} />
+        {/* Quick Actions & System Status */}
+        <div className="grid md:grid-cols-2 gap-6">
+          <QuickActions />
+          <SystemStatus timeSlots={stats.timeSlots} />
+        </div>
       </div>
     </div>
   );

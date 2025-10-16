@@ -118,14 +118,14 @@ function TeachersTable({ filteredTeacher }) {
   );
 
   return (
-    <Card>
+    <Card className="bg-card text-card-foreground border border-border shadow-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="w-5 h-5" />
+        <CardTitle className="flex items-center gap-2 text-foreground">
+          <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
           Teachers ({filteredTeacher.length})
           <div className="flex gap-2 ml-auto">
             <Button
-              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white dark:from-blue-600 dark:to-blue-700 dark:hover:from-blue-500 dark:hover:to-blue-600"
               onClick={() => setRenderNewRow(true)}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -154,7 +154,7 @@ function TeachersTable({ filteredTeacher }) {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="text-center py-8"
+                      className="text-center py-8 text-muted-foreground"
                     >
                       Loading teachers...
                     </TableCell>
@@ -163,7 +163,7 @@ function TeachersTable({ filteredTeacher }) {
                   <TableRow>
                     <TableCell
                       colSpan={columns.length}
-                      className="text-center py-8"
+                      className="text-center py-8 text-muted-foreground"
                     >
                       No teachers found
                     </TableCell>
@@ -176,7 +176,7 @@ function TeachersTable({ filteredTeacher }) {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -20 }}
                       transition={{ delay: index * 0.05 }}
-                      className="hover:bg-slate-50"
+                      className="hover:bg-accent hover:text-accent-foreground transition-colors"
                       onMouseEnter={() => setHoveredRowId(teacher.id)}
                       onMouseLeave={() => setHoveredRowId(null)}
                     >
@@ -186,7 +186,7 @@ function TeachersTable({ filteredTeacher }) {
                               {col.key === "name" && (
                                 <input
                                   {...editRegister("name", { required: true })}
-                                  className="w-full border px-2 py-1 rounded"
+                                  className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                                 />
                               )}
                               {col.key === "emp_id" && (
@@ -194,7 +194,7 @@ function TeachersTable({ filteredTeacher }) {
                                   {...editRegister("emp_id", {
                                     required: true,
                                   })}
-                                  className="w-full border px-2 py-1 rounded"
+                                  className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                                 />
                               )}
                               {col.key === "subjects" && (
@@ -207,7 +207,7 @@ function TeachersTable({ filteredTeacher }) {
                                       value={field.value}
                                       onValueChange={field.onChange}
                                     >
-                                      <SelectTrigger className="w-full">
+                                      <SelectTrigger className="w-full bg-background text-foreground border-border">
                                         <SelectValue placeholder="Select Subject" />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -219,7 +219,7 @@ function TeachersTable({ filteredTeacher }) {
                                             <Badge
                                               key={subject.subject_name}
                                               variant="outline"
-                                              className="border-slate-200 text-slate-500"
+                                              className="bg-muted text-muted-foreground border-border"
                                             >
                                               {subject.subject_name}
                                             </Badge>
@@ -240,7 +240,7 @@ function TeachersTable({ filteredTeacher }) {
                                       value={field.value}
                                       onValueChange={field.onChange}
                                     >
-                                      <SelectTrigger className="w-full">
+                                      <SelectTrigger className="w-full bg-background text-foreground border-border">
                                         <SelectValue placeholder="Designation" />
                                       </SelectTrigger>
                                       <SelectContent>
@@ -258,7 +258,7 @@ function TeachersTable({ filteredTeacher }) {
                                 <input
                                   type="email"
                                   {...editRegister("email", { required: true })}
-                                  className="w-full border px-2 py-1 rounded"
+                                  className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                                 />
                               )}
                               {col.key === "max_hours" && (
@@ -267,7 +267,7 @@ function TeachersTable({ filteredTeacher }) {
                                   {...editRegister("max_hours", {
                                     required: true,
                                   })}
-                                  className="w-full border px-2 py-1 rounded"
+                                  className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                                 />
                               )}
                               {col.key === "actions" && (
@@ -284,7 +284,7 @@ function TeachersTable({ filteredTeacher }) {
                                   </Button>
                                   <Button
                                     size="sm"
-                                    className="bg-blue-500 text-white"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
                                     onClick={handleEditSubmit(onEditSubmit)}
                                   >
                                     <Check className="w-3 h-3" />
@@ -312,7 +312,7 @@ function TeachersTable({ filteredTeacher }) {
                                       <Badge
                                         key={idx}
                                         variant="outline"
-                                        className="border-slate-200 text-slate-500"
+                                        className="bg-muted text-muted-foreground border-border"
                                       >
                                         {teacherSubject.subject}
                                       </Badge>
@@ -322,7 +322,7 @@ function TeachersTable({ filteredTeacher }) {
                               {col.key === "designation" && teacher.designation}
                               {col.key === "email" && (
                                 <div className="flex items-center gap-1">
-                                  <Mail className="w-3 h-3 text-slate-400" />
+                                  <Mail className="w-3 h-3 text-muted-foreground" />
                                   {teacher.email}
                                 </div>
                               )}
@@ -369,7 +369,7 @@ function TeachersTable({ filteredTeacher }) {
                           <input
                             type="text"
                             placeholder="Name"
-                            className="w-full border px-2 py-1 rounded"
+                            className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                             {...register("name", { required: true })}
                           />
                         )}
@@ -377,7 +377,7 @@ function TeachersTable({ filteredTeacher }) {
                           <input
                             type="text"
                             placeholder="Employee ID"
-                            className="w-full border px-2 py-1 rounded"
+                            className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                             {...register("emp_id", { required: true })}
                           />
                         )}
@@ -391,7 +391,7 @@ function TeachersTable({ filteredTeacher }) {
                                 value={field.value}
                                 onValueChange={field.onChange}
                               >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full bg-background text-foreground border-border">
                                   <SelectValue placeholder="Subject" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -403,7 +403,7 @@ function TeachersTable({ filteredTeacher }) {
                                       <Badge
                                         key={subject.subject_name}
                                         variant="outline"
-                                        className="border-slate-200 text-slate-500"
+                                        className="bg-muted text-muted-foreground border-border"
                                       >
                                         {subject.subject_name}
                                       </Badge>
@@ -424,7 +424,7 @@ function TeachersTable({ filteredTeacher }) {
                                 value={field.value}
                                 onValueChange={field.onChange}
                               >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full bg-background text-foreground border-border">
                                   <SelectValue placeholder="Designation" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -442,7 +442,7 @@ function TeachersTable({ filteredTeacher }) {
                           <input
                             type="email"
                             placeholder="Email"
-                            className="w-full border px-2 py-1 rounded"
+                            className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                             {...register("email", {
                               required: true,
                               pattern: /^\S+@\S+$/i,
@@ -452,7 +452,7 @@ function TeachersTable({ filteredTeacher }) {
                         {col.key === "max_hours" && (
                           <input
                             placeholder="Max Hours"
-                            className="w-full border px-2 py-1 rounded"
+                            className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                             {...register("max_hours", {
                               required: true,
                               min: 1,
@@ -474,7 +474,7 @@ function TeachersTable({ filteredTeacher }) {
                             </Button>
                             <Button
                               size="sm"
-                              className="bg-blue-500 text-white"
+                              className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
                               onClick={handleSubmit(onSubmit)}
                             >
                               <Check className="w-3 h-3" />

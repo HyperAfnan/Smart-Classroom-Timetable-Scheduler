@@ -41,12 +41,12 @@ export default function RoomExcelUploader() {
 
       const headers = rows[0];
       const headerLower = headers.map((h) =>
-        h && typeof h === "string" ? h.trim().toLowerCase() : ""
+        h && typeof h === "string" ? h.trim().toLowerCase() : "",
       );
 
       // Validate required columns
       const missing = ROOM_REQUIRED_COLUMNS.filter(
-        (col) => !headerLower.includes(col.toLowerCase())
+        (col) => !headerLower.includes(col.toLowerCase()),
       );
       if (missing.length > 0) {
         setUploadError(`Missing required columns: ${missing.join(", ")}`);
@@ -79,8 +79,8 @@ export default function RoomExcelUploader() {
 
         // Basic validation
         if (!rawRoomNumber || !rawType || (!rawCapacity && rawCapacity !== 0)) {
-            // Skip invalid row silently
-            continue;
+          // Skip invalid row silently
+          continue;
         }
 
         const capacity = parseInt(rawCapacity, 10);
@@ -108,7 +108,7 @@ export default function RoomExcelUploader() {
 
         // Match existing by room_number (case-insensitive)
         const existing = rooms.find(
-          (r) => r.room_number?.toLowerCase() === room_number.toLowerCase()
+          (r) => r.room_number?.toLowerCase() === room_number.toLowerCase(),
         );
 
         if (existing) {
@@ -135,7 +135,7 @@ export default function RoomExcelUploader() {
           createdCount++;
         } catch (err) {
           errorMessages.push(
-            `Create error for ${room.room_number}: ${err?.message || err}`
+            `Create error for ${room.room_number}: ${err?.message || err}`,
           );
         }
       }
@@ -145,9 +145,9 @@ export default function RoomExcelUploader() {
           await updateRoomAsync({ id, updates });
           updatedCount++;
         } catch (err) {
-            errorMessages.push(
-              `Update error for ${updates.room_number}: ${err?.message || err}`
-            );
+          errorMessages.push(
+            `Update error for ${updates.room_number}: ${err?.message || err}`,
+          );
         }
       }
 
@@ -157,7 +157,7 @@ export default function RoomExcelUploader() {
 
       if (createdCount || updatedCount) {
         toast.success(
-          `Import complete: ${createdCount} created, ${updatedCount} updated.`
+          `Import complete: ${createdCount} created, ${updatedCount} updated.`,
         );
       }
 
@@ -176,6 +176,7 @@ export default function RoomExcelUploader() {
         variant="outline"
         onClick={() => document.getElementById("roomExcelFileInput").click()}
         disabled={isUploading}
+        className="border-border hover:bg-accent hover:text-accent-foreground transition-colors"
       >
         {isUploading ? (
           <>
@@ -199,9 +200,12 @@ export default function RoomExcelUploader() {
       />
 
       {uploadError && (
-        <Alert variant="destructive" className="mt-4 whitespace-pre-wrap">
+        <Alert
+          variant="destructive"
+          className="mt-4 whitespace-pre-wrap bg-destructive/10 text-destructive border border-destructive/30 dark:bg-destructive/20"
+        >
           <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{uploadError}</AlertDescription>
+          <AlertDescription>{uploadError}</AlertDescription>
         </Alert>
       )}
     </div>

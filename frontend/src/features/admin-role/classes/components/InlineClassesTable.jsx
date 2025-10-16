@@ -160,13 +160,13 @@ export default function InlineClassesTable({
   return (
     <div className="overflow-x-auto">
       <div className="flex items-center gap-2 mb-4">
-        <div className="flex items-center gap-2 text-slate-700 font-semibold">
-          <GraduationCap className="w-5 h-5" />
+        <div className="flex items-center gap-2 text-foreground font-semibold">
+          <GraduationCap className="w-5 h-5 text-violet-600 dark:text-violet-400" />
           Classes ({classes.length})
         </div>
         <div className="ml-auto flex gap-2">
           <Button
-            className="bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700"
+            className="bg-gradient-to-r from-violet-500 to-violet-600 hover:from-violet-600 hover:to-violet-700 text-white dark:from-violet-600 dark:to-violet-700 dark:hover:from-violet-500 dark:hover:to-violet-600"
             onClick={() => {
               setRenderNewRow(true);
               setEditingClassId(null);
@@ -212,7 +212,7 @@ export default function InlineClassesTable({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
                   transition={{ delay: index * 0.05 }}
-                  className="hover:bg-slate-50"
+                  className="hover:bg-accent hover:text-accent-foreground transition-colors"
                   onMouseEnter={() => setHoveredRowId(cls.id)}
                   onMouseLeave={() => setHoveredRowId(null)}
                 >
@@ -222,6 +222,7 @@ export default function InlineClassesTable({
                         <Input
                           {...editRegister("class_name", { required: true })}
                           placeholder="Class Name"
+                          className="bg-background text-foreground border-border"
                         />
                       </TableCell>
                       {/* <TableCell> */}
@@ -263,10 +264,10 @@ export default function InlineClassesTable({
                               value={field.value}
                               onValueChange={field.onChange}
                             >
-                              <SelectTrigger>
+                              <SelectTrigger className="bg-background text-foreground border-border">
                                 <SelectValue placeholder="Sem" />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="bg-popover text-popover-foreground border border-border">
                                 {semesters.map((s) => (
                                   <SelectItem key={s} value={s.toString()}>
                                     Sem {s}
@@ -281,6 +282,7 @@ export default function InlineClassesTable({
                         <Input
                           {...editRegister("section", { required: true })}
                           placeholder="Section"
+                          className="bg-background text-foreground border-border"
                         />
                       </TableCell>
                       <TableCell>
@@ -292,12 +294,14 @@ export default function InlineClassesTable({
                             min: 1,
                           })}
                           placeholder="Count"
+                          className="bg-background text-foreground border-border"
                         />
                       </TableCell>
                       <TableCell>
                         <Input
                           {...editRegister("academic_year", { required: true })}
                           placeholder="2024-25"
+                          className="bg-background text-foreground border-border"
                         />
                       </TableCell>
                       <TableCell>
@@ -314,7 +318,7 @@ export default function InlineClassesTable({
                           </Button>
                           <Button
                             size="sm"
-                            className="bg-violet-500 text-white"
+                            className="bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-600 dark:hover:bg-violet-500"
                             onClick={handleEditSubmit(onEditSubmit)}
                           >
                             <Check className="w-3 h-3" />
@@ -326,7 +330,7 @@ export default function InlineClassesTable({
                     <>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Layers className="w-3 h-3 text-slate-400" />
+                          <Layers className="w-3 h-3 text-muted-foreground" />
                           <span className="font-medium">
                             {cls.class_name || cls.name}
                           </span>
@@ -342,27 +346,27 @@ export default function InlineClassesTable({
                       {/* </TableCell> */}
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Building2 className="w-3 h-3 text-slate-400" />
+                          <Building2 className="w-3 h-3 text-muted-foreground" />
                           Sem {cls.semester}
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge
                           variant="outline"
-                          className="bg-slate-50 text-slate-700 border-slate-200"
+                          className="bg-muted text-muted-foreground border-border"
                         >
                           {cls.section}
                         </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Users className="w-3 h-3 text-slate-400" />
+                          <Users className="w-3 h-3 text-muted-foreground" />
                           {cls.students}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-slate-400" />
+                          <Calendar className="w-3 h-3 text-muted-foreground" />
                           {cls.academic_year}
                         </div>
                       </TableCell>
@@ -405,6 +409,7 @@ export default function InlineClassesTable({
                   <Input
                     placeholder="Class Name"
                     {...register("class_name", { required: true })}
+                    className="bg-background text-foreground border-border"
                   />
                 </TableCell>
                 {/* <TableCell> */}
@@ -441,10 +446,10 @@ export default function InlineClassesTable({
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-background text-foreground border-border">
                           <SelectValue placeholder="Sem" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-popover text-popover-foreground border border-border">
                           {semesters.map((s) => (
                             <SelectItem key={s} value={s.toString()}>
                               Sem {s}
@@ -459,6 +464,7 @@ export default function InlineClassesTable({
                   <Input
                     placeholder="Section"
                     {...register("section", { required: true })}
+                    className="bg-background text-foreground border-border"
                   />
                 </TableCell>
                 <TableCell>
@@ -467,12 +473,14 @@ export default function InlineClassesTable({
                     min={1}
                     placeholder="Count"
                     {...register("students", { required: true, min: 1 })}
+                    className="bg-background text-foreground border-border"
                   />
                 </TableCell>
                 <TableCell>
                   <Input
                     placeholder="2024-25"
                     {...register("academic_year", { required: true })}
+                    className="bg-background text-foreground border-border"
                   />
                 </TableCell>
                 <TableCell>
@@ -489,7 +497,7 @@ export default function InlineClassesTable({
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-violet-500 text-white"
+                      className="bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-600 dark:hover:bg-violet-500"
                       onClick={handleSubmit(onCreateSubmit)}
                     >
                       <Check className="w-3 h-3" />
