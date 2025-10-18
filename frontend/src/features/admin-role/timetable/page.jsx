@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Loader2 } from "lucide-react";
-import useTimetable from "./hooks/useTimetable";
+import useGenerateAndPersistTimetable from "./hooks/useGenerateAndPersistTimetable";
 import HeaderSection from "./components/HeaderSection";
 import ControlsCard from "./components/ControlsCard";
 import TimetableTable from "./components/TimetableTable";
 import { days, times } from "./constants";
 import { useTimetableEntriesByClass } from "./hooks/useTimetableEntries";
-import useTimetableEntriesMutations from "./hooks/useTimetableEntriesMutations";
+// using orchestrated generate+persist hook; no direct entry mutations here
 
 export default function Timetable() {
   const [selectedClass, setSelectedClass] = useState("");
@@ -19,17 +19,17 @@ export default function Timetable() {
     isLoading,
     isError,
     error: loadError,
-    assemblePayload,
-
+    generating,
+    persisting,
+    isPending,
+    lastOrganized,
+    generateAndPersistAsync,
     getTeacherName,
     getSubjectName,
     getRoomNumber,
-    generateAsync,
-    generationStatus,
-  } = useTimetable({ days, times });
+  } = useGenerateAndPersistTimetable({ days, times });
 
-  const { mapOrganizedToRows, insertEntriesAsync, insertEntries } =
-    useTimetableEntriesMutations();
+  // Using orchestrated generate+persist hook; direct mutations not used here
 
   const {
     entries,
@@ -40,7 +40,7 @@ export default function Timetable() {
     queryOptions: { enabled: !!selectedClass },
   });
 
-  const generating = generationStatus.isPending || insertEntries.isPending;
+  // using generating from hook; no local redeclaration
 
   const normalizeToHHMM = (val) => {
     if (!val) return val;
@@ -57,40 +57,12 @@ export default function Timetable() {
     }
     setError("");
     try {
-      const payload = assemblePayload({
-        classes,
-        teachers,
-        subjects,
-        rooms,
-        timeSlots,
+      const result = await generateAndPersistAsync({
+        filterClassId: selectedClass,
       });
-      const { organized } = await generateAsync({ payload });
 
-      // Map organized grid to DB rows and persist
-      const organizedKeys = Object.keys(organized || {});
-      const dbIdSet = new Set((classes || []).map((c) => String(c.id)));
-      const looksIndexed =
-        organizedKeys.length > 0 &&
-        organizedKeys.every((k) => /^\d+$/.test(k)) &&
-        !organizedKeys.some((k) => dbIdSet.has(k));
-      const classKeyToId = looksIndexed
-        ? Object.fromEntries(
-            organizedKeys
-              .map((k) => [k, classes[Number(k)]?.id])
-              .filter(([, v]) => v != null),
-          )
-        : undefined;
-
-      const rows = mapOrganizedToRows({
-        organized,
-        days,
-        timeSlots,
-        classKeyToId,
-      });
-      await insertEntriesAsync({ rows, mode: "upsert" });
-
-      // Optionally update local state and refetch from DB
-      setTimetableData(organized);
+      // Update local state for immediate UI render and refetch DB for consistency
+      setTimetableData(result?.organized || lastOrganized || {});
       await refetchEntries();
     } catch (err) {
       console.error("Timetable generation error:", err);
