@@ -98,7 +98,6 @@ async function fetchTimetableEntries({
    const selectArg = includeTimeSlot
       ? `${baseColumns}, time_slots:time_slot_id(id, day, start_time, end_time)`
       : baseColumns;
-   console.log(selectArg)
    let query = supabase.from("timetable_entries").select(selectArg);
 
    if (filters.classId !== undefined && filters.classId !== null) {

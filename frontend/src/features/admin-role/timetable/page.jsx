@@ -36,7 +36,7 @@ export default function Timetable() {
     isLoading: entriesLoading,
     refetch: refetchEntries,
   } = useTimetableEntriesByClass(selectedClass, {
-    includeTimeSlot: false,
+    includeTimeSlot: true,
     queryOptions: { enabled: !!selectedClass },
   });
 
@@ -44,8 +44,10 @@ export default function Timetable() {
 
   const normalizeToHHMM = (val) => {
     if (!val) return val;
-    const str = String(val);
-    return str.length >= 5 && str[2] === ":" ? str.slice(0, 5) : str;
+    let str = String(val);
+    if (str.length >= 5 && str[2] === ":") str = str.slice(0, 5);
+    if (/^\d:\d{2}$/.test(str)) return "0" + str;
+    return str;
   };
 
   const generateTimetable = async () => {
@@ -65,7 +67,26 @@ export default function Timetable() {
       const { organized } = await generateAsync({ payload });
 
       // Map organized grid to DB rows and persist
-      const rows = mapOrganizedToRows({ organized, days, timeSlots });
+      const organizedKeys = Object.keys(organized || {});
+      const dbIdSet = new Set((classes || []).map((c) => String(c.id)));
+      const looksIndexed =
+        organizedKeys.length > 0 &&
+        organizedKeys.every((k) => /^\d+$/.test(k)) &&
+        !organizedKeys.some((k) => dbIdSet.has(k));
+      const classKeyToId = looksIndexed
+        ? Object.fromEntries(
+            organizedKeys
+              .map((k) => [k, classes[Number(k)]?.id])
+              .filter(([, v]) => v != null),
+          )
+        : undefined;
+
+      const rows = mapOrganizedToRows({
+        organized,
+        days,
+        timeSlots,
+        classKeyToId,
+      });
       await insertEntriesAsync({ rows, mode: "upsert" });
 
       // Optionally update local state and refetch from DB
@@ -78,17 +99,52 @@ export default function Timetable() {
   };
 
   const getSlotData = (day, time) => {
-    // Prefer data from DB: entries joined with time_slots
+    // Prefer locally generated timetable first, then fall back to DB entries
     const dayIndex = days.indexOf(day);
     if (dayIndex === -1) return null;
     const hhmm = normalizeToHHMM(time);
 
-    const match = (entries || []).find(
-      (e) =>
-        e?.time_slots?.day === dayIndex &&
+    // 1) Try local organized data
+    const selectedId = String(selectedClass);
+    let classKey = selectedId;
+
+    if (
+      !timetableData ||
+      typeof timetableData !== "object" ||
+      !timetableData[selectedId]
+    ) {
+      const keys = Object.keys(timetableData || {});
+      for (const k of keys) {
+        if (/^\d+$/.test(k)) {
+          const idx = Number(k);
+          if (
+            classes &&
+            classes[idx] &&
+            String(classes[idx].id) === selectedId
+          ) {
+            classKey = k;
+            break;
+          }
+        }
+      }
+    }
+
+    const dayObj = timetableData?.[classKey]?.[day];
+    if (dayObj) {
+      const localSlot = dayObj[hhmm] || dayObj[time];
+      if (localSlot) return localSlot;
+    }
+
+    // 2) Fall back to DB entries (joined with time_slots)
+    const match = (entries || []).find((e) => {
+      const dbDay = e?.time_slots?.day;
+      const dayMatches = dbDay === dayIndex || dbDay === dayIndex + 1;
+      return (
+        dayMatches &&
         normalizeToHHMM(e?.time_slots?.start_time) === hhmm &&
-        String(e?.class_id) === String(selectedClass),
-    );
+        String(e?.class_id) === String(selectedClass)
+      );
+    });
     return match || null;
   };
 
@@ -142,7 +198,10 @@ export default function Timetable() {
               <CardTitle className="flex items-center gap-2 text-foreground">
                 <Calendar className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 Weekly Timetable –
-                {classes.find((c) => String(c.id) === selectedClass)?.name}
+                {
+                  classes.find((c) => String(c.id) === selectedClass)
+                    ?.class_name
+                }
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -154,6 +213,27 @@ export default function Timetable() {
                   getSubjectName={getSubjectName}
                   getTeacherName={getTeacherName}
                   getRoomNumber={getRoomNumber}
+                  renderSlot={({ slot }) => (
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200 text-left">
+                      <div className="font-semibold text-blue-900 text-sm">
+                        {slot.subject_name || getSubjectName(slot.subject_id)}
+                      </div>
+                      <div className="text-xs text-blue-600 mt-1">
+                        {slot.teacher_name || getTeacherName(slot.teacher_id)}
+                      </div>
+                      <div className="text-xs text-blue-500 mt-1">
+                        {slot.room_name ||
+                          (getRoomNumber
+                            ? getRoomNumber(slot.room_id)
+                            : `Room: ${String(slot.room_id ?? "")}`)}
+                      </div>
+                      {slot.type ? (
+                        <span className="inline-flex items-center rounded border border-blue-300 bg-blue-200 px-2 py-0.5 text-xs text-blue-800 mt-1">
+                          {slot.type}
+                        </span>
+                      ) : null}
+                    </div>
+                  )}
                 />
               </div>
             </CardContent>

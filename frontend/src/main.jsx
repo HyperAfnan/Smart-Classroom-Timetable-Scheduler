@@ -15,6 +15,7 @@ import AuthInitializer from "./features/auth/authInit.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ThemeProvider from "./shared/components/ThemeProvider.jsx";
+import { setupSentry } from "./config/sentry.js";
 
 const TeacherSchedule = lazy(
    () => import("./features/teacher-role/schedule/page.jsx"),
@@ -76,6 +77,8 @@ const router = createBrowserRouter([
       ],
    },
 ]);
+
+setupSentry();
 
 createRoot(document.getElementById("root")).render(
    <StrictMode>

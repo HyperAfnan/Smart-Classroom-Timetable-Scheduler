@@ -45,7 +45,7 @@ export default function AuthInitializer({ children }) {
          const { data: subjectsData } = await supabase
             .from("teacher_subjects")
             .select("subject")
-            .eq("teacher", profileData.name);
+            .eq("teacher", profileData?.name);
 
          user = { ...user, subjects: subjectsData.map(s => s.subject) };
       } else if (roles.includes("hod")) {

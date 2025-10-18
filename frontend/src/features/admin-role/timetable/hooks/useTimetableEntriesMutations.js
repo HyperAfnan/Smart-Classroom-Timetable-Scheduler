@@ -39,10 +39,10 @@ import { queryKeys } from "@/shared/queryKeys";
  */
 function normalizeToHHMM(value) {
   if (!value) return value;
-  const str = String(value);
-  // If it's already "HH:MM", return as is. If "HH:MM:SS", slice first 5 chars.
-  if (str.length >= 5 && str[2] === ":") return str.slice(0, 5);
-  return str;
+  let str = String(value);
+  if (str.length >= 5 && str[2] === ":") str = str.slice(0, 5);
+  if (/^\d:\d{2}$/.test(str)) return "0" + str;
+  return;
 }
 
 /**
@@ -66,7 +66,10 @@ function buildTimeSlotIndex(timeSlots) {
  * - Else, assume it is already a valid ID (string or uuid).
  */
 function resolveClassId(classKey, classKeyToId) {
-  if (classKeyToId && Object.prototype.hasOwnProperty.call(classKeyToId, classKey)) {
+  if (
+    classKeyToId &&
+    Object.prototype.hasOwnProperty.call(classKeyToId, classKey)
+  ) {
     return classKeyToId[classKey];
   }
   // Numeric-like?
@@ -98,7 +101,12 @@ function resolveClassId(classKey, classKeyToId) {
  * }} args
  * @returns {Array<{ class_id: any, time_slot_id: any, subject_id: any, teacher_id: any, room_id: any, type?: string }>}
  */
-export function mapOrganizedToRows({ organized, days, timeSlots, classKeyToId }) {
+export function mapOrganizedToRows({
+  organized,
+  days,
+  timeSlots,
+  classKeyToId,
+}) {
   if (!organized || typeof organized !== "object") return [];
 
   // Map day name to numeric day index (0..6) based on provided days array
@@ -125,7 +133,11 @@ export function mapOrganizedToRows({ organized, days, timeSlots, classKeyToId })
         if (!slot) continue;
 
         const hhmm = normalizeToHHMM(timeLabel);
-        const time_slot_id = tsIndex.get(`${dayIndex}::${hhmm}`);
+        let time_slot_id = tsIndex.get(`${dayIndex}::${hhmm}`);
+        if (!time_slot_id) {
+          // Fallback: some schemas store Monday as 1..5 while UI uses 0..4
+          time_slot_id = tsIndex.get(`${dayIndex + 1}::${hhmm}`);
+        }
 
         if (!time_slot_id) {
           // If there's no exact time slot match, skip this cell gracefully.
@@ -133,12 +145,7 @@ export function mapOrganizedToRows({ organized, days, timeSlots, classKeyToId })
           continue;
         }
 
-        const {
-          subject_id,
-          teacher_id,
-          room_id,
-          type = "Theory",
-        } = slot;
+        const { subject_id, teacher_id, room_id, type = "Theory" } = slot;
 
         // Minimal validation: ensure core FKs are present
         if (
@@ -199,7 +206,12 @@ async function insertEntriesInternal(args) {
     inputRows && inputRows.length
       ? inputRows
       : organized
-        ? mapOrganizedToRows({ organized, days: days || [], timeSlots: timeSlots || [], classKeyToId })
+        ? mapOrganizedToRows({
+            organized,
+            days: days || [],
+            timeSlots: timeSlots || [],
+            classKeyToId,
+          })
         : [];
 
   if (!rows.length) {
@@ -217,7 +229,9 @@ async function insertEntriesInternal(args) {
       .in("class_id", classIds);
 
     if (delError) {
-      throw new Error(delError.message || "Failed to clear existing timetable entries");
+      throw new Error(
+        delError.message || "Failed to clear existing timetable entries",
+      );
     }
   }
 
@@ -241,7 +255,9 @@ async function insertEntriesInternal(args) {
  * @param {{ classIds: Array<string|number> }} args
  */
 async function clearClassEntriesInternal({ classIds }) {
-  const ids = Array.isArray(classIds) ? classIds.filter((v) => v !== null && v !== undefined) : [];
+  const ids = Array.isArray(classIds)
+    ? classIds.filter((v) => v !== null && v !== undefined)
+    : [];
   if (!ids.length) return { data: [], error: null };
 
   const { data, error } = await supabase
@@ -274,7 +290,9 @@ export default function useTimetableEntriesMutations() {
     mutationFn: insertEntriesInternal,
     onSuccess: async () => {
       // Invalidate timetable entries caches so UI reflects latest DB state
-      await queryClient.invalidateQueries({ queryKey: queryKeys.timetableEntries.all });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.timetableEntries.all,
+      });
     },
   });
 
@@ -282,7 +300,9 @@ export default function useTimetableEntriesMutations() {
     mutationKey: [...queryKeys.timetableEntries.all, "clearByClass"],
     mutationFn: clearClassEntriesInternal,
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: queryKeys.timetableEntries.all });
+      await queryClient.invalidateQueries({
+        queryKey: queryKeys.timetableEntries.all,
+      });
     },
   });
 
