@@ -16,15 +16,19 @@ Public API:
 from __future__ import annotations
 
 import random
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, cast
 
 import numpy as np
+from numpy.typing import NDArray
+from app.core.utils import get_logger
 
 from ..models.request_models import TimetableRequest
+from ..schemas.combined_timetable import CombinedTimetable
 from ..schemas.slot_info import SlotInfo
 from ..schemas.student_timetable import StudentTimetable
 from ..schemas.teacher_timetable import TeacherTimetable
-from ..schemas.combined_timetable import CombinedTimetable
+
+log = get_logger(__name__)
 
 
 class TimetableGenerator:
@@ -35,53 +39,74 @@ class TimetableGenerator:
     monolithic application to ensure drop-in compatibility.
     """
 
-    def __init__(self, config: TimetableRequest):
-        self.config = config
+    def __init__(self, config: TimetableRequest, 
+        TOTAL_ROOMS: int,
+        TOTAL_TEACHERS: int,
+        TOTAL_SUBJECTS: int,
+        NUM_CLASSES: int,
+        department_data: dict[str, Any] | None = None,
+        ROOM_NAMES: list[str] | None = None,
+        CLASS_NAMES: list[str] | None = None,
+        SUBJECT_NAMES: list[str] | None = None,
+        TEACHER_NAMES: list[str] | None = None):
+        self.config: TimetableRequest = config
 
         # Core dimensions
-        self.NUM_CLASSES = config.num_classes
-        self.DAYS = config.days
-        self.SLOTS_PER_DAY = config.slots_per_day
-
-        # Resources
-        self.TOTAL_ROOMS = config.total_rooms
-        self.TOTAL_TEACHERS = config.total_teachers
+        self.NUM_CLASSES: int = NUM_CLASSES
+        self.DAYS: int = config.days
+        self.SLOTS_PER_DAY: int = config.slots_per_day
 
         # Curriculum and constraints
-        # Ensure integer keys (Pydantic may deserialize dicts with string keys)
-        self.SUBJECT_HOURS: Dict[int, int] = {
-            int(k): v for k, v in config.subject_hours.items()
-        }
-        self.NUM_SUBJECTS = max(self.SUBJECT_HOURS.keys()) + 1
-        self.SUBJECT_TEACHERS: Dict[int, List[int]] = {
-            int(k): v for k, v in config.subject_teachers.items()
-        }
-        self.MAX_HOURS_PER_DAY = config.max_hours_per_day
-        self.MAX_HOURS_PER_WEEK = config.max_hours_per_week
+        self.SUBJECT_HOURS: dict[int, int] = {int(k): v for k, v in config.subject_hours.items()}
+        self.NUM_SUBJECTS: int = TOTAL_SUBJECTS
+        self.SUBJECT_TEACHERS: dict[int, list[int]] = {int(k): v for k, v in config.subject_teachers.items()}
+        self.MAX_HOURS_PER_DAY: int = config.max_hours_per_day
+        self.MAX_HOURS_PER_WEEK: int = config.max_hours_per_week
 
-        # Names/labels (fallbacks preserved)
-        self.CLASS_NAMES = config.class_names or [
-            f"Class-{i + 1}" for i in range(self.NUM_CLASSES)
-        ]
-        self.SUBJ_NAMES = config.subject_names or [
-            f"Subject-{i}" for i in range(self.NUM_SUBJECTS)
-        ]
-        self.TEACHER_NAMES = config.teacher_names or [
-            f"Teacher-{i}" for i in range(self.TOTAL_TEACHERS)
-        ]
-        self.ROOM_NAMES = config.room_names or [
-            f"Room-{i}" for i in range(self.TOTAL_ROOMS)
-        ]
+        # Initialize placeholders (important!)
+        self.TOTAL_TEACHERS: int = TOTAL_TEACHERS
+        self.TOTAL_ROOMS: int = TOTAL_ROOMS
+
+        # Names/labels for classes and subjects
+        self.CLASS_NAMES: list[str] = CLASS_NAMES or []
+        self.SUBJ_NAMES: list[str] = SUBJECT_NAMES or []
+
+        # Ensure subject and class name lists are long enough
+        if len(self.CLASS_NAMES) < self.NUM_CLASSES:
+            self.CLASS_NAMES.extend(
+                [f"Class-{i + 1}" for i in range(len(self.CLASS_NAMES), self.NUM_CLASSES)]
+            )
+        if len(self.SUBJ_NAMES) < self.NUM_SUBJECTS:
+            self.SUBJ_NAMES.extend(
+                [f"Subject-{i}" for i in range(len(self.SUBJ_NAMES), self.NUM_SUBJECTS)]
+            )
 
         # GA settings
-        self.POP_SIZE = config.population_size
-        self.GENERATIONS = config.generations
-        self.MUTATION_RATE = config.mutation_rate
+        self.POP_SIZE: int = config.population_size
+        self.GENERATIONS: int = config.generations
+        self.MUTATION_RATE: float = config.mutation_rate
+
+        # Department fetching
+        self.department_id: int | None = config.department_id
+
+        self.TEACHER_NAMES: list[str] = TEACHER_NAMES or []
+        self.ROOM_NAMES: list[str] = ROOM_NAMES or []
+
+        # Ensure our name lists match fetched totals
+        if len(self.TEACHER_NAMES) < self.TOTAL_TEACHERS:
+            self.TEACHER_NAMES.extend(
+                [f"Teacher-{i}" for i in range(len(self.TEACHER_NAMES), self.TOTAL_TEACHERS)]
+            )
+        if len(self.ROOM_NAMES) < self.TOTAL_ROOMS:
+            self.ROOM_NAMES.extend(
+                [f"Room-{i}" for i in range(len(self.ROOM_NAMES), self.TOTAL_ROOMS)]
+            )
+
 
     # ---------------------------
     # Generation helpers
     # ---------------------------
-    def normalize_chromosome(self, chrom: Any) -> np.ndarray:
+    def normalize_chromosome(self, chrom: object) -> NDArray[np.int_]:
         """
         Normalize/validate a chromosome (timetable) to a consistent ndarray
         of shape (NUM_CLASSES, DAYS, SLOTS_PER_DAY, 3) with dtype=int, using -1
@@ -94,13 +119,13 @@ class TimetableGenerator:
 
         # Fast path if it's already correct shape and dtype
         if chrom.shape == target.shape and chrom.dtype != object:
-            return chrom.astype(int)
+            return cast(NDArray[np.int_], chrom.astype(int))
 
         for c in range(self.NUM_CLASSES):
             for d in range(self.DAYS):
                 for s in range(self.SLOTS_PER_DAY):
                     try:
-                        entry = chrom[c][d][s]
+                        entry: object | None = cast(object, chrom[c][d][s])
                     except Exception:
                         entry = None
 
@@ -117,7 +142,11 @@ class TimetableGenerator:
                             continue
                     else:
                         # Only subject provided; randomize permissible teacher/room
-                        subj = int(entry)
+                        if isinstance(entry, (int, np.integer, str)):
+                            subj = int(entry)
+                        else:
+                            # Unrecognized entry type; skip
+                            subj = -1
                         teacher = random.randrange(self.TOTAL_TEACHERS)
                         room = random.randrange(self.TOTAL_ROOMS)
 
@@ -136,7 +165,7 @@ class TimetableGenerator:
 
         return target
 
-    def generate_random_timetable(self) -> np.ndarray:
+    def generate_random_timetable(self) -> NDArray[np.int_]:
         """
         Create a randomized timetable seeded by subject hour requirements per class.
         """
@@ -144,7 +173,7 @@ class TimetableGenerator:
             (self.NUM_CLASSES, self.DAYS, self.SLOTS_PER_DAY, 3), -1, dtype=int
         )
         for cls in range(self.NUM_CLASSES):
-            subject_list: List[int] = []
+            subject_list: list[int] = []
             for subj, hrs in self.SUBJECT_HOURS.items():
                 subject_list += [subj] * hrs
 
@@ -173,7 +202,7 @@ class TimetableGenerator:
     # ---------------------------
     # Genetic Algorithm core
     # ---------------------------
-    def fitness(self, chrom: Any) -> float:
+    def fitness(self, chrom: object) -> float:
         """
         Fitness function (higher is better). Penalizes:
         - Teacher double-booking within the same slot
@@ -191,9 +220,10 @@ class TimetableGenerator:
 
         for d in range(self.DAYS):
             for s in range(self.SLOTS_PER_DAY):
-                t_seen, r_seen = set(), set()
+                t_seen: set[int] = set()
+                r_seen: set[int] = set()
                 for c in range(self.NUM_CLASSES):
-                    subj, teacher, room = chrom[c, d, s]
+                    subj, teacher, room = map(int, chrom[c, d, s])
                     if subj == -1:
                         continue
 
@@ -225,7 +255,7 @@ class TimetableGenerator:
 
         # Subject hour mismatch per class
         for c in range(self.NUM_CLASSES):
-            flat_subjects = chrom[c, :, :, 0].ravel()
+            flat_subjects = cast(NDArray[np.int_], chrom[c, :, :, 0]).ravel()
             flat_subjects = flat_subjects[flat_subjects >= 0]  # filter free slots
             subj_counts = np.bincount(flat_subjects, minlength=self.NUM_SUBJECTS)
             for subj, hrs in self.SUBJECT_HOURS.items():
@@ -234,22 +264,22 @@ class TimetableGenerator:
 
         return -float(penalty)
 
-    def crossover(self, p1: np.ndarray, p2: np.ndarray) -> np.ndarray:
+    def crossover(self, p1: NDArray[np.int_], p2: NDArray[np.int_]) -> NDArray[np.int_]:
         """
         Single-point crossover along the class axis.
         """
         cut = random.randint(1, self.NUM_CLASSES - 1)
-        child = p1.copy()
+        child = cast(NDArray[np.int_], p1.copy())
         child[cut:] = p2[cut:]
         return child
 
-    def mutate(self, chrom: np.ndarray) -> np.ndarray:
+    def mutate(self, chrom: NDArray[np.int_]) -> NDArray[np.int_]:
         """
         Randomly mutate the timetable:
         - With 60% probability: replace a random slot with a new valid assignment.
         - Otherwise: swap two random slots.
         """
-        out = chrom.copy()
+        out = cast(NDArray[np.int_], chrom.copy())
         n = max(
             1,
             int(self.MUTATION_RATE * self.NUM_CLASSES * self.DAYS * self.SLOTS_PER_DAY),
@@ -280,11 +310,17 @@ class TimetableGenerator:
 
         return out
 
-    def run_ga(self) -> Tuple[np.ndarray, float]:
+    def run_ga(self) -> tuple[NDArray[np.int_], float]:
         """
         Execute the genetic algorithm and return the best timetable and its fitness.
         """
-        pop: List[np.ndarray] = [
+        log.info(
+            "Starting GA with pop_size=%d, generations=%d",
+            self.POP_SIZE,
+            self.GENERATIONS,
+        )
+        log.info("department_id=%s", self.department_id)
+        pop: list[NDArray[np.int_]] = [
             self.generate_random_timetable() for _ in range(self.POP_SIZE)
         ]
 
@@ -298,7 +334,7 @@ class TimetableGenerator:
             sel = [x for _, x in scored[: max(2, self.POP_SIZE // 3)]]
 
             # Elitism: carry forward best two
-            new: List[np.ndarray] = [scored[0][1].copy(), scored[1][1].copy()]
+            new: list[NDArray[np.int_]] = [scored[0][1].copy(), scored[1][1].copy()]
 
             # Fill rest via crossover + mutation
             while len(new) < self.POP_SIZE:
@@ -308,23 +344,23 @@ class TimetableGenerator:
 
             pop = new
 
-        best = max(pop, key=self.fitness)
+        best = cast(NDArray[np.int_], max(pop, key=self.fitness))
         return best, float(self.fitness(best))
 
     # ---------------------------
     # Views
     # ---------------------------
-    def generate_student_view(self, tt: np.ndarray) -> List[StudentTimetable]:
+    def generate_student_view(self, tt: NDArray[np.int_]) -> list[StudentTimetable]:
         """
         Build the student (class-wise) view from a timetable array.
         """
-        data: List[StudentTimetable] = []
+        data: list[StudentTimetable] = []
         for c in range(self.NUM_CLASSES):
-            days: List[List[SlotInfo]] = []
+            days: list[list[SlotInfo]] = []
             for d in range(self.DAYS):
-                slots: List[SlotInfo] = []
+                slots: list[SlotInfo] = []
                 for s in range(self.SLOTS_PER_DAY):
-                    subj, t, r = tt[c, d, s]
+                    subj, t, r = map(int, tt[c, d, s])
                     if subj == -1:
                         slots.append(SlotInfo(day=d, slot=s, is_free=True))
                     else:
@@ -333,9 +369,13 @@ class TimetableGenerator:
                                 subject_id=int(subj),
                                 subject_name=self.SUBJ_NAMES[subj],
                                 teacher_id=int(t),
-                                teacher_name=self.TEACHER_NAMES[t],
+                                teacher_name=self.TEACHER_NAMES[t]
+                                if 0 <= t < len(self.TEACHER_NAMES)
+                                else f"Teacher-{t}",
                                 room_id=int(r),
-                                room_name=self.ROOM_NAMES[r],
+                                room_name=self.ROOM_NAMES[r]
+                                if 0 <= r < len(self.ROOM_NAMES)
+                                else f"Room-{r}",
                                 class_id=c,
                                 class_name=self.CLASS_NAMES[c],
                                 day=d,
@@ -350,28 +390,32 @@ class TimetableGenerator:
             )
         return data
 
-    def generate_teacher_view(self, tt: np.ndarray) -> List[TeacherTimetable]:
+    def generate_teacher_view(self, tt: NDArray[np.int_]) -> list[TeacherTimetable]:
         """
         Build the teacher-wise view from a timetable array.
         """
-        data: List[TeacherTimetable] = []
+        data: list[TeacherTimetable] = []
         for t in range(self.TOTAL_TEACHERS):
-            sched: List[List[Optional[SlotInfo]]] = [
+            sched: list[list[SlotInfo | None]] = [
                 [None for _ in range(self.SLOTS_PER_DAY)] for _ in range(self.DAYS)
             ]
             hours = 0
             for c in range(self.NUM_CLASSES):
                 for d in range(self.DAYS):
                     for s in range(self.SLOTS_PER_DAY):
-                        subj, teacher, r = tt[c, d, s]
+                        subj, teacher, r = map(int, tt[c, d, s])
                         if teacher == t and subj != -1:
                             sched[d][s] = SlotInfo(
                                 subject_id=int(subj),
                                 subject_name=self.SUBJ_NAMES[subj],
                                 teacher_id=t,
-                                teacher_name=self.TEACHER_NAMES[t],
+                                teacher_name=self.TEACHER_NAMES[t]
+                                if 0 <= t < len(self.TEACHER_NAMES)
+                                else f"Teacher-{t}",
                                 room_id=r,
-                                room_name=self.ROOM_NAMES[r],
+                                room_name=self.ROOM_NAMES[r]
+                                if 0 <= r < len(self.ROOM_NAMES)
+                                else f"Room-{r}",
                                 class_id=c,
                                 class_name=self.CLASS_NAMES[c],
                                 day=d,
@@ -381,32 +425,38 @@ class TimetableGenerator:
             data.append(
                 TeacherTimetable(
                     teacher_id=t,
-                    teacher_name=self.TEACHER_NAMES[t],
+                    teacher_name=self.TEACHER_NAMES[t]
+                    if 0 <= t < len(self.TEACHER_NAMES)
+                    else f"Teacher-{t}",
                     total_hours=hours,
                     timetable=sched,
                 )
             )
         return data
 
-    def generate_combined_view(self, tt: np.ndarray) -> List[CombinedTimetable]:
+    def generate_combined_view(self, tt: NDArray[np.int_]) -> list[CombinedTimetable]:
         """
         Build the combined (slot-wise across all classes) view from a timetable array.
         """
-        res: List[CombinedTimetable] = []
+        res: list[CombinedTimetable] = []
         for d in range(self.DAYS):
             for s in range(self.SLOTS_PER_DAY):
-                assigns: List[SlotInfo] = []
+                assigns: list[SlotInfo] = []
                 for c in range(self.NUM_CLASSES):
-                    subj, t, r = tt[c, d, s]
+                    subj, t, r = map(int, tt[c, d, s])
                     if subj != -1:
                         assigns.append(
                             SlotInfo(
                                 subject_id=subj,
                                 subject_name=self.SUBJ_NAMES[subj],
                                 teacher_id=t,
-                                teacher_name=self.TEACHER_NAMES[t],
+                                teacher_name=self.TEACHER_NAMES[t]
+                                if 0 <= t < len(self.TEACHER_NAMES)
+                                else f"Teacher-{t}",
                                 room_id=r,
-                                room_name=self.ROOM_NAMES[r],
+                                room_name=self.ROOM_NAMES[r]
+                                if 0 <= r < len(self.ROOM_NAMES)
+                                else f"Room-{r}",
                                 class_id=c,
                                 class_name=self.CLASS_NAMES[c],
                                 day=d,
@@ -416,11 +466,11 @@ class TimetableGenerator:
                 res.append(CombinedTimetable(day=d, slot=s, assignments=assigns))
         return res
 
-    def calculate_statistics(self, tt: np.ndarray) -> Dict[str, Any]:
+    def calculate_statistics(self, tt: NDArray[np.int_]) -> dict[str, int]:
         """
         Calculate basic utilization statistics for a timetable.
         """
-        stats: Dict[str, Any] = {
+        stats: dict[str, int] = {
             "total_slots": self.NUM_CLASSES * self.DAYS * self.SLOTS_PER_DAY,
             "occupied_slots": 0,
             "free_slots": 0,

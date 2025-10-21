@@ -35,9 +35,11 @@ class TimetableRequest(BaseModel):
     teacher_names: Optional[List[str]] = None
     room_names: Optional[List[str]] = None
 
-    population_size: int = 60
-    generations: int = 80
-    mutation_rate: float = 0.02
+    department_id: Optional[int] = None
+
+    population_size: int = 100
+    generations: int = 300
+    mutation_rate: float = 0.01
 
     class Config:
         schema_extra = {

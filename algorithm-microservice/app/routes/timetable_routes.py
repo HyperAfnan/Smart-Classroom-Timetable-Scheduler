@@ -1,13 +1,17 @@
 from __future__ import annotations
 
+import traceback
 from typing import TypedDict
 
-import traceback
+from ..services.fetch_details import get_department_resources
 from fastapi import APIRouter, HTTPException
 
 from ..models.request_models import TimetableRequest
 from ..models.response_models import StudentTimetableResponse, TimetableResponse
 from ..services.generator import TimetableGenerator
+from ..core.utils import get_logger
+
+log = get_logger(__name__)
 
 router = APIRouter()
 
@@ -79,7 +83,48 @@ async def generate_timetable_teacherwise(request: TimetableRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/generate-timetable/studentwise", response_model=StudentTimetableResponse)
+@router.post(
+    "/generate-timetable/studentwise/department/{department_id}",
+    response_model=StudentTimetableResponse,
+)
+async def generate_timetable_across_department(
+    department_id: int, request: TimetableRequest
+):
+    try:
+        request.department_id = department_id
+        resources = await get_department_resources(department_id)
+        log.info(resources["subject_hours"])
+        log.info(resources["subject_names"])
+        log.info(resources["subject_teachers"])
+        gen = TimetableGenerator(
+            request,
+            TOTAL_ROOMS=resources["total_rooms"],
+            TOTAL_TEACHERS=resources["total_teachers"],
+            department_data=resources["department"],
+            ROOM_NAMES=resources["room_names"],
+            NUM_CLASSES=resources["total_classes"],
+            CLASS_NAMES=resources["class_names"],
+            TOTAL_SUBJECTS=resources["total_subjects"],
+            SUBJECT_NAMES=resources["subject_names"],
+        )
+
+        best, score = gen.run_ga()
+        return StudentTimetableResponse(
+            success=True,
+            fitness_score=float(score),
+            generation_count=request.generations,
+            student_timetables=gen.generate_student_view(best),
+            teacher_timetables=gen.generate_teacher_view(best),
+            combined_view=gen.generate_combined_view(best),
+        )
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post(
+    "/generate-timetable/studentwise/", response_model=StudentTimetableResponse
+)
 async def generate_timetable_studentwise(request: TimetableRequest):
     """
     Generate student-wise timetable view using GA.

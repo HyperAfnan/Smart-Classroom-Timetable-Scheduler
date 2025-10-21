@@ -1,4 +1,8 @@
 from __future__ import annotations
+from fastapi import FastAPI
+from .core.config import apply_cors, get_settings
+from .routes.timetable_routes import router as timetable_router
+from .routes.example_routes import router as example_router
 
 """
 FastAPI application entrypoint for the Timetable API.
@@ -8,13 +12,6 @@ This module wires together:
 - CORS middleware based on settings
 - API routers for timetable generation and example endpoints
 """
-
-from fastapi import FastAPI
-
-from .core.config import apply_cors, get_settings
-from .routes.timetable_routes import router as timetable_router
-from .routes.example_routes import router as example_router
-
 
 def create_app() -> FastAPI:
     """
