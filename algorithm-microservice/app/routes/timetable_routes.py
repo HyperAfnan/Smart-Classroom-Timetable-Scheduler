@@ -93,9 +93,12 @@ async def generate_timetable_across_department(
     try:
         request.department_id = department_id
         resources = await get_department_resources(department_id)
-        log.info(resources["subject_hours"])
-        log.info(resources["subject_names"])
-        log.info(resources["subject_teachers"])
+        # log.info(resources["subject_hours"])
+        # log.info(resources["subject_names"])
+        # log.info(f"Subject Teachers  {resources['subject_teachers']}")
+        # log.info(f"Teachers before mapping  {resources['teachers']}")
+        # log.info(f"Subject  before mapping {resources['subject']}")
+        # log.info(resources["teacher_names"])
         gen = TimetableGenerator(
             request,
             TOTAL_ROOMS=resources["total_rooms"],
@@ -106,6 +109,9 @@ async def generate_timetable_across_department(
             CLASS_NAMES=resources["class_names"],
             TOTAL_SUBJECTS=resources["total_subjects"],
             SUBJECT_NAMES=resources["subject_names"],
+            TEACHER_NAMES=resources["teacher_names"],
+            SUBJECT_TEACHERS=resources["subject_teachers"],
+            SUBJECT_HOURS=resources["subject_hours"],
         )
 
         best, score = gen.run_ga()

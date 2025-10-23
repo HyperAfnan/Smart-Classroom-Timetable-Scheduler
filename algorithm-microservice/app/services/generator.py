@@ -48,6 +48,8 @@ class TimetableGenerator:
         ROOM_NAMES: list[str] | None = None,
         CLASS_NAMES: list[str] | None = None,
         SUBJECT_NAMES: list[str] | None = None,
+        SUBJECT_TEACHERS: dict[int, list[int]] | None = None,
+        SUBJECT_HOURS: dict[int, int] | None = None,
         TEACHER_NAMES: list[str] | None = None):
         self.config: TimetableRequest = config
 
@@ -57,11 +59,14 @@ class TimetableGenerator:
         self.SLOTS_PER_DAY: int = config.slots_per_day
 
         # Curriculum and constraints
-        self.SUBJECT_HOURS: dict[int, int] = {int(k): v for k, v in config.subject_hours.items()}
+        self.SUBJECT_HOURS: dict[int, int] = SUBJECT_HOURS or {}
         self.NUM_SUBJECTS: int = TOTAL_SUBJECTS
-        self.SUBJECT_TEACHERS: dict[int, list[int]] = {int(k): v for k, v in config.subject_teachers.items()}
+        self.SUBJECT_TEACHERS: dict[int, list[int]] = SUBJECT_TEACHERS or {}
         self.MAX_HOURS_PER_DAY: int = config.max_hours_per_day
         self.MAX_HOURS_PER_WEEK: int = config.max_hours_per_week
+
+        log.info("FROM GENERATOR SERVICE")
+        log.info(f"subject teachers {self.SUBJECT_TEACHERS}")
 
         # Initialize placeholders (important!)
         self.TOTAL_TEACHERS: int = TOTAL_TEACHERS

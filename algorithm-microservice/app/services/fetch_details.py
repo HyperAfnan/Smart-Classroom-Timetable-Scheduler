@@ -49,6 +49,7 @@ async def get_teachers_by_department(department_id: int) -> list[dict[str, Any]]
         lambda: supabase.table("teacher_profile")
         .select("*")
         .eq("department_id", department_id)
+        .order("id")
         .execute()
     )
 
@@ -83,7 +84,7 @@ async def get_subjects_by_department(department_id: int) -> list[dict[str, Any]]
         lambda: supabase.table("subjects")
         .select("*")
         .eq("department_id", department_id)
-        .order("id", desc=True)
+        .order("id")
         .execute()
     )
 
@@ -111,6 +112,73 @@ def build_subject_hours(subjects_list: list[dict[str, Any]]) -> dict[int, int]:
             hrs = 0
         mapping[idx] = hrs
     return mapping
+
+
+def build_subject_teachers(
+    subjects_list: list[dict[str, Any]],
+    teachers_list: list[dict[str, Any]],
+    assignments_list: list[dict[str, Any]],
+) -> dict[int, list[int]]:
+    """
+    Build subject_teachers mapping using subject IDs as keys and teacher IDs as values.
+    Returns: {subject_id: [teacher_id, ...]}
+    """
+
+    print("=== DEBUG: Building initial mapping from subjects_list ===")
+    mapping: dict[int, list[int]] = {subj["id"]: [] for subj in subjects_list if "id" in subj}
+    print(f"Initial mapping keys (subject IDs): {list(mapping.keys())}")
+
+    print("\n=== DEBUG: Processing assignments ===")
+    for idx, row in enumerate(assignments_list):
+        print(f"\nAssignment #{idx + 1}: {row}")
+
+        subj = row.get("subject") or {}
+        teacher = row.get("teacher") or {}
+        sid = subj.get("id")
+        tid = teacher.get("id")
+
+        print(f"  Extracted subject ID: {sid}, teacher ID: {tid}")
+
+        if sid in mapping and tid is not None:
+            mapping[sid].append(tid)
+            print(f"  ✅ Added teacher {tid} to subject {sid}")
+        else:
+            print(f"  ⚠️ Skipped — subject {sid} not in mapping or teacher ID missing")
+
+    print("\n=== DEBUG: Sorting teacher IDs for each subject ===")
+    for s_id in mapping:
+        mapping[s_id].sort()
+        print(f"  Subject {s_id}: Sorted teachers → {mapping[s_id]}")
+
+    print("\n=== FINAL MAPPING RESULT ===")
+    print(mapping)
+    return mapping
+
+
+async def get_teacher_subject_assignments_by_department(
+    department_id: int,
+) -> list[dict[str, Any]]:
+    """
+    Fetch teacher-subject assignment rows with expanded teacher and subject.
+    Filters to the given department using nested teacher.department_id where available.
+    """
+    fetched = await run_in_threadpool(
+        lambda: supabase.table("teacher_subjects")
+        .select(
+            "id, teacher:teacher_profile(id,name,email,department_id), subject:subjects(id,subject_name,department_id)"
+        )
+        .execute()
+    )
+
+    data = getattr(fetched, "data", [])
+    items = cast(list[dict[str, Any]], data if isinstance(data, list) else [])
+    filtered = [
+        it
+        for it in items
+            if (it.get("teacher") or {}).get("department_id") == department_id
+        or (it.get("subject") or {}).get("department_id") == department_id
+    ]
+    return filtered
 
 
 async def get_subject_teachers_by_department(
@@ -142,14 +210,14 @@ async def get_department_resources(department_id: int) -> dict[str, Any]:
         teachers_list,
         class_list,
         subjects_list,
-        subject_teachers_list,
+        assignments_list,
     ) = await asyncio.gather(
         get_department_details(department_id),
         get_rooms_by_department(department_id),
         get_teachers_by_department(department_id),
         get_classes_by_department(department_id),
         get_subjects_by_department(department_id),
-        get_subject_teachers_by_department(department_id),
+        get_teacher_subject_assignments_by_department(department_id),
     )
 
     return {
@@ -171,7 +239,7 @@ async def get_department_resources(department_id: int) -> dict[str, Any]:
             for subject in subjects_list
             if "subject_name" in subject
         ],
+        "teacher_names": [t["name"] for t in teachers_list if "name" in t],
         "subject_hours": build_subject_hours(subjects_list),
-        "subject_teachers": subject_teachers_list,
-        "total_subject_teachers": len(subject_teachers_list),
+        "subject_teachers": build_subject_teachers( subjects_list, teachers_list, assignments_list),
     }
