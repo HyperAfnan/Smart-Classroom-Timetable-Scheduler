@@ -30,6 +30,7 @@ class SlotInfo(BaseModel):
     day: int
     slot: int
     is_free: bool = False
+    session_type: Optional[str] = None
 
 
 class StudentTimetable(BaseModel):

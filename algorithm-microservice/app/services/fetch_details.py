@@ -120,39 +120,28 @@ def build_subject_teachers(
     assignments_list: list[dict[str, Any]],
 ) -> dict[int, list[int]]:
     """
-    Build subject_teachers mapping using subject IDs as keys and teacher IDs as values.
-    Returns: {subject_id: [teacher_id, ...]}
+    Build subject_teachers mapping using subject indices as keys and
+    teacher indices (aligned with teachers_list) as values.
+    Returns: {subject_index: [teacher_index, ...]}
     """
-
-    print("=== DEBUG: Building initial mapping from subjects_list ===")
-    mapping: dict[int, list[int]] = {subj["id"]: [] for subj in subjects_list if "id" in subj}
-    print(f"Initial mapping keys (subject IDs): {list(mapping.keys())}")
-
-    print("\n=== DEBUG: Processing assignments ===")
-    for idx, row in enumerate(assignments_list):
-        print(f"\nAssignment #{idx + 1}: {row}")
-
+    subj_id_to_index = {
+        subj["id"]: idx for idx, subj in enumerate(subjects_list) if "id" in subj
+    }
+    teacher_id_to_index = {
+        t["id"]: idx for idx, t in enumerate(teachers_list) if "id" in t
+    }
+    mapping: dict[int, list[int]] = {idx: [] for idx in subj_id_to_index.values()}
+    for row in assignments_list:
         subj = row.get("subject") or {}
         teacher = row.get("teacher") or {}
         sid = subj.get("id")
         tid = teacher.get("id")
-
-        print(f"  Extracted subject ID: {sid}, teacher ID: {tid}")
-
-        if sid in mapping and tid is not None:
-            mapping[sid].append(tid)
-            print(f"  ✅ Added teacher {tid} to subject {sid}")
-        else:
-            print(f"  ⚠️ Skipped — subject {sid} not in mapping or teacher ID missing")
-
-    print("\n=== DEBUG: Sorting teacher IDs for each subject ===")
-    for s_id in mapping:
-        mapping[s_id].sort()
-        print(f"  Subject {s_id}: Sorted teachers → {mapping[s_id]}")
-
-    print("\n=== FINAL MAPPING RESULT ===")
-    print(mapping)
-    return mapping
+        si = subj_id_to_index.get(sid)
+        ti = teacher_id_to_index.get(tid)
+        if si is not None and ti is not None:
+            mapping.setdefault(si, []).append(ti)
+    # Deduplicate and sort teachers per subject
+    return {si: sorted(set(tis)) for si, tis in mapping.items()}
 
 
 async def get_teacher_subject_assignments_by_department(
@@ -175,7 +164,7 @@ async def get_teacher_subject_assignments_by_department(
     filtered = [
         it
         for it in items
-            if (it.get("teacher") or {}).get("department_id") == department_id
+        if (it.get("teacher") or {}).get("department_id") == department_id
         or (it.get("subject") or {}).get("department_id") == department_id
     ]
     return filtered
@@ -242,4 +231,12 @@ async def get_department_resources(department_id: int) -> dict[str, Any]:
         "teacher_names": [t["name"] for t in teachers_list if "name" in t],
         "subject_hours": build_subject_hours(subjects_list),
         "subject_teachers": build_subject_teachers( subjects_list, teachers_list, assignments_list),
+        "subject_types": {
+            idx: (
+                "lab"
+                if ((subj.get("type") or "").strip().lower() == "lab")
+                else "lecture"
+            )
+            for idx, subj in enumerate(subjects_list)
+        },
     }
