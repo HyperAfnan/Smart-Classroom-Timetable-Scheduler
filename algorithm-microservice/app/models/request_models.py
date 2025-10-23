@@ -26,8 +26,8 @@ class TimetableRequest(BaseModel):
     max_hours_per_week: int = 20
     department_id: int = 132
 
-    population_size: int = 100
-    generations: int = 300
+    population_size: int = 50
+    generations: int = 100
     mutation_rate: float = 0.01
 
     class Config:

@@ -230,7 +230,9 @@ async def get_department_resources(department_id: int) -> dict[str, Any]:
         ],
         "teacher_names": [t["name"] for t in teachers_list if "name" in t],
         "subject_hours": build_subject_hours(subjects_list),
-        "subject_teachers": build_subject_teachers( subjects_list, teachers_list, assignments_list),
+        "subject_teachers": build_subject_teachers(
+            subjects_list, teachers_list, assignments_list
+        ),
         "subject_types": {
             idx: (
                 "lab"

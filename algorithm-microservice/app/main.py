@@ -13,6 +13,7 @@ This module wires together:
 - API routers for timetable generation and example endpoints
 """
 
+
 def create_app() -> FastAPI:
     """
     Create and configure the FastAPI application instance.
@@ -26,6 +27,7 @@ def create_app() -> FastAPI:
 
     # Middleware
     apply_cors(app, settings)
+
 
     # Routers (keep same paths/behavior as the original monolith)
     app.include_router(timetable_router)
