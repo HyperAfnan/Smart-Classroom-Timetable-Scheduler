@@ -114,8 +114,6 @@ async def generate_timetable_across_department(
             fitness_score=float(score),
             generation_count=request.generations,
             student_timetables=gen.generate_student_view(best),
-            teacher_timetables=gen.generate_teacher_view(best),
-            combined_view=gen.generate_combined_view(best),
         )
     except Exception as e:
         traceback.print_exc()
@@ -138,8 +136,6 @@ async def generate_timetable_studentwise(request: TimetableRequest):
             fitness_score=float(score),
             generation_count=request.generations,
             student_timetables=gen.generate_student_view(best),
-            teacher_timetables=gen.generate_teacher_view(best),
-            combined_view=gen.generate_combined_view(best),
         )
     except Exception as e:
         traceback.print_exc()

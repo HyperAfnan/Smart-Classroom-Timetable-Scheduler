@@ -561,7 +561,6 @@ class TimetableGenerator:
             self.GENERATIONS,
         )
         log.info("department_id=%s", self.department_id)
-        log.debug("a debug message")
         pop: list[NDArray[np.int_]] = [
             self.generate_random_timetable() for _ in range(self.POP_SIZE)
         ]

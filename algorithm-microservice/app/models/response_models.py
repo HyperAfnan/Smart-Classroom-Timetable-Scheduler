@@ -43,8 +43,6 @@ class StudentTimetableResponse(BaseModel):
     fitness_score: float
     generation_count: int
     student_timetables: List[StudentTimetable]
-    teacher_timetables: List[TeacherTimetable] = Field(default_factory=list)
-    combined_view: List[CombinedTimetable] = Field(default_factory=list)
 
 
 __all__ = [
