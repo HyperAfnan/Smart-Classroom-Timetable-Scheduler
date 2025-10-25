@@ -2,6 +2,11 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import SidebarMenu from "./components/ui/SideBar";
 import { Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 
 export default function Layout() {
   const location = useLocation();
@@ -18,12 +23,12 @@ export default function Layout() {
   };
 
   const currentRole = Object.keys(roleTitleMap).find((role) =>
-    roles.includes(role)
+    roles.includes(role),
   );
 
   if (!currentRole) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="h-svh bg-background">
         <Outlet />
       </div>
     );
@@ -31,25 +36,60 @@ export default function Layout() {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-slate-50">
-        {isSidebarVisible && <SidebarMenu />}
-
-        <main className="flex-1 flex flex-col">
-          <header className="bg-white border-b border-slate-200 px-6 py-4 md:hidden">
-            <div className="flex items-center gap-4">
-              {currentRole === "admin" && isSidebarVisible && (
-                <SidebarTrigger className="hover:bg-slate-100 p-2 rounded-lg transition-colors duration-200" />
-              )}
-              <h1 className="text-xl font-semibold text-slate-900">
-                {roleTitleMap[currentRole]}
-              </h1>
+      <div className="h-svh w-full overflow-hidden bg-background">
+        {isSidebarVisible ? (
+          <ResizablePanelGroup
+            direction="horizontal"
+            className="flex w-full h-svh min-h-0 overflow-hidden"
+          >
+            <ResizablePanel
+              defaultSize={16}
+              minSize={5}
+              className="min-w-[3rem] h-svh overflow-hidden"
+              maxSize={16}
+            >
+              <SidebarMenu />
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel
+              defaultSize={82}
+              minSize={20}
+              className="flex min-h-0 flex-col"
+            >
+              <main className="flex-1 min-h-0 flex flex-col">
+                <header className="bg-background border-b border-border px-6 py-4 md:hidden">
+                  <div className="flex items-center gap-4">
+                    {currentRole === "admin" && isSidebarVisible && (
+                      <SidebarTrigger className="hover:bg-muted p-2 rounded-lg transition-colors duration-200" />
+                    )}
+                    <h1 className="text-xl font-semibold text-foreground">
+                      {roleTitleMap[currentRole]}
+                    </h1>
+                  </div>
+                </header>
+                <div className="flex-1 overflow-auto bg-gradient-to-br from-background to-muted/50">
+                  <Outlet />
+                </div>
+              </main>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        ) : (
+          <main className="h-svh min-h-0 flex flex-col overflow-hidden">
+            <header className="bg-background border-b border-border px-6 py-4 md:hidden">
+              <div className="flex items-center gap-4">
+                {currentRole === "admin" && isSidebarVisible && (
+                  <SidebarTrigger className="hover:bg-muted p-2 rounded-lg transition-colors duration-200" />
+                )}
+                <h1 className="text-xl font-semibold text-foreground">
+                  {roleTitleMap[currentRole]}
+                </h1>
+              </div>
+            </header>
+            <div className="flex-1 overflow-auto bg-gradient-to-br from-background to-muted/50">
+              <Outlet />
             </div>
-          </header>
-
-          <div className="flex-1 overflow-auto bg-gradient-to-br from-slate-50 to-slate-100">
-            <Outlet />
-          </div>
-        </main>
+          </main>
+        )}
       </div>
     </SidebarProvider>
   );

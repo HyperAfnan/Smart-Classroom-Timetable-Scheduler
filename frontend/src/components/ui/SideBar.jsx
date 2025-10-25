@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Calendar,
@@ -14,19 +13,19 @@ import {
   LogOut,
 } from "lucide-react";
 import {
-  Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+
 import { useSelector, useDispatch } from "react-redux";
 import { clearAuth } from "@/Store/auth";
 import { supabase } from "@/config/supabase";
+import { useState, useEffect, useRef } from "react";
 
 const adminNavigationOptions = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -117,6 +116,27 @@ export default function SidebarMenuComponent() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth);
 
+  // Track collapse state: hide labels when width is below threshold
+  const sidebarRef = useRef(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const COLLAPSE_THRESHOLD = 160; // px
+
+  useEffect(() => {
+    const el = sidebarRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const width = el.getBoundingClientRect().width;
+      // Consider collapsed when panel is below the collapse threshold
+      setIsCollapsed(width <= COLLAPSE_THRESHOLD);
+    };
+
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -126,22 +146,31 @@ export default function SidebarMenuComponent() {
       dispatch(clearAuth());
       try {
         localStorage.clear();
-      } catch (_) {}
+      } catch {
+        void 0;
+      }
       navigate("/");
     }
   };
 
   return (
-    <Sidebar className="border-r border-sidebar-border">
-      <SidebarHeader className="border-b border-sidebar-border p-6">
+    <div
+      ref={sidebarRef}
+      className="border-r border-sidebar-border h-svh min-h-0 overflow-hidden flex flex-col bg-background text-foreground"
+    >
+      <SidebarHeader className="border-b border-sidebar-border p-6 shrink-0">
         <Link to={"/dashboard"}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
               <Clock className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <h2 className="font-bold text-foreground text-lg">Calvio</h2>
-              <p className="text-xs text-muted-foreground">
+            <div
+              className={`min-w-0 flex-1 ${isCollapsed ? "hidden" : "block"}`}
+            >
+              <h2 className="font-bold text-foreground text-lg truncate">
+                Calvio
+              </h2>
+              <p className="text-xs text-muted-foreground truncate">
                 Academic Scheduling
               </p>
             </div>
@@ -149,68 +178,88 @@ export default function SidebarMenuComponent() {
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="p-4">
+      <SidebarContent className="p-4 flex-1 overflow-auto min-h-0">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {user.roles.includes("admin") &&
                 adminNavigationOptions.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={location.pathname === item.url}
-                      className="rounded-lg py-3 px-3"
+                    <Link
+                      to={item.url}
+                      className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"} rounded-lg py-3 px-3 w-full ${!isCollapsed && location.pathname === item.url ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
                     >
-                      <Link to={item.url} className="flex items-center gap-3">
-                        <item.icon className="w-5 h-5" />
-                        <span className="font-medium">{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                      <span
+                        className={`${isCollapsed && location.pathname === item.url ? "bg-sidebar-accent text-sidebar-accent-foreground rounded-md p-3" : ""}`}
+                      >
+                        <item.icon className="w-5 h-5 flex-none" />
+                      </span>
+                      <span
+                        className={`font-medium truncate ${isCollapsed ? "hidden" : "inline"}`}
+                      >
+                        {item.title}
+                      </span>
+                    </Link>
                   </SidebarMenuItem>
                 ))}
               {user.roles.includes("teacher") &&
                 teacherNavigationOptions.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={location.pathname === item.url}
-                      className="rounded-lg py-3 px-3"
+                    <Link
+                      to={item.url}
+                      className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"} rounded-lg py-3 px-3 w-full ${!isCollapsed && location.pathname === item.url ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
                     >
-                      <Link to={item.url} className="flex items-center gap-3">
-                        <item.icon className="h-5 w-5" />
-                        <span className="font-medium">{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                      <span
+                        className={`${isCollapsed && location.pathname === item.url ? "bg-sidebar-accent text-sidebar-accent-foreground rounded-md p-2" : ""}`}
+                      >
+                        <item.icon className="h-5 w-5 flex-none" />
+                      </span>
+                      <span
+                        className={`font-medium truncate ${isCollapsed ? "hidden" : "inline"}`}
+                      >
+                        {item.title}
+                      </span>
+                    </Link>
                   </SidebarMenuItem>
                 ))}
               {user.roles.includes("student") &&
                 studentNavigationOptions.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={location.pathname === item.url}
-                      className="rounded-lg py-3 px-3"
+                    <Link
+                      to={item.url}
+                      className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"} rounded-lg py-3 px-3 w-full ${!isCollapsed && location.pathname === item.url ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
                     >
-                      <Link to={item.url} className="flex items-center gap-3">
-                        <item.icon className="w-5 h-5" />
-                        <span className="font-medium">{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                      <span
+                        className={`${isCollapsed && location.pathname === item.url ? "bg-sidebar-accent text-sidebar-accent-foreground rounded-md p-2" : ""}`}
+                      >
+                        <item.icon className="w-5 h-5 flex-none" />
+                      </span>
+                      <span
+                        className={`font-medium truncate ${isCollapsed ? "hidden" : "inline"}`}
+                      >
+                        {item.title}
+                      </span>
+                    </Link>
                   </SidebarMenuItem>
                 ))}
               {user.roles.includes("hod") &&
                 HODNavigationOptions.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={location.pathname === item.url}
-                      className="rounded-lg py-3 px-3"
+                    <Link
+                      to={item.url}
+                      className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"} rounded-lg py-3 px-3 w-full ${!isCollapsed && location.pathname === item.url ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium" : ""}`}
                     >
-                      <Link to={item.url} className="flex items-center gap-3">
-                        <item.icon className="w-5 h-5" />
-                        <span className="font-medium">{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
+                      <span
+                        className={`${isCollapsed && location.pathname === item.url ? "bg-sidebar-accent text-sidebar-accent-foreground rounded-md p-2" : ""}`}
+                      >
+                        <item.icon className="w-5 h-5 flex-none" />
+                      </span>
+                      <span
+                        className={`font-medium truncate ${isCollapsed ? "hidden" : "inline"}`}
+                      >
+                        {item.title}
+                      </span>
+                    </Link>
                   </SidebarMenuItem>
                 ))}
             </SidebarMenu>
@@ -218,27 +267,31 @@ export default function SidebarMenuComponent() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4">
-        <div className="flex items-center space-x-3 px-4 py-3 rounded-lg bg-muted/50 w-full">
-          <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
+      <SidebarFooter className="border-t border-sidebar-border p-4 shrink-0">
+        <div
+          className={`flex items-center w-full ${isCollapsed ? "justify-center px-0 py-0 bg-transparent" : "space-x-3 px-4 py-3 rounded-lg bg-muted/50"}`}
+        >
+          <div
+            className={`w-8 h-8 bg-muted rounded-full flex items-center justify-center ${isCollapsed ? "hidden" : "flex"}`}
+          >
             <span className="text-foreground font-medium text-sm">
               {user?.user?.first_name?.charAt(0)}
             </span>
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium text-foreground">
+          <div className={`flex-1 min-w-0 ${isCollapsed ? "hidden" : "block"}`}>
+            <p className="text-sm font-medium text-foreground truncate">
               {[user?.user?.first_name, user?.user?.last_name]
                 .filter(Boolean)
                 .join(" ")}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground truncate">
               {user?.roles?.[0]?.charAt(0)?.toUpperCase()}
               {user?.roles?.[0]?.slice(1)?.toLowerCase()}
             </p>
           </div>
           <button
             onClick={handleLogout}
-            className="text-muted-foreground hover:text-foreground ml-auto"
+            className={`${isCollapsed ? "inline-flex items-center justify-center p-5 rounded-md bg-muted/50 hover:bg-muted" : "ml-auto"} text-muted-foreground hover:text-foreground`}
             aria-label="Logout"
             title="Logout"
           >
@@ -246,6 +299,6 @@ export default function SidebarMenuComponent() {
           </button>
         </div>
       </SidebarFooter>
-    </Sidebar>
+    </div>
   );
 }
