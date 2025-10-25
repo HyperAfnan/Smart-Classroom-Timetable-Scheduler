@@ -1,46 +1,54 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Loader2 } from "lucide-react";
-import useGenerateAndPersistTimetable from "./hooks/useGenerateAndPersistTimetable";
+// import useGenerateAndPersistTimetable from "./hooks/useGenerateAndPersistTimetable";
 import HeaderSection from "./components/HeaderSection";
 import ControlsCard from "./components/ControlsCard";
 import TimetableTable from "./components/TimetableTable";
 import { days, times } from "./constants";
-import { useTimetableEntriesByClass } from "./hooks/useTimetableEntries";
-// using orchestrated generate+persist hook; no direct entry mutations here
+import useClasses from "../classes/hooks/useClasses.js";
+import useTimetableMutation from "./hooks/useTimetableMutation.js";
+import { useSelector } from "react-redux";
+import useTimetable from "./hooks/useTimetable.js";
+// import { useTimetableEntriesByClass } from "./hooks/useTimetableEntries";
 
 export default function Timetable() {
   const [selectedClass, setSelectedClass] = useState("");
   const [timetableData, setTimetableData] = useState({});
+  const { createTimetableEntryAsync, isCreateError, creating, createError } =
+    useTimetableMutation(
+      useSelector((state) => state.auth.user?.department_id),
+    );
+  const { getSubjectName, getTeacherName, getRoomNumber } = useTimetable();
   const [error, setError] = useState("");
-
-  const {
-    data: { classes, teachers, subjects, rooms, timeSlots },
-    isLoading,
-    isError,
-    error: loadError,
-    generating,
-    persisting,
-    isPending,
-    lastOrganized,
-    generateAndPersistAsync,
-    getTeacherName,
-    getSubjectName,
-    getRoomNumber,
-  } = useGenerateAndPersistTimetable({ days, times });
-
-  // Using orchestrated generate+persist hook; direct mutations not used here
-
-  const {
-    entries,
-    isLoading: entriesLoading,
-    refetch: refetchEntries,
-  } = useTimetableEntriesByClass(selectedClass, {
-    includeTimeSlot: true,
-    queryOptions: { enabled: !!selectedClass },
+  const { classes, isLoading } = useClasses({
+    queryOptions: {
+      staleTime: 5 * 60 * 1000,
+      cacheTime: 10 * 60 * 1000,
+    },
   });
 
-  // using generating from hook; no local redeclaration
+  // const {
+  //   data: { classes },
+  //   isLoading,
+  //   isError,
+  //   error: loadError,
+  //   generating,
+  //   lastOrganized,
+  //   generateAndPersistAsync,
+  //   getTeacherName,
+  //   getSubjectName,
+  //   getRoomNumber,
+  // } = useGenerateAndPersistTimetable({ days, times });
+
+  // const {
+  //   entries,
+  //   refetch: refetchEntries,
+  // } = useTimetableEntriesByClass(selectedClass, {
+  //   includeTimeSlot: true,
+  //   queryOptions: { enabled: !!selectedClass },
+  // });
+  //
 
   const normalizeToHHMM = (val) => {
     if (!val) return val;
@@ -50,6 +58,7 @@ export default function Timetable() {
     return str;
   };
 
+  // NOTE:: called on button click
   const generateTimetable = async () => {
     if (!selectedClass) {
       setError("Please select a class first");
@@ -57,13 +66,9 @@ export default function Timetable() {
     }
     setError("");
     try {
-      const result = await generateAndPersistAsync({
-        filterClassId: selectedClass,
-      });
-
-      // Update local state for immediate UI render and refetch DB for consistency
-      setTimetableData(result?.organized || lastOrganized || {});
-      await refetchEntries();
+      const organized = await createTimetableEntryAsync();
+      console.log(organized);
+      setTimetableData(organized || {});
     } catch (err) {
       console.error("Timetable generation error:", err);
       setError(`Error generating timetable: ${err.message}`);
@@ -71,12 +76,10 @@ export default function Timetable() {
   };
 
   const getSlotData = (day, time) => {
-    // Prefer locally generated timetable first, then fall back to DB entries
     const dayIndex = days.indexOf(day);
     if (dayIndex === -1) return null;
     const hhmm = normalizeToHHMM(time);
 
-    // 1) Try local organized data
     const selectedId = String(selectedClass);
     let classKey = selectedId;
 
@@ -107,8 +110,7 @@ export default function Timetable() {
       if (localSlot) return localSlot;
     }
 
-    // 2) Fall back to DB entries (joined with time_slots)
-    const match = (entries || []).find((e) => {
+    const match = [].find((e) => {
       const dbDay = e?.time_slots?.day;
       const dayMatches = dbDay === dayIndex || dbDay === dayIndex + 1;
       return (
@@ -142,7 +144,7 @@ export default function Timetable() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background">
-      <div className="max-w-6xl mx-auto px-4 py-8 md:py-12 space-y-6">
+      <div className="max-w-8xl mx-auto px-16 m-0 py-8 md:py-12 space-y-6">
         <HeaderSection
           title="Timetable Generator"
           subtitle="Generate and view individual class schedules"
@@ -154,11 +156,11 @@ export default function Timetable() {
           selectedClass={selectedClass}
           onSelectClass={setSelectedClass}
           onGenerate={generateTimetable}
-          generating={generating}
+          generating={creating}
           errorMessage={
             error ||
-            (isError && loadError
-              ? String(loadError?.message || loadError)
+            (isCreateError && createError
+              ? String(createError?.message || createError)
               : "")
           }
         />
@@ -185,6 +187,8 @@ export default function Timetable() {
                   getSubjectName={getSubjectName}
                   getTeacherName={getTeacherName}
                   getRoomNumber={getRoomNumber}
+                  breakAfterTime="12:00"
+                  breakLabel="Break"
                   renderSlot={({ slot }) => (
                     <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200 text-left">
                       <div className="font-semibold text-blue-900 text-sm">

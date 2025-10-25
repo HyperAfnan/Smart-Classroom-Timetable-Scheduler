@@ -81,7 +81,7 @@ const router = createBrowserRouter([
 setupSentry();
 
 createRoot(document.getElementById("root")).render(
-   <StrictMode>
+   // <StrictMode>
       <QueryClientProvider client={queryClient}>
          <Provider store={store}>
             <ThemeProvider>
@@ -102,5 +102,5 @@ createRoot(document.getElementById("root")).render(
             </ThemeProvider>
          </Provider>
       </QueryClientProvider>
-   </StrictMode>,
+   // {/* </StrictMode>, */}
 );

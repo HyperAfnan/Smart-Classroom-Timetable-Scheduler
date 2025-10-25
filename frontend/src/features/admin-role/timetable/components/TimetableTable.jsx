@@ -1,5 +1,3 @@
-import React from "react";
-
 import {
   Table,
   TableBody,
@@ -10,7 +8,6 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Clock } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 /**
  * TimetableTable
@@ -24,11 +21,13 @@ import { motion, AnimatePresence } from "framer-motion";
  * - getTeacherName: (teacherId: string|number) => string
  * - getRoomNumber: (roomId: string|number) => string
  * - className?: string - Optional class for the outer Table element
- * - animate?: boolean - Enables row fade animation
  * - showFreeLabel?: boolean - Whether to show the "Free" label for empty slots
  * - freeLabel?: string - Label for empty slots (default: "Free")
  * - onCellClick?: (args: { day: string, time: string, slot: any|null }) => void
  * - renderSlot?: (args: { slot: any, day: string, time: string }) => React.ReactNode
+ * - breakAfterTime?: string - Insert a non-interactive Break column after the interval that starts at this time (e.g., "12:00")
+ * - breakLabel?: string - Label to show for break cells (default: "Break")
+ * - breakCellClassName?: string - Optional classes to style break cells
  */
 export default function TimetableTable({
   days,
@@ -38,29 +37,17 @@ export default function TimetableTable({
   getTeacherName,
   getRoomNumber,
   className = "",
-  animate = true,
   showFreeLabel = true,
   freeLabel = "Free",
-  onCellClick,
   renderSlot,
+  breakAfterTime,
+  breakLabel = "Break",
+  breakCellClassName,
 }) {
-  const Row = animate ? motion.tr : "tr";
-
-  const handleCellClick = (day, time, slot) => {
-    if (typeof onCellClick === "function") {
-      onCellClick({ day, time, slot });
-    }
-  };
-  const isClickable = typeof onCellClick === "function";
-
   const defaultRenderSlot = (slot) => {
     if (!slot) return null;
     return (
-      <motion.div
-        initial={animate ? { scale: 0.95, opacity: 0 } : false}
-        animate={animate ? { scale: 1, opacity: 1 } : false}
-        className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200 text-left"
-      >
+      <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200 text-left">
         <div className="font-semibold text-blue-900 text-sm">
           {getSubjectName?.(slot.subject_id) ?? String(slot.subject_id ?? "")}
         </div>
@@ -80,79 +67,103 @@ export default function TimetableTable({
             {slot.type}
           </Badge>
         ) : null}
-      </motion.div>
+      </div>
     );
   };
+
+  // Build intervals from times and insert an optional Break column after the specified start time.
+  const intervals =
+    Array.isArray(times) && times.length > 1
+      ? times.slice(0, -1).map((t, i) => ({
+          type: "interval",
+          start: t,
+          end: times[i + 1],
+        }))
+      : [];
+
+  let timeline = intervals.map((it) => ({ ...it }));
+  if (breakAfterTime) {
+    const idx = intervals.findIndex((it) => it.start === breakAfterTime);
+    if (idx !== -1 && idx + 1 < intervals.length) {
+      timeline[idx + 1] = { ...timeline[idx + 1], type: "break" };
+    }
+  }
+  const breakIndex = timeline.findIndex((it) => it.type === "break");
 
   return (
     <Table className={className}>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-24">Time</TableHead>
-          {days.map((day) => (
-            <TableHead key={day} className="text-center min-w-[150px]">
-              {day}
-            </TableHead>
-          ))}
+          <TableHead className="w-24">Day</TableHead>
+          {timeline.map((item, idx) =>
+            item.type === "interval" ? (
+              <TableHead
+                key={`${item.start}-${item.end}`}
+                className="text-center min-w-[150px]"
+              >
+                {`${item.start}-${item.end}`}
+              </TableHead>
+            ) : (
+              <TableHead
+                key={`break-${idx}`}
+                className="text-center min-w-[100px] text-muted-foreground"
+              >
+                {breakLabel ?? "Break"}
+              </TableHead>
+            ),
+          )}
         </TableRow>
       </TableHeader>
 
       <TableBody>
-        <AnimatePresence initial={false}>
-          {times.map((time) => (
-            <Row
-              key={time}
-              initial={animate ? { opacity: 0 } : false}
-              animate={animate ? { opacity: 1 } : false}
-              exit={animate ? { opacity: 0 } : false}
-            >
-              <TableCell className="font-medium bg-muted">
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-muted-foreground" />
-                  {time}
-                </div>
-              </TableCell>
+        {days.map((day) => (
+          <tr key={day}>
+            <TableCell className="font-medium">{day}</TableCell>
 
-              {days.map((day) => {
-                const slot = getSlotData?.(day, time) ?? null;
-                const clickableProps = isClickable
-                  ? {
-                      onClick: () => handleCellClick(day, time, slot),
-                      className:
-                        "p-2 text-center cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors",
-                      role: "button",
-                      tabIndex: 0,
-                      onKeyDown: (e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          handleCellClick(day, time, slot);
-                        }
-                      },
-                      "aria-label": slot
-                        ? `Slot: ${getSubjectName?.(slot.subject_id) ?? "Subject"} at ${time} on ${day}`
-                        : `Free slot at ${time} on ${day}`,
-                    }
-                  : { className: "p-2 text-center" };
-
+            {timeline.map((item, idx) => {
+              if (item.type === "break") {
+                const dayIndex = Math.max(0, days.indexOf(day));
+                const letters = breakLabel ?? "Break";
+                const displayChar =
+                  letters.charAt(dayIndex % letters.length) ||
+                  letters.charAt(0);
                 return (
-                  <TableCell key={day} {...clickableProps}>
-                    {slot ? (
-                      renderSlot ? (
-                        renderSlot({ slot, day, time })
-                      ) : (
-                        defaultRenderSlot(slot)
-                      )
-                    ) : (
-                      <div className="p-3 rounded-lg border border-dashed bg-muted text-muted-foreground border-border">
-                        {showFreeLabel ? freeLabel : null}
-                      </div>
-                    )}
+                  <TableCell key={`break-${idx}`} className="p-2 text-center">
+                    <div
+                      className={`p-8 bg-muted text-muted-foreground  ${breakCellClassName || ""}`.trim()}
+                    >
+                      {displayChar}
+                    </div>
                   </TableCell>
                 );
-              })}
-            </Row>
-          ))}
-        </AnimatePresence>
+              }
+
+              const time =
+                breakIndex !== -1 && idx > breakIndex
+                  ? intervals[idx - 1].start
+                  : item.start;
+              const slot = getSlotData?.(day, time) ?? null;
+              return (
+                <TableCell
+                  key={`${item.start}-${item.end}`}
+                  className="p-2 text-center"
+                >
+                  {slot ? (
+                    renderSlot ? (
+                      renderSlot({ slot, day, time })
+                    ) : (
+                      defaultRenderSlot(slot)
+                    )
+                  ) : (
+                    <div className="p-3 rounded-lg border border-dashed bg-muted text-muted-foreground border-border">
+                      {showFreeLabel ? freeLabel : null}
+                    </div>
+                  )}
+                </TableCell>
+              );
+            })}
+          </tr>
+        ))}
       </TableBody>
     </Table>
   );

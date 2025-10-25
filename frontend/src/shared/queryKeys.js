@@ -47,7 +47,7 @@ export const queryKeys = Object.freeze({
   timetableEntries: Object.freeze({
     all: ["timetable_entries"],
     list: () => ["timetable_entries", "list"],
-    detail: (id) => ["timetable_entries", "detail", String(id)],
+    detail: (department_id) => ["timetable_entries", "detail", String(department_id)],
     byClass: (classId) => ["timetable_entries", "class", String(classId)],
     byTeacher: (teacherId) => [
       "timetable_entries",
