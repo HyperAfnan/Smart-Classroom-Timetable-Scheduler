@@ -60,6 +60,8 @@ const EMPTY_DEPARTMENTS = Object.freeze([]);
  * Fetch all teachers from Supabase.
  * @returns {Promise<Teacher[]>}
  */
+// TODO: fetch only specific department teacher_profiles only,
+// otherwise, the app will be slot and will fetch unnessesary teachers data
 async function fetchTeachers() {
   const { data, error } = await supabase.from("teacher_profile").select("*");
   if (error) {

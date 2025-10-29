@@ -46,14 +46,14 @@ export default function Layout() {
               defaultSize={16}
               minSize={5}
               className="min-w-[3rem] h-svh overflow-hidden"
-              maxSize={16}
+              maxSize={20}
             >
               <SidebarMenu />
             </ResizablePanel>
-            <ResizableHandle withHandle />
+            <ResizableHandle />
             <ResizablePanel
-              defaultSize={82}
-              minSize={20}
+              defaultSize={84}
+              minSize={80}
               className="flex min-h-0 flex-col"
             >
               <main className="flex-1 min-h-0 flex flex-col">
