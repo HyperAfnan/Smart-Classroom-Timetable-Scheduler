@@ -38,7 +38,7 @@ const adminNavigationOptions = [
     url: "/dashboard/timetablegen",
     icon: Calendar,
   },
-  { title: "Master Timetable", url: "/dashboard/timetable", icon: LayoutGrid },
+  { title: "Timetable Viewer", url: "/dashboard/timetableViewer", icon: LayoutGrid },
   {
     id: "settings",
     title: "Settings",

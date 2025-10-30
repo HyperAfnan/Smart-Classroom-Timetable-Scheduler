@@ -39,10 +39,10 @@ const Timetable = lazy(
 const TeacherSettings = lazy(
    () => import("./features/teacher-role/settings/page.jsx"),
 );
-// const MasterTimetable = lazy(() => import("./features/admin-role/timetable"));
 const Rooms = lazy(() => import("./features/admin-role/rooms/page"));
 const Subjects = lazy(() => import("./features/admin-role/subjects/page"));
 const Teachers = lazy(() => import("./features/admin-role/teachers/page"));
+const TimetableViewer = lazy(() => import("./features/admin-role/timetableViewer/page.jsx"));
 const Settings = lazy(() => import("./features/settings/page.jsx"));
 
 function RequireAuth() {
@@ -65,11 +65,11 @@ const router = createBrowserRouter([
             children: [
                { index: true, element: <Dashboard /> },
                { path: "classes", element: <Classes /> },
-               // { path: "timetable", element: <MasterTimetable /> },
                { path: "rooms", element: <Rooms /> },
                { path: "subjects", element: <Subjects /> },
                { path: "teachers", element: <Teachers /> },
                { path: "timetablegen", element: <Timetable /> },
+               { path: "timetableViewer", element: <TimetableViewer /> },
                { path: "teacher-schedule", element: <TeacherSchedule /> },
                { path: "teacher-notifications", element: <TeacherNotifications /> },
                { path: "teacher-dashboard", element: <TeacherDashboard /> },

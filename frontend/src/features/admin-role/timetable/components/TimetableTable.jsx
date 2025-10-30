@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { Badge } from "@/components/ui/badge";
 import {
 	Table,
 	TableBody,
@@ -8,6 +7,9 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import TimetableSlot from "./TimetableSlot";
+import FreeSlot from "./FreeSlot";
+import BreakSlot from "./BreakSlot";
 import useTimetable from "../hooks/useTimetable.js";
 
 export default function TimetableTable({
@@ -17,36 +19,8 @@ export default function TimetableTable({
 	className, // string: selected class name to filter entries by
 	breakAfterTime,
 	breakLabel = "Break",
-	renderSlot, // optional custom renderer
 }) {
-	const { timetable } = useTimetable(departmentId, {
-		enabled: !!departmentId,
-	});
-
-	const defaultRenderSlot = (slot) => {
-		if (!slot) return null;
-		return (
-			<div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200 text-left">
-				<div className="font-semibold text-blue-900 text-sm">
-					{String(slot?.subject_name ?? "")}
-				</div>
-				<div className="text-xs text-blue-600 mt-1">
-					{String(slot?.teacher_name ?? "")}
-				</div>
-				<div className="text-xs text-blue-500 mt-1">
-					Room: {String(slot?.room_id ?? "")}
-				</div>
-				{slot?.type ? (
-					<Badge
-						variant="outline"
-						className="bg-blue-200 text-blue-800 border-blue-300 text-xs mt-1"
-					>
-						{slot.type}
-					</Badge>
-				) : null}
-			</div>
-		);
-	};
+	const { timetable } = useTimetable(departmentId, { enabled: !!departmentId });
 
 	const normalizeToHHMM = (val) => {
 		if (!val) return val;
@@ -54,10 +28,6 @@ export default function TimetableTable({
 		if (str.length >= 5 && str[2] === ":") str = str.slice(0, 5);
 		if (/^\d:\d{2}$/.test(str)) return "0" + str;
 		return str;
-		// examples:
-		// "09:15" -> "09:15"
-		// "9:15"  -> "09:15"
-		// "09:15:00" -> "09:15"
 	};
 
 	// Build intervals from times and insert an optional Break column after the specified start time.
@@ -138,9 +108,7 @@ export default function TimetableTable({
 										key={`break-${idx}`}
 										className="p-2 text-center"
 									>
-										<div className="p-8 bg-muted text-muted-foreground">
-											{displayChar}
-										</div>
+										<BreakSlot displayChar={displayChar} />
 									</TableCell>
 								);
 							}
@@ -162,17 +130,7 @@ export default function TimetableTable({
 									key={`${item.start}-${item.end}`}
 									className="p-2 text-center"
 								>
-									{slot ? (
-										renderSlot ? (
-											renderSlot({ slot, day, time })
-										) : (
-											defaultRenderSlot(slot)
-										)
-									) : (
-										<div className="p-3 rounded-lg border border-dashed bg-muted text-muted-foreground border-border">
-											Free
-										</div>
-									)}
+									{slot ? <TimetableSlot slot={slot} /> : <FreeSlot />}
 								</TableCell>
 							);
 						})}

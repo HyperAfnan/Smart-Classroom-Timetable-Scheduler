@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/config/supabase";
 import { queryKeys } from "@/shared/queryKeys";
 import axios from "axios";
@@ -50,13 +50,6 @@ async function fetchTimeSlots(department_id) {
 	return data || [];
 }
 
-function useTimeSlots(department_id) {
-	return useQuery({
-		queryKey: queryKeys.timeSlots.detail(department_id),
-		queryFn: () => fetchTimeSlots(department_id),
-	});
-}
-
 async function fetchTeacheProfiles(department_id) {
 	const { data, error } = await supabase
 		.from("teacher_profile")
@@ -69,13 +62,6 @@ async function fetchTeacheProfiles(department_id) {
 	}
 
 	return data || [];
-}
-
-function useTeacheProfiles(department_id) {
-	return useQuery({
-		queryKey: queryKeys.teachers.byDepartment(department_id),
-		queryFn: () => fetchTeacheProfiles(department_id),
-	});
 }
 
 /**
@@ -154,12 +140,18 @@ function transformGeneratorOutputToRows(
 }
 
 // Function to create a timetable entry by calling the external API
-async function createTimetableEntry(
-	department_id,
-	timeSlots,
-	teacher_profiles,
-	body,
-) {
+async function createTimetableEntry(department_id, queryClient, body) {
+
+	// Fetch dependencies via QueryClient to use cache if available
+	const timeSlots = await queryClient.fetchQuery({
+		queryKey: queryKeys.timeSlots.detail(department_id),
+		queryFn: () => fetchTimeSlots(department_id),
+	});
+	const teacher_profiles = await queryClient.fetchQuery({
+		queryKey: queryKeys.teachers.byDepartment(department_id),
+		queryFn: () => fetchTeacheProfiles(department_id),
+	});
+
 	let rawTimetable;
 	try {
 		const url = `${algoUrl.replace(/\/$/, "")}/generate-timetable/studentwise/department/${department_id}`;
@@ -258,18 +250,7 @@ async function createTimetableEntry(
 
 export default function useTimetableMutation(department_id) {
 	const queryClient = useQueryClient();
-	const {
-		data: timeSlots,
-		isLoading,
-		isError,
-		error,
-	} = useTimeSlots(department_id);
-	const {
-		data: teacher_profiles,
-		isLoading: teacher_profile_loading,
-		isError: teacher_profile_iserror,
-		error: teacher_profile_error,
-	} = useTeacheProfiles(department_id);
+
 	const {
 		mutateAsync: createTimetableEntryAsync,
 		isPending: creating,
@@ -281,10 +262,10 @@ export default function useTimetableMutation(department_id) {
 			"generate",
 			String(department_id),
 		],
-		mutationFn: (body) =>
+		mutationFn: () =>
 			// NOTE: Replace hardcoded values with dynamic input as needed, put thees setting in the
 			//  department table in supabase, and have a ui for this to get from the user
-			createTimetableEntry(department_id, timeSlots, teacher_profiles, {
+			createTimetableEntry(department_id, queryClient, {
 				days: 5,
 				slots_per_day: 7,
 				max_hours_per_day: 7,
@@ -298,8 +279,8 @@ export default function useTimetableMutation(department_id) {
 
 	return {
 		createTimetableEntryAsync,
-		isLoading: creating || isLoading || teacher_profile_loading,
-		isError: isCreateError || isError || teacher_profile_iserror,
-		error: createError || error || teacher_profile_error,
+		isLoading: creating,
+		isError: isCreateError,
+		error: createError,
 	};
 }
