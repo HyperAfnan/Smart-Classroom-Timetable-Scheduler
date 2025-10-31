@@ -1,12 +1,10 @@
-import { useSelector } from "react-redux";
 import { TimetableGrid } from "./components/TimetableGrid";
 
 export default function TimetableViewer() {
-	const departmentId = useSelector((state) => state.auth.user?.department_id);
   return (
-    <div className="min-h-screen bg-[#F5F5F5] p-8">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background p-8 " >
       <div className="max-w-[1800px] mx-auto">
-        <TimetableGrid  departmentId={departmentId}/>
+        <TimetableGrid />
       </div>
     </div>
   );

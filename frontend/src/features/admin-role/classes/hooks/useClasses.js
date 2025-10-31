@@ -54,14 +54,14 @@ const EMPTY_CLASSES = Object.freeze([]);
  */
 // TODO: fetch only department level classes
 async function fetchClasses() {
-  const { data, error } = await supabase
-    .from("classes")
-    .select("*")
-    .order("created_at", { ascending: false });
-  if (error) {
-    throw new Error(error.message || "Failed to load classes");
-  }
-  return data ?? [];
+	const { data, error } = await supabase
+		.from("classes")
+		.select("*")
+		.order("created_at", { ascending: false });
+	if (error) {
+		throw new Error(error.message || "Failed to load classes");
+	}
+	return data ?? [];
 }
 
 /**
@@ -70,15 +70,15 @@ async function fetchClasses() {
  * @returns {Promise<ClassEntity>}
  */
 async function insertClass(classPayload) {
-  const { data, error } = await supabase
-    .from("classes")
-    .insert([classPayload])
-    .select("*")
-    .single();
-  if (error) {
-    throw new Error(error.message || "Failed to create class");
-  }
-  return data;
+	const { data, error } = await supabase
+		.from("classes")
+		.insert([classPayload])
+		.select("*")
+		.single();
+	if (error) {
+		throw new Error(error.message || "Failed to create class");
+	}
+	return data;
 }
 
 /**
@@ -87,16 +87,16 @@ async function insertClass(classPayload) {
  * @returns {Promise<ClassEntity>}
  */
 async function updateClassById({ id, updates }) {
-  const { data, error } = await supabase
-    .from("classes")
-    .update(updates)
-    .eq("id", id)
-    .select("*")
-    .single();
-  if (error) {
-    throw new Error(error.message || "Failed to update class");
-  }
-  return data;
+	const { data, error } = await supabase
+		.from("classes")
+		.update(updates)
+		.eq("id", id)
+		.select("*")
+		.single();
+	if (error) {
+		throw new Error(error.message || "Failed to update class");
+	}
+	return data;
 }
 
 /**
@@ -105,11 +105,11 @@ async function updateClassById({ id, updates }) {
  * @returns {Promise<{ id: string|number }>}
  */
 async function deleteClassById(id) {
-  const { error } = await supabase.from("classes").delete().eq("id", id);
-  if (error) {
-    throw new Error(error.message || "Failed to delete class");
-  }
-  return { id };
+	const { error } = await supabase.from("classes").delete().eq("id", id);
+	if (error) {
+		throw new Error(error.message || "Failed to delete class");
+	}
+	return { id };
 }
 
 /**
@@ -132,123 +132,129 @@ async function deleteClassById(id) {
  * @param {UseClassesOptions=} options
  */
 export default function useClasses({
-  classesQueryOptions = {},
-  createOptions,
-  updateOptions,
-  deleteOptions,
+	classesQueryOptions = {},
+	createOptions,
+	updateOptions,
+	deleteOptions,
 } = {}) {
-  const queryClient = useQueryClient();
+	const queryClient = useQueryClient();
 
-  // Query: classes
-  const classesQuery = useQuery({
-    queryKey: queryKeys.classes.all,
-    queryFn: fetchClasses,
-    staleTime: 60_000, // 1 minute
-    ...classesQueryOptions,
-  });
+	// Query: classes
+	const classesQuery = useQuery({
+		queryKey: queryKeys.classes.all,
+		queryFn: fetchClasses,
+		staleTime: 60_000, // 1 minute
+		...classesQueryOptions,
+	});
 
-  // Create mutation
-  const createStatus = useMutation({
-    mutationFn: insertClass,
-    onSuccess: async (created, variables, context) => {
-      // Optimistically update list
-      queryClient.setQueryData(classesKeys.all, (prev) => {
-        const list = Array.isArray(prev) ? prev : [];
-        return [created, ...list];
-      });
-      // Ensure consistency by invalidating
-      await queryClient.invalidateQueries({ queryKey: classesKeys.all });
-      if (createOptions?.onSuccess) {
-        createOptions.onSuccess(created, variables, context);
-      }
-    },
-    onError: (err, variables, context) => {
-      if (createOptions?.onError) {
-        createOptions.onError(err, variables, context);
-      }
-    },
-    ...createOptions,
-  });
+	// Create mutation
+	const createStatus = useMutation({
+		mutationFn: insertClass,
+		onSuccess: async (created, variables, context) => {
+			// Optimistically update list
+			queryClient.setQueryData(queryKeys.classes.all, (prev) => {
+				const list = Array.isArray(prev) ? prev : [];
+				return [created, ...list];
+			});
+			// Ensure consistency by invalidating
+			await queryClient.invalidateQueries({
+				queryKey: queryKeys.classes.all,
+			});
+			if (createOptions?.onSuccess) {
+				createOptions.onSuccess(created, variables, context);
+			}
+		},
+		onError: (err, variables, context) => {
+			if (createOptions?.onError) {
+				createOptions.onError(err, variables, context);
+			}
+		},
+		...createOptions,
+	});
 
-  // Update mutation
-  const updateStatus = useMutation({
-    mutationFn: updateClassById,
-    onSuccess: async (updated, variables, context) => {
-      queryClient.setQueryData(classesKeys.all, (prev) => {
-        if (!Array.isArray(prev)) return prev;
-        return prev.map((c) =>
-          c?.id === updated?.id ? { ...c, ...updated } : c,
-        );
-      });
-      await queryClient.invalidateQueries({ queryKey: classesKeys.all });
-      if (updateOptions?.onSuccess) {
-        updateOptions.onSuccess(updated, variables, context);
-      }
-    },
-    onError: (err, variables, context) => {
-      if (updateOptions?.onError) {
-        updateOptions.onError(err, variables, context);
-      }
-    },
-    ...updateOptions,
-  });
+	// Update mutation
+	const updateStatus = useMutation({
+		mutationFn: updateClassById,
+		onSuccess: async (updated, variables, context) => {
+			queryClient.setQueryData(queryKeys.classes.all, (prev) => {
+				if (!Array.isArray(prev)) return prev;
+				return prev.map((c) =>
+					c?.id === updated?.id ? { ...c, ...updated } : c,
+				);
+			});
+			await queryClient.invalidateQueries({
+				queryKey: queryKeys.classes.all,
+			});
+			if (updateOptions?.onSuccess) {
+				updateOptions.onSuccess(updated, variables, context);
+			}
+		},
+		onError: (err, variables, context) => {
+			if (updateOptions?.onError) {
+				updateOptions.onError(err, variables, context);
+			}
+		},
+		...updateOptions,
+	});
 
-  // Delete mutation
-  const deleteStatus = useMutation({
-    mutationFn: deleteClassById,
-    onSuccess: async (result, variables, context) => {
-      const deletedId = result?.id ?? variables;
-      queryClient.setQueryData(classesKeys.all, (prev) => {
-        if (!Array.isArray(prev)) return prev;
-        return prev.filter((c) => c?.id !== deletedId);
-      });
-      await queryClient.invalidateQueries({ queryKey: classesKeys.all });
-      if (deleteOptions?.onSuccess) {
-        deleteOptions.onSuccess(result, variables, context);
-      }
-    },
-    onError: (err, variables, context) => {
-      if (deleteOptions?.onError) {
-        deleteOptions.onError(err, variables, context);
-      }
-    },
-    ...deleteOptions,
-  });
+	// Delete mutation
+	const deleteStatus = useMutation({
+		mutationFn: deleteClassById,
+		onSuccess: async (result, variables, context) => {
+			const deletedId = result?.id ?? variables;
+			queryClient.setQueryData(queryKeys.classes.all, (prev) => {
+				if (!Array.isArray(prev)) return prev;
+				return prev.filter((c) => c?.id !== deletedId);
+			});
+			await queryClient.invalidateQueries({
+				queryKey: queryKeys.classes.all,
+			});
+			if (deleteOptions?.onSuccess) {
+				deleteOptions.onSuccess(result, variables, context);
+			}
+		},
+		onError: (err, variables, context) => {
+			if (deleteOptions?.onError) {
+				deleteOptions.onError(err, variables, context);
+			}
+		},
+		...deleteOptions,
+	});
 
-  // Derived helper flags
-  const isSubmitting = Boolean(
-    createStatus.isPending || updateStatus.isPending,
-  );
-  const isDeleting = Boolean(deleteStatus.isPending);
+	// Derived helper flags
+	const isSubmitting = Boolean(
+		createStatus.isPending || updateStatus.isPending,
+	);
+	const isDeleting = Boolean(deleteStatus.isPending);
 
-  // Helper mutateAsync aliases
-  const createClassAsync = createStatus.mutateAsync;
-  const updateClassAsync = updateStatus.mutateAsync;
-  const deleteClassAsync = deleteStatus.mutateAsync;
+	// Helper mutateAsync aliases
+	const createClassAsync = createStatus.mutateAsync;
+	const updateClassAsync = updateStatus.mutateAsync;
+	const deleteClassAsync = deleteStatus.mutateAsync;
 
-  return {
-    // Data
-    classes: classesQuery.data ?? EMPTY_CLASSES,
+	return {
+		// Data
+		classes: classesQuery.data ?? EMPTY_CLASSES,
 
-    // Query state
-    isLoading: classesQuery.isLoading,
-    isError: classesQuery.isError,
-    error: classesQuery.error ?? null,
-    refetch: classesQuery.refetch,
-    classesQuery,
+		// Query state
+		isLoading: classesQuery.isLoading,
+		isError: classesQuery.isError,
+		error: classesQuery.error ?? null,
+		refetch: classesQuery.refetch,
+		classesQuery,
 
-    // Mutations
-    createClassAsync,
-    updateClassAsync,
-    deleteClassAsync,
+		// Mutations
+		createClassAsync,
+		updateClassAsync,
+		deleteClassAsync,
 
-    // Mutation results
-    createStatus,
-    updateStatus,
-    deleteStatus,
+		// Mutation results
+		createStatus,
+		updateStatus,
+		deleteStatus,
 
-    // Derived flags
-    isSubmitting,
-    isDeleting,
-  };
+		// Derived flags
+		isSubmitting,
+		isDeleting,
+	};
 }
