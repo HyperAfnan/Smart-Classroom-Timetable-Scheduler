@@ -22,7 +22,7 @@ async function fetchTimetableEntries(department_id) {
 
 export default function useTimetable(department_id, options = {}) {
 	const timetableQueries = useQuery({
-		queryKey: [...queryKeys.timetableEntries.list(), String(department_id)],
+		queryKey: [queryKeys.timetableEntries.all],
 		queryFn: () => fetchTimetableEntries(department_id),
 		staleTime: 60_000_000,
 		...options,

@@ -33,9 +33,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/config/supabase";
 import { queryKeys } from "@/shared/queryKeys";
 
-// Fallback keys in case "classes" isn't present in the shared query keys yet.
-const classesKeys = queryKeys.classes;
-
 const EMPTY_CLASSES = Object.freeze([]);
 
 /**
@@ -55,6 +52,7 @@ const EMPTY_CLASSES = Object.freeze([]);
  * Fetch classes from Supabase.
  * @returns {Promise<ClassEntity[]>}
  */
+// TODO: fetch only department level classes
 async function fetchClasses() {
   const { data, error } = await supabase
     .from("classes")
@@ -143,7 +141,7 @@ export default function useClasses({
 
   // Query: classes
   const classesQuery = useQuery({
-    queryKey: classesKeys.all,
+    queryKey: queryKeys.classes.all,
     queryFn: fetchClasses,
     staleTime: 60_000, // 1 minute
     ...classesQueryOptions,
