@@ -56,7 +56,7 @@ function TimetableHeader({
 									: "bg-muted text-muted-foreground opacity-60"
 							}`}
 						>
-							<span>{day.toLowerCase()}</span>
+							<span>{day[0].toUpperCase() + day.slice(1, day.length)}</span>
 						</TableHead>
 					);
 				})}

@@ -1,5 +1,5 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import SidebarMenu from "./components/ui/SideBar";
+import SidebarMenu from "@/shared/components/SideBar";
 import { Outlet, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {

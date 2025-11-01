@@ -26,6 +26,7 @@ function TimetableBody({
 	classLabels,
 	timetableEntries,
 	selectedDay,
+	activeTeacherName,
 }) {
 	const isActiveDay = (day) => selectedDay === null || selectedDay === day;
 	const toLecture = (entry) =>
@@ -65,6 +66,12 @@ function TimetableBody({
 		return m;
 	}, [timetableEntries]);
 
+	const isTeacherFilterActive = Boolean(activeTeacherName);
+	const norm = (s) =>
+		String(s ?? "")
+			.trim()
+			.toLowerCase();
+
 	return (
 		<TableBody>
 			{classLabels.map((className) => (
@@ -91,7 +98,11 @@ function TimetableBody({
 											active ? "dark:bg-amber-950/30" : "opacity-60"
 										}`}
 									>
-										<TimetableCell lecture={null} isBreak={true} />
+										<TimetableCell
+											lecture={null}
+											isBreak={true}
+											isDimmed={isTeacherFilterActive}
+										/>
 									</TableCell>
 								);
 							}
@@ -127,6 +138,15 @@ function TimetableBody({
 									<TimetableCell
 										lecture={toLecture(entry)}
 										isBreak={false}
+										isDimmed={
+											isTeacherFilterActive &&
+											!(entry
+												? norm(entry?.teacher_name) ===
+														norm(activeTeacherName) ||
+													norm(entry?.teacher) ===
+														norm(activeTeacherName)
+												: false)
+										}
 									/>
 								</TableCell>
 							);
