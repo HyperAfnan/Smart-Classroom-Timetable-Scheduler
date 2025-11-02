@@ -11,10 +11,10 @@ export default function Dashboard() {
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      {roles.includes('admin') && <AdminDashboard />}
-      {roles.includes('teacher') && <TeacherDashboard />}
-      {roles.includes('student') && <StudentDashboard />}
-      {roles.includes('hod') && <HODDashboard />}
+      {roles.includes("admin") && <AdminDashboard />}
+      {roles.includes("teacher") && <TeacherDashboard />}
+      {roles.includes("student") && <StudentDashboard />}
+      {roles.includes("hod") && <HODDashboard />}
     </Suspense>
   );
 }

@@ -34,48 +34,50 @@ export default function AuthInitializer({ children }) {
       }
 
       if (roles.includes("admin") || roles.includes("teacher")) {
-         const {data: profileData } = await supabase
-            .from("teacher_profile")
-            .select("*")
-            .eq("email", user.email)
-            .single();
+        const { data: profileData } = await supabase
+          .from("teacher_profile")
+          .select("*")
+          .eq("email", user.email)
+          .single();
 
-         user = { ...user, ...profileData };
+        user = { ...user, ...profileData };
 
-         const { data: subjectsData } = await supabase
-            .from("teacher_subjects")
-            .select("subject")
-            .eq("teacher", profileData?.name);
+        const { data: subjectsData } = await supabase
+          .from("teacher_subjects")
+          .select("subject")
+          .eq("teacher", profileData?.name);
 
-         user = { ...user, subjects: subjectsData.map(s => s.subject) };
+        user = { ...user, subjects: subjectsData.map((s) => s.subject) };
       } else if (roles.includes("hod")) {
-         const {data: profileData } = await supabase
-            .from("hod_profile")
-            .select("*")
-            .eq("email", user.email)
-            .single();
+        const { data: profileData } = await supabase
+          .from("hod_profile")
+          .select("*")
+          .eq("email", user.email)
+          .single();
 
-         user = { ...user, ...profileData };
+        user = { ...user, ...profileData };
       } else if (roles.includes("student")) {
-         const {data: profileData } = await supabase
-            .from("student_profile")
-            .select("*")
-            .eq("userId", user.id)
-            .single();
-         user = { ...user, ...profileData };
+        const { data: profileData } = await supabase
+          .from("student_profile")
+          .select("*")
+          .eq("userId", user.id)
+          .single();
+        user = { ...user, ...profileData };
       }
 
       dispatch(setAuth({ user, token, roles }));
       setLoading(false);
-    } 
+    };
 
     supabase.auth.getSession().then(({ data }) => {
       getUserAndRoles(data?.session);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      getUserAndRoles(session);
-    });
+    const { data: listener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        getUserAndRoles(session);
+      },
+    );
 
     return () => {
       listener?.subscription.unsubscribe();

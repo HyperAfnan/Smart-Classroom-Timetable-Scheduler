@@ -1,5 +1,5 @@
-import NotificationItem from "./notificationItem.jsx"
-import EmptyState from "./emptyState.jsx"
+import NotificationItem from "./notificationItem.jsx";
+import EmptyState from "./emptyState.jsx";
 
 const NotificationList = ({
   filteredNotifications,
@@ -9,7 +9,7 @@ const NotificationList = ({
 }) =>
   filteredNotifications.length > 0 ? (
     <div className="space-y-4">
-      {filteredNotifications.map(notification => (
+      {filteredNotifications.map((notification) => (
         <NotificationItem
           key={notification.id}
           notification={notification}
@@ -20,6 +20,6 @@ const NotificationList = ({
     </div>
   ) : (
     <EmptyState filter={filter} />
-  )
+  );
 
-export default NotificationList
+export default NotificationList;

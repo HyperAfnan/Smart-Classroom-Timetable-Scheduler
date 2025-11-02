@@ -18,7 +18,8 @@ export default function RegistrationForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.universityName.trim() || !formData.universityLocation.trim()) return;
+    if (!formData.universityName.trim() || !formData.universityLocation.trim())
+      return;
 
     setIsSubmitting(true);
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -44,7 +45,8 @@ export default function RegistrationForm() {
           Register Your University
         </h2>
         <p className="text-slate-600 dark:text-muted-foreground">
-          Let's start by collecting some basic information about your institution
+          Let's start by collecting some basic information about your
+          institution
         </p>
       </div>
 
@@ -65,7 +67,9 @@ export default function RegistrationForm() {
               type="text"
               placeholder="Enter your university name"
               value={formData.universityName}
-              onChange={(e) => handleInputChange("universityName", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("universityName", e.target.value)
+              }
               className="pl-12 py-3 text-base border-slate-300 focus:border-purple-500 focus:ring-purple-500/20 
                          dark:bg-background dark:text-foreground dark:border-white/10 
                          dark:placeholder:text-slate-500 dark:focus:border-purple-500 dark:focus:ring-purple-500/30"
@@ -88,7 +92,9 @@ export default function RegistrationForm() {
               type="text"
               placeholder="City, State/Province, Country"
               value={formData.universityLocation}
-              onChange={(e) => handleInputChange("universityLocation", e.target.value)}
+              onChange={(e) =>
+                handleInputChange("universityLocation", e.target.value)
+              }
               className="pl-12 py-3 text-base border-slate-300 focus:border-purple-500 focus:ring-purple-500/20 
                          dark:bg-background dark:text-foreground dark:border-white/10 
                          dark:placeholder:text-slate-500 dark:focus:border-purple-500 dark:focus:ring-purple-500/30"

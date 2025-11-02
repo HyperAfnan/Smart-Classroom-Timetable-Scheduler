@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react"
+import { useState, useCallback, useMemo } from "react";
 import {
   DAYS,
   TIME_SLOTS,
@@ -8,7 +8,7 @@ import {
   aggregateScheduleMetrics,
   getEntryStyles,
   cloneSchedule,
-} from "../constants"
+} from "../constants";
 
 /**
  * useSchedule
@@ -30,9 +30,11 @@ export const useSchedule = (initialSchedule = SAMPLE_SCHEDULE) => {
   /* ------------------------------------------------------------------------ */
   /* Core State                                                               */
   /* ------------------------------------------------------------------------ */
-  const [currentWeek, setCurrentWeek] = useState(0) // 0 = this week
-  const [viewType, setViewType] = useState("week") // "week" | "day"
-  const [schedule, setSchedule] = useState(() => cloneSchedule(initialSchedule))
+  const [currentWeek, setCurrentWeek] = useState(0); // 0 = this week
+  const [viewType, setViewType] = useState("week"); // "week" | "day"
+  const [schedule, setSchedule] = useState(() =>
+    cloneSchedule(initialSchedule),
+  );
 
   /* ------------------------------------------------------------------------ */
   /* Derived Data                                                             */
@@ -43,34 +45,31 @@ export const useSchedule = (initialSchedule = SAMPLE_SCHEDULE) => {
    */
   const weekDates = useMemo(
     () => getWeekDates(currentWeek, "en-US", DAYS),
-    [currentWeek]
-  )
+    [currentWeek],
+  );
 
   /**
    * Aggregated metrics for dashboard cards.
    */
-  const metrics = useMemo(
-    () => aggregateScheduleMetrics(schedule),
-    [schedule]
-  )
+  const metrics = useMemo(() => aggregateScheduleMetrics(schedule), [schedule]);
 
   /**
    * Flattened list of all events with supplemental computed data.
    * (Useful for future features: exporting, analytics, search)
    */
   const flatEvents = useMemo(() => {
-    const list = []
-    DAYS.forEach(day => {
-      ;(schedule[day] || []).forEach(entry => {
+    const list = [];
+    DAYS.forEach((day) => {
+      (schedule[day] || []).forEach((entry) => {
         list.push({
           day,
           ...entry,
           styles: getEntryStyles(entry),
-        })
-      })
-    })
-    return list
-  }, [schedule])
+        });
+      });
+    });
+    return list;
+  }, [schedule]);
 
   /* ------------------------------------------------------------------------ */
   /* Accessors                                                                */
@@ -81,37 +80,28 @@ export const useSchedule = (initialSchedule = SAMPLE_SCHEDULE) => {
    */
   const getEntryAt = useCallback(
     (day, timeSlot) => findClassAtTime(schedule, day, timeSlot),
-    [schedule]
-  )
+    [schedule],
+  );
 
   /**
    * Determine if a slot is occupied (simple presence check).
    */
   const isOccupied = useCallback(
     (day, timeSlot) => !!getEntryAt(day, timeSlot),
-    [getEntryAt]
-  )
+    [getEntryAt],
+  );
 
   /* ------------------------------------------------------------------------ */
   /* Navigation Actions                                                       */
   /* ------------------------------------------------------------------------ */
 
-  const goToPreviousWeek = useCallback(
-    () => setCurrentWeek(w => w - 1),
-    []
-  )
+  const goToPreviousWeek = useCallback(() => setCurrentWeek((w) => w - 1), []);
 
-  const goToNextWeek = useCallback(
-    () => setCurrentWeek(w => w + 1),
-    []
-  )
+  const goToNextWeek = useCallback(() => setCurrentWeek((w) => w + 1), []);
 
-  const goToCurrentWeek = useCallback(() => setCurrentWeek(0), [])
+  const goToCurrentWeek = useCallback(() => setCurrentWeek(0), []);
 
-  const changeView = useCallback(
-    (nextView) => setViewType(nextView),
-    []
-  )
+  const changeView = useCallback((nextView) => setViewType(nextView), []);
 
   /* ------------------------------------------------------------------------ */
   /* Mutation Helpers                                                         */
@@ -123,64 +113,59 @@ export const useSchedule = (initialSchedule = SAMPLE_SCHEDULE) => {
    * @param {object} entry - { time, subject, room, students, duration }
    */
   const addEntry = useCallback((day, entry) => {
-    if (!DAYS.includes(day)) return
-    setSchedule(prev => ({
+    if (!DAYS.includes(day)) return;
+    setSchedule((prev) => ({
       ...prev,
       [day]: [...(prev[day] || []), { ...entry }],
-    }))
-  }, [])
+    }));
+  }, []);
 
   /**
    * Update an existing entry matched by time + subject.
    * (You may later want to use a unique id.)
    */
   const updateEntry = useCallback((day, time, subject, patch) => {
-    if (!DAYS.includes(day)) return
-    setSchedule(prev => ({
+    if (!DAYS.includes(day)) return;
+    setSchedule((prev) => ({
       ...prev,
-      [day]: (prev[day] || []).map(e =>
-        e.time === time && e.subject === subject ? { ...e, ...patch } : e
+      [day]: (prev[day] || []).map((e) =>
+        e.time === time && e.subject === subject ? { ...e, ...patch } : e,
       ),
-    }))
-  }, [])
+    }));
+  }, []);
 
   /**
    * Remove entries matching the given predicate.
    * If no predicate, remove by day/time/subject.
    */
-  const removeEntry = useCallback(
-    ({ day, time, subject, predicate }) => {
-      if (!DAYS.includes(day)) return
-      setSchedule(prev => ({
-        ...prev,
-        [day]: (prev[day] || []).filter(e =>
-          predicate
-            ? !predicate(e)
-            : !(e.time === time && e.subject === subject)
-        ),
-      }))
-    },
-    []
-  )
+  const removeEntry = useCallback(({ day, time, subject, predicate }) => {
+    if (!DAYS.includes(day)) return;
+    setSchedule((prev) => ({
+      ...prev,
+      [day]: (prev[day] || []).filter((e) =>
+        predicate ? !predicate(e) : !(e.time === time && e.subject === subject),
+      ),
+    }));
+  }, []);
 
   /**
    * Replace the entire schedule (e.g., after fetch).
    */
   const replaceSchedule = useCallback((next) => {
-    setSchedule(cloneSchedule(next || {}))
-  }, [])
+    setSchedule(cloneSchedule(next || {}));
+  }, []);
 
   /* ------------------------------------------------------------------------ */
   /* Label Helpers                                                            */
   /* ------------------------------------------------------------------------ */
 
   const weekLabel = useMemo(() => {
-    if (currentWeek === 0) return "This Week"
+    if (currentWeek === 0) return "This Week";
     if (currentWeek > 0)
-      return `${currentWeek} Week${currentWeek > 1 ? "s" : ""} Ahead`
-    const abs = Math.abs(currentWeek)
-    return `${abs} Week${abs > 1 ? "s" : ""} Ago`
-  }, [currentWeek])
+      return `${currentWeek} Week${currentWeek > 1 ? "s" : ""} Ahead`;
+    const abs = Math.abs(currentWeek);
+    return `${abs} Week${abs > 1 ? "s" : ""} Ago`;
+  }, [currentWeek]);
 
   /* ------------------------------------------------------------------------ */
   /* Return API                                                               */
@@ -193,7 +178,7 @@ export const useSchedule = (initialSchedule = SAMPLE_SCHEDULE) => {
 
     // Derived
     weekDates,
-    metrics,          // { teachingHours, sessionCount, totalStudents }
+    metrics, // { teachingHours, sessionCount, totalStudents }
     flatEvents,
     weekLabel,
 
@@ -216,7 +201,7 @@ export const useSchedule = (initialSchedule = SAMPLE_SCHEDULE) => {
     // Constants (re-export for convenience)
     DAYS,
     TIME_SLOTS,
-  }
-}
+  };
+};
 
-export default useSchedule
+export default useSchedule;

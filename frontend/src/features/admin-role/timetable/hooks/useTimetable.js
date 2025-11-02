@@ -5,34 +5,32 @@ import queryKeys from "@/shared/queryKeys.js";
 const EMPTY = Object.freeze([]);
 
 async function fetchTimetableEntries(department_id) {
-	const { data, error } = await supabase
-		.from("timetable_entries")
-		.select("*, time_slots(*)")
-		.eq("department_id", department_id);
+  const { data, error } = await supabase
+    .from("timetable_entries")
+    .select("*, time_slots(*)")
+    .eq("department_id", department_id);
 
-	if (error) {
-		console.error("Error While Fetching timetable_entries: ", error);
-		throw new Error(
-			`Error While Fetching timetable_entries: ${error.message}`,
-		);
-	}
+  if (error) {
+    console.error("Error While Fetching timetable_entries: ", error);
+    throw new Error(`Error While Fetching timetable_entries: ${error.message}`);
+  }
 
-	return data || [];
+  return data || [];
 }
 
 export default function useTimetable(department_id, options = {}) {
-	const timetableQueries = useQuery({
-		queryKey: [queryKeys.timetableEntries.all],
-		queryFn: () => fetchTimetableEntries(department_id),
-		staleTime: 60_000_000,
-		...options,
-	});
-	return {
-		timetable: timetableQueries.data ?? EMPTY,
-		isLoading: timetableQueries.isLoading,
-		isError: timetableQueries.isError,
-		error: timetableQueries.error,
-		refresh: timetableQueries.refetch,
-		timetableQueries,
-	};
+  const timetableQueries = useQuery({
+    queryKey: [queryKeys.timetableEntries.all],
+    queryFn: () => fetchTimetableEntries(department_id),
+    staleTime: 60_000_000,
+    ...options,
+  });
+  return {
+    timetable: timetableQueries.data ?? EMPTY,
+    isLoading: timetableQueries.isLoading,
+    isError: timetableQueries.isError,
+    error: timetableQueries.error,
+    refresh: timetableQueries.refetch,
+    timetableQueries,
+  };
 }

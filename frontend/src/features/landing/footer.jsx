@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Calendar, Mail, Phone, MapPin } from "lucide-react";
 
@@ -19,8 +18,9 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-slate-300 leading-relaxed max-w-md">
-              Empowering universities worldwide with intelligent timetable scheduling solutions. 
-              Join thousands of institutions that trust Calvio for their scheduling needs.
+              Empowering universities worldwide with intelligent timetable
+              scheduling solutions. Join thousands of institutions that trust
+              Calvio for their scheduling needs.
             </p>
           </div>
 
@@ -28,10 +28,38 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-3">
-              <li><a href="#" className="text-slate-300 hover:text-white transition-colors">Features</a></li>
-              <li><a href="#" className="text-slate-300 hover:text-white transition-colors">Pricing</a></li>
-              <li><a href="#" className="text-slate-300 hover:text-white transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-slate-300 hover:text-white transition-colors">Support</a></li>
+              <li>
+                <a
+                  href="#"
+                  className="text-slate-300 hover:text-white transition-colors"
+                >
+                  Features
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-slate-300 hover:text-white transition-colors"
+                >
+                  Pricing
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-slate-300 hover:text-white transition-colors"
+                >
+                  Documentation
+                </a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  className="text-slate-300 hover:text-white transition-colors"
+                >
+                  Support
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -61,9 +89,24 @@ export default function Footer() {
               © 2024 Calvio. All rights reserved.
             </p>
             <div className="flex gap-6 mt-4 md:mt-0">
-              <a href="#" className="text-slate-400 hover:text-white transition-colors text-sm">Privacy Policy</a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors text-sm">Terms of Service</a>
-              <a href="#" className="text-slate-400 hover:text-white transition-colors text-sm">Cookie Policy</a>
+              <a
+                href="#"
+                className="text-slate-400 hover:text-white transition-colors text-sm"
+              >
+                Privacy Policy
+              </a>
+              <a
+                href="#"
+                className="text-slate-400 hover:text-white transition-colors text-sm"
+              >
+                Terms of Service
+              </a>
+              <a
+                href="#"
+                className="text-slate-400 hover:text-white transition-colors text-sm"
+              >
+                Cookie Policy
+              </a>
             </div>
           </div>
         </div>

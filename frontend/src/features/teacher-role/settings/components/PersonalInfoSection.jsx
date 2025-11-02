@@ -5,17 +5,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, Briefcase, Building2, Save, X, Edit2 } from "lucide-react";
+import {
+  User as UserIcon,
+  Briefcase,
+  Building2,
+  Save,
+  X,
+  Edit2,
+} from "lucide-react";
 // import { User } from "@/entities/User";
 
 export default function PersonalInfoSection({ user, onUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
-    full_name: user?.full_name || '',
-    position: user?.position || '',
-    department: user?.department || '',
-    bio: user?.bio || ''
+    full_name: user?.full_name || "",
+    position: user?.position || "",
+    department: user?.department || "",
+    bio: user?.bio || "",
   });
 
   const handleSave = async () => {
@@ -24,23 +31,23 @@ export default function PersonalInfoSection({ user, onUpdate }) {
       await User.updateMyUserData({
         position: formData.position,
         department: formData.department,
-        bio: formData.bio
+        bio: formData.bio,
       });
       onUpdate();
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating personal info:', error);
-      alert('Failed to update information. Please try again.');
+      console.error("Error updating personal info:", error);
+      alert("Failed to update information. Please try again.");
     }
     setIsSaving(false);
   };
 
   const handleCancel = () => {
     setFormData({
-      full_name: user?.full_name || '',
-      position: user?.position || '',
-      department: user?.department || '',
-      bio: user?.bio || ''
+      full_name: user?.full_name || "",
+      position: user?.position || "",
+      department: user?.department || "",
+      bio: user?.bio || "",
     });
     setIsEditing(false);
   };
@@ -82,16 +89,22 @@ export default function PersonalInfoSection({ user, onUpdate }) {
                   className="bg-gray-50"
                   icon={<UserIcon className="w-4 h-4 text-gray-400" />}
                 />
-                <p className="text-xs text-gray-500">Contact support to change your name</p>
+                <p className="text-xs text-gray-500">
+                  Contact support to change your name
+                </p>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-gray-700 font-medium">Position / Title</Label>
+                <Label className="text-gray-700 font-medium">
+                  Position / Title
+                </Label>
                 <div className="relative">
                   <Briefcase className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                   <Input
                     value={formData.position}
-                    onChange={(e) => setFormData({...formData, position: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, position: e.target.value })
+                    }
                     disabled={!isEditing}
                     className={!isEditing ? "bg-gray-50 pl-10" : "pl-10"}
                     placeholder="e.g., Senior Mathematics Teacher"
@@ -105,7 +118,9 @@ export default function PersonalInfoSection({ user, onUpdate }) {
                   <Building2 className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                   <Input
                     value={formData.department}
-                    onChange={(e) => setFormData({...formData, department: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, department: e.target.value })
+                    }
                     disabled={!isEditing}
                     className={!isEditing ? "bg-gray-50 pl-10" : "pl-10"}
                     placeholder="e.g., Mathematics & Science"
@@ -117,7 +132,9 @@ export default function PersonalInfoSection({ user, onUpdate }) {
                 <Label className="text-gray-700 font-medium">Bio</Label>
                 <Textarea
                   value={formData.bio}
-                  onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, bio: e.target.value })
+                  }
                   disabled={!isEditing}
                   className={!isEditing ? "bg-gray-50" : ""}
                   placeholder="Tell us about yourself..."
@@ -127,7 +144,7 @@ export default function PersonalInfoSection({ user, onUpdate }) {
             </div>
 
             {isEditing && (
-              <motion.div 
+              <motion.div
                 className="flex justify-end gap-3 pt-4 border-t"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -149,7 +166,11 @@ export default function PersonalInfoSection({ user, onUpdate }) {
                     <>
                       <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
                       >
                         <Save className="w-4 h-4 mr-2" />
                       </motion.div>

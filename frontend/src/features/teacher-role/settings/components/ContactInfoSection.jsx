@@ -11,8 +11,8 @@ export default function ContactInfoSection({ user, onUpdate }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
-    phone: user?.phone || '',
-    secondary_email: user?.secondary_email || ''
+    phone: user?.phone || "",
+    secondary_email: user?.secondary_email || "",
   });
 
   const handleSave = async () => {
@@ -20,21 +20,21 @@ export default function ContactInfoSection({ user, onUpdate }) {
     try {
       await User.updateMyUserData({
         phone: formData.phone,
-        secondary_email: formData.secondary_email
+        secondary_email: formData.secondary_email,
       });
       onUpdate();
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating contact info:', error);
-      alert('Failed to update contact information. Please try again.');
+      console.error("Error updating contact info:", error);
+      alert("Failed to update contact information. Please try again.");
     }
     setIsSaving(false);
   };
 
   const handleCancel = () => {
     setFormData({
-      phone: user?.phone || '',
-      secondary_email: user?.secondary_email || ''
+      phone: user?.phone || "",
+      secondary_email: user?.secondary_email || "",
     });
     setIsEditing(false);
   };
@@ -72,12 +72,14 @@ export default function ContactInfoSection({ user, onUpdate }) {
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                 <Input
-                  value={user?.email || ''}
+                  value={user?.email || ""}
                   disabled
                   className="bg-gray-50 pl-10"
                 />
               </div>
-              <p className="text-xs text-gray-500">Your primary email cannot be changed</p>
+              <p className="text-xs text-gray-500">
+                Your primary email cannot be changed
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -86,7 +88,9 @@ export default function ContactInfoSection({ user, onUpdate }) {
                 <Phone className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                 <Input
                   value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
                   disabled={!isEditing}
                   className={!isEditing ? "bg-gray-50 pl-10" : "pl-10"}
                   placeholder="+1 (555) 123-4567"
@@ -96,12 +100,19 @@ export default function ContactInfoSection({ user, onUpdate }) {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-700 font-medium">Secondary Email</Label>
+              <Label className="text-gray-700 font-medium">
+                Secondary Email
+              </Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
                 <Input
                   value={formData.secondary_email}
-                  onChange={(e) => setFormData({...formData, secondary_email: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      secondary_email: e.target.value,
+                    })
+                  }
                   disabled={!isEditing}
                   className={!isEditing ? "bg-gray-50 pl-10" : "pl-10"}
                   placeholder="alternate@email.com"
@@ -111,7 +122,7 @@ export default function ContactInfoSection({ user, onUpdate }) {
             </div>
 
             {isEditing && (
-              <motion.div 
+              <motion.div
                 className="flex justify-end gap-3 pt-4 border-t"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -133,7 +144,11 @@ export default function ContactInfoSection({ user, onUpdate }) {
                     <>
                       <motion.div
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
                       >
                         <Save className="w-4 h-4 mr-2" />
                       </motion.div>

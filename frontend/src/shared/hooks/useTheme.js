@@ -1,5 +1,10 @@
-import { selectThemeMode , selectResolvedTheme, setMode, toggleMode } from "@/Store/theme.js";
-import { useDispatch, useSelector } from 'react-redux';
+import {
+  selectThemeMode,
+  selectResolvedTheme,
+  setMode,
+  toggleMode,
+} from "@/Store/theme.js";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function useTheme() {
   const dispatch = useDispatch();

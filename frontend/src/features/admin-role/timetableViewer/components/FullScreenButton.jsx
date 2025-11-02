@@ -1,6 +1,11 @@
-import { useState , useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Maximize, Minimize } from "lucide-react";
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
 function FullscreenButton({ tableRef }) {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -30,7 +35,9 @@ function FullscreenButton({ tableRef }) {
           <button
             onClick={toggleFullscreen}
             className="p-2 rounded-md hover:bg-muted transition-colors"
-            aria-label={isFullscreen ? "Exit fullscreen" : "Expand to fullscreen"}
+            aria-label={
+              isFullscreen ? "Exit fullscreen" : "Expand to fullscreen"
+            }
           >
             {isFullscreen ? (
               <Minimize className="w-5 h-5 text-muted-foreground" />

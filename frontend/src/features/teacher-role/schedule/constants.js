@@ -16,7 +16,7 @@
 /**
  * Ordered list of days displayed in the teacher schedule view.
  */
-export const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
+export const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 
 /**
  * Ordered list of time slots (start times) used to build the grid.
@@ -33,7 +33,7 @@ export const TIME_SLOTS = [
   "3:00 PM",
   "4:00 PM",
   "5:00 PM",
-]
+];
 
 /**
  * Sample schedule data.
@@ -152,7 +152,7 @@ export const SAMPLE_SCHEDULE = {
       duration: 1,
     },
   ],
-}
+};
 
 /* -------------------------------------------------------------------------- */
 /* Styling Helpers                                                            */
@@ -177,7 +177,7 @@ export const SUBJECT_STYLE_MAP = {
     container: "bg-green-50 border border-green-200 hover:shadow-sm",
     text: "text-green-700",
   },
-}
+};
 
 /**
  * Returns styling classes for a given schedule entry.
@@ -185,9 +185,9 @@ export const SUBJECT_STYLE_MAP = {
  * @returns {{ container: string, text: string }}
  */
 export const getEntryStyles = (entry) => {
-  if (!entry || !entry.subject) return SUBJECT_STYLE_MAP.default
-  return SUBJECT_STYLE_MAP[entry.subject] || SUBJECT_STYLE_MAP.default
-}
+  if (!entry || !entry.subject) return SUBJECT_STYLE_MAP.default;
+  return SUBJECT_STYLE_MAP[entry.subject] || SUBJECT_STYLE_MAP.default;
+};
 
 /* -------------------------------------------------------------------------- */
 /* Utility Functions                                                          */
@@ -202,22 +202,22 @@ export const getEntryStyles = (entry) => {
  * @returns {string[]} formatted date labels (e.g. ["Sep 2", "Sep 3", ...])
  */
 export const getWeekDates = (weekOffset = 0, locale = "en-US", days = DAYS) => {
-  const today = new Date()
+  const today = new Date();
   // Determine Monday of the target week
-  const currentDay = today.getDay() // 0 (Sun) .. 6 (Sat)
-  const distanceToMonday = ((currentDay + 6) % 7) // convert so Monday = 0
-  const monday = new Date(today)
-  monday.setDate(today.getDate() - distanceToMonday + weekOffset * 7)
+  const currentDay = today.getDay(); // 0 (Sun) .. 6 (Sat)
+  const distanceToMonday = (currentDay + 6) % 7; // convert so Monday = 0
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - distanceToMonday + weekOffset * 7);
 
   return days.map((_, idx) => {
-    const d = new Date(monday)
-    d.setDate(monday.getDate() + idx)
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + idx);
     return d.toLocaleDateString(locale, {
       month: "short",
       day: "numeric",
-    })
-  })
-}
+    });
+  });
+};
 
 /**
  * Find a class entry at a specific day/time combination.
@@ -228,9 +228,9 @@ export const getWeekDates = (weekOffset = 0, locale = "en-US", days = DAYS) => {
  * @returns {object|undefined}
  */
 export const findClassAtTime = (schedule, day, timeSlot) => {
-  const entries = schedule?.[day] || []
-  return entries.find((e) => e.time === timeSlot)
-}
+  const entries = schedule?.[day] || [];
+  return entries.find((e) => e.time === timeSlot);
+};
 
 /**
  * Aggregate high-level metrics from a schedule.
@@ -244,23 +244,24 @@ export const findClassAtTime = (schedule, day, timeSlot) => {
  * @returns {{ teachingHours: number, sessionCount: number, totalStudents: number }}
  */
 export const aggregateScheduleMetrics = (schedule) => {
-  let teachingHours = 0
-  let sessionCount = 0
-  let totalStudents = 0
+  let teachingHours = 0;
+  let sessionCount = 0;
+  let totalStudents = 0;
 
   Object.values(schedule || {}).forEach((entries) => {
     entries.forEach((entry) => {
-      const isTeaching = typeof entry.students === "number" && entry.students > 0
+      const isTeaching =
+        typeof entry.students === "number" && entry.students > 0;
       if (isTeaching) {
-        teachingHours += entry.duration || 1
-        sessionCount += 1
-        totalStudents += entry.students
+        teachingHours += entry.duration || 1;
+        sessionCount += 1;
+        totalStudents += entry.students;
       }
-    })
-  })
+    });
+  });
 
-  return { teachingHours, sessionCount, totalStudents }
-}
+  return { teachingHours, sessionCount, totalStudents };
+};
 
 /**
  * Shallow clone of the schedule (useful if you need an immutable copy).
@@ -271,8 +272,8 @@ export const cloneSchedule = (schedule) =>
     Object.entries(schedule || {}).map(([day, entries]) => [
       day,
       entries.map((e) => ({ ...e })),
-    ])
-  )
+    ]),
+  );
 
 /* -------------------------------------------------------------------------- */
 /* Default Export (optional aggregation)                                      */
@@ -288,4 +289,4 @@ export default {
   findClassAtTime,
   aggregateScheduleMetrics,
   cloneSchedule,
-}
+};

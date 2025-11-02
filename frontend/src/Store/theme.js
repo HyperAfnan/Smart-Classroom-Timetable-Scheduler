@@ -1,11 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
-  mode: 'system',
-  resolvedMode: 'light',
+  mode: "system",
+  resolvedMode: "light",
 };
 
 const themeSlice = createSlice({
-  name: 'theme',
+  name: "theme",
   initialState,
   reducers: {
     hydrateTheme(state, action) {
@@ -20,23 +20,19 @@ const themeSlice = createSlice({
       state.resolvedMode = action.payload;
     },
     toggleMode(state) {
-      if (state.mode === 'system') {
-        state.mode = state.resolvedMode === 'dark' ? 'light' : 'dark';
+      if (state.mode === "system") {
+        state.mode = state.resolvedMode === "dark" ? "light" : "dark";
         state.resolvedMode = state.mode;
         return;
       }
-      state.mode = state.mode === 'dark' ? 'light' : 'dark';
+      state.mode = state.mode === "dark" ? "light" : "dark";
       state.resolvedMode = state.mode;
     },
   },
 });
 
-export const {
-  hydrateTheme,
-  setMode,
-  setResolvedMode,
-  toggleMode,
-} = themeSlice.actions;
+export const { hydrateTheme, setMode, setResolvedMode, toggleMode } =
+  themeSlice.actions;
 
 export const selectThemeMode = (state) => state.theme.mode;
 export const selectResolvedTheme = (state) => state.theme.resolvedMode;

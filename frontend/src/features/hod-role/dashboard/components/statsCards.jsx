@@ -1,14 +1,6 @@
-import {
-  AlertTriangle,
-  Users,
-  BookOpen,
-} from "lucide-react"
+import { AlertTriangle, Users, BookOpen } from "lucide-react";
 
-const StatsCards = ({
-  metrics = {},
-  loading = false,
-  className = "",
-}) => {
+const StatsCards = ({ metrics = {}, loading = false, className = "" }) => {
   return (
     <div
       className={[
@@ -16,16 +8,12 @@ const StatsCards = ({
         className,
       ].join(" ")}
     >
-      {cards.map(card => (
-        <MetricCard
-          key={card.key}
-          loading={loading}
-          {...card}
-        />
+      {cards.map((card) => (
+        <MetricCard key={card.key} loading={loading} {...card} />
       ))}
     </div>
-  )
-}
+  );
+};
 
 /* -------------------------------------------------------------------------- */
 /* MetricCard                                                                 */
@@ -76,8 +64,8 @@ export const MetricCard = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 /* -------------------------------------------------------------------------- */
 /* Skeleton Elements                                                          */
@@ -87,14 +75,14 @@ const SkeletonValue = () => (
   <div className="mt-1">
     <div className="h-8 w-16 bg-muted/60 rounded-md animate-pulse" />
   </div>
-)
+);
 
 const SkeletonLine = () => (
   <div className="h-3 w-28 bg-muted/60 rounded animate-pulse" />
-)
+);
 
 const SkeletonIcon = () => (
   <div className="w-6 h-6 bg-muted/60 rounded-md animate-pulse" />
-)
+);
 
-export default StatsCards
+export default StatsCards;

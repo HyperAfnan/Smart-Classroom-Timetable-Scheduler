@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from "react"
+import { useState, useCallback, useMemo } from "react";
 import {
   INITIAL_PENDING_REQUESTS,
   INITIAL_CONFLICTS,
@@ -6,7 +6,7 @@ import {
   deriveDashboardMetrics,
   getPriorityColor,
   getSeverityColor,
-} from "../constants"
+} from "../constants";
 
 /**
  * useHODDashboard
@@ -36,9 +36,9 @@ export const useHODDashboard = ({
   /* ------------------------------------------------------------------------ */
   /* State                                                                    */
   /* ------------------------------------------------------------------------ */
-  const [pendingRequests, setPendingRequests] = useState(initialPending)
-  const [conflicts] = useState(initialConflicts)
-  const [activity] = useState(initialActivity)
+  const [pendingRequests, setPendingRequests] = useState(initialPending);
+  const [conflicts] = useState(initialConflicts);
+  const [activity] = useState(initialActivity);
 
   /* ------------------------------------------------------------------------ */
   /* Actions                                                                  */
@@ -49,32 +49,32 @@ export const useHODDashboard = ({
    * @param {string} requestId
    */
   const approveRequest = useCallback((requestId) => {
-    setPendingRequests(prev => prev.filter(req => req.id !== requestId))
+    setPendingRequests((prev) => prev.filter((req) => req.id !== requestId));
     // Placeholder: trigger API call / toast
-  }, [])
+  }, []);
 
   /**
    * Deny a request (removes it from the pending list).
    * @param {string} requestId
    */
   const denyRequest = useCallback((requestId) => {
-    setPendingRequests(prev => prev.filter(req => req.id !== requestId))
+    setPendingRequests((prev) => prev.filter((req) => req.id !== requestId));
     // Placeholder: trigger API call / toast
-  }, [])
+  }, []);
 
   /**
    * Bulk resolve (example future function).
    * Accepts an array of IDs or predicate.
    */
   const bulkResolve = useCallback(({ ids, predicate }) => {
-    setPendingRequests(prev =>
-      prev.filter(req => {
-        if (predicate) return !predicate(req)
-        if (ids) return !ids.includes(req.id)
-        return true
-      })
-    )
-  }, [])
+    setPendingRequests((prev) =>
+      prev.filter((req) => {
+        if (predicate) return !predicate(req);
+        if (ids) return !ids.includes(req.id);
+        return true;
+      }),
+    );
+  }, []);
 
   /* ------------------------------------------------------------------------ */
   /* Derived Data                                                             */
@@ -82,34 +82,34 @@ export const useHODDashboard = ({
 
   const metrics = useMemo(
     () => deriveDashboardMetrics(pendingRequests),
-    [pendingRequests]
-  )
+    [pendingRequests],
+  );
 
   // Group requests by priority (for optional UI sections)
   const requestsByPriority = useMemo(() => {
     return pendingRequests.reduce(
       (acc, req) => {
-        const bucket = req.priority || "other"
-        if (!acc[bucket]) acc[bucket] = []
-        acc[bucket].push(req)
-        return acc
+        const bucket = req.priority || "other";
+        if (!acc[bucket]) acc[bucket] = [];
+        acc[bucket].push(req);
+        return acc;
       },
-      { high: [], medium: [], low: [], other: [] }
-    )
-  }, [pendingRequests])
+      { high: [], medium: [], low: [], other: [] },
+    );
+  }, [pendingRequests]);
 
   // Sort pending requests by a simple urgency heuristic (high → low)
   const sortedPendingRequests = useMemo(() => {
-    const priorityRank = { high: 3, medium: 2, low: 1 }
+    const priorityRank = { high: 3, medium: 2, low: 1 };
     return [...pendingRequests].sort(
       (a, b) =>
-        (priorityRank[b.priority] || 0) - (priorityRank[a.priority] || 0)
-    )
-  }, [pendingRequests])
+        (priorityRank[b.priority] || 0) - (priorityRank[a.priority] || 0),
+    );
+  }, [pendingRequests]);
 
   // Flag for empty states
-  const hasNoRequests = pendingRequests.length === 0
-  const hasConflicts = conflicts.length > 0
+  const hasNoRequests = pendingRequests.length === 0;
+  const hasConflicts = conflicts.length > 0;
 
   /* ------------------------------------------------------------------------ */
   /* Style Helpers (re-exported for convenience)                              */
@@ -117,13 +117,13 @@ export const useHODDashboard = ({
 
   const priorityBadgeClass = useCallback(
     (priority) => getPriorityColor(priority),
-    []
-  )
+    [],
+  );
 
   const conflictSeverityClass = useCallback(
     (severity) => getSeverityColor(severity),
-    []
-  )
+    [],
+  );
 
   /* ------------------------------------------------------------------------ */
   /* API Placeholder Stubs                                                    */
@@ -133,7 +133,7 @@ export const useHODDashboard = ({
     // Example:
     // const remote = await fetch('/api/dashboard')
     // setPendingRequests(remote.pending)
-  }, [])
+  }, []);
 
   /* ------------------------------------------------------------------------ */
   /* Return API                                                               */
@@ -145,7 +145,7 @@ export const useHODDashboard = ({
     activity,
 
     // Derived
-    metrics,                 // { pendingCount, activeTeachers, classesToday, systemEfficiency }
+    metrics, // { pendingCount, activeTeachers, classesToday, systemEfficiency }
     sortedPendingRequests,
     requestsByPriority,
     hasNoRequests,
@@ -160,7 +160,7 @@ export const useHODDashboard = ({
     // Style Helpers
     priorityBadgeClass,
     conflictSeverityClass,
-  }
-}
+  };
+};
 
-export default useHODDashboard
+export default useHODDashboard;

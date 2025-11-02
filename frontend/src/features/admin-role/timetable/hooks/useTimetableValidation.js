@@ -62,17 +62,17 @@ import { useMemo, useRef } from "react";
  * @returns {Map<number|string, { day: string|null, slot: number|null, start_time: string|null, end_time: string|null }>}
  */
 export function buildTimeSlotLookup(timeSlots) {
-	const byId = new Map();
-	for (const ts of Array.isArray(timeSlots) ? timeSlots : []) {
-		if (!ts || ts.id === undefined || ts.id === null) continue;
-		byId.set(ts.id, {
-			day: ts.day ?? null,
-			slot: typeof ts.slot === "number" ? ts.slot : (ts.slot ?? null),
-			start_time: ts.start_time ?? null,
-			end_time: ts.end_time ?? null,
-		});
-	}
-	return byId;
+  const byId = new Map();
+  for (const ts of Array.isArray(timeSlots) ? timeSlots : []) {
+    if (!ts || ts.id === undefined || ts.id === null) continue;
+    byId.set(ts.id, {
+      day: ts.day ?? null,
+      slot: typeof ts.slot === "number" ? ts.slot : (ts.slot ?? null),
+      start_time: ts.start_time ?? null,
+      end_time: ts.end_time ?? null,
+    });
+  }
+  return byId;
 }
 
 /**
@@ -81,48 +81,48 @@ export function buildTimeSlotLookup(timeSlots) {
  * @returns {Conflicts}
  */
 export function findConflicts(rows) {
-	const teacherMap = new Map();
-	const roomMap = new Map();
-	const classMap = new Map();
+  const teacherMap = new Map();
+  const roomMap = new Map();
+  const classMap = new Map();
 
-	/** @param {Map<string, TimetableRow[]>} map */
-	const push = (map, key, row) => {
-		if (!key) return;
-		const arr = map.get(key);
-		if (arr) arr.push(row);
-		else map.set(key, [row]);
-	};
+  /** @param {Map<string, TimetableRow[]>} map */
+  const push = (map, key, row) => {
+    if (!key) return;
+    const arr = map.get(key);
+    if (arr) arr.push(row);
+    else map.set(key, [row]);
+  };
 
-	for (const r of Array.isArray(rows) ? rows : []) {
-		// Composite keys (stringify to be safe with numeric IDs)
-		const tKey =
-			r?.teacher_name != null && r?.time_slot_id != null
-				? `${String(r.teacher_name)}::${String(r.time_slot_id)}`
-				: null;
-		const rKey =
-			r?.room_id && r?.time_slot_id != null
-				? `${String(r.room_id)}::${String(r.time_slot_id)}`
-				: null;
-		const cKey =
-			r?.class_name && r?.time_slot_id != null
-				? `${String(r.class_name)}::${String(r.time_slot_id)}`
-				: null;
+  for (const r of Array.isArray(rows) ? rows : []) {
+    // Composite keys (stringify to be safe with numeric IDs)
+    const tKey =
+      r?.teacher_name != null && r?.time_slot_id != null
+        ? `${String(r.teacher_name)}::${String(r.time_slot_id)}`
+        : null;
+    const rKey =
+      r?.room_id && r?.time_slot_id != null
+        ? `${String(r.room_id)}::${String(r.time_slot_id)}`
+        : null;
+    const cKey =
+      r?.class_name && r?.time_slot_id != null
+        ? `${String(r.class_name)}::${String(r.time_slot_id)}`
+        : null;
 
-		push(teacherMap, tKey, r);
-		push(roomMap, rKey, r);
-		push(classMap, cKey, r);
-	}
+    push(teacherMap, tKey, r);
+    push(roomMap, rKey, r);
+    push(classMap, cKey, r);
+  }
 
-	const toConflictList = (map) =>
-		[...map.entries()]
-			.filter(([, arr]) => (arr?.length ?? 0) > 1)
-			.map(([key, rows]) => ({ key, rows }));
+  const toConflictList = (map) =>
+    [...map.entries()]
+      .filter(([, arr]) => (arr?.length ?? 0) > 1)
+      .map(([key, rows]) => ({ key, rows }));
 
-	return {
-		teacherConflicts: toConflictList(teacherMap),
-		roomConflicts: toConflictList(roomMap),
-		classConflicts: toConflictList(classMap),
-	};
+  return {
+    teacherConflicts: toConflictList(teacherMap),
+    roomConflicts: toConflictList(roomMap),
+    classConflicts: toConflictList(classMap),
+  };
 }
 
 /**
@@ -132,14 +132,13 @@ export function findConflicts(rows) {
  * @returns {string}
  */
 export function describeTimeSlot(time_slot_id, timeSlotById) {
-	const ts = timeSlotById?.get?.(time_slot_id);
-	if (!ts) return `time_slot_id=${String(time_slot_id)}`;
-	const time =
-		ts.start_time && ts.end_time
-			? `${ts.start_time}-${ts.end_time}`
-			: (ts.start_time ??
-				(ts.slot != null ? `slot#${ts.slot}` : "time=N/A"));
-	return `${ts.day ?? "?"} (${time}) [id=${String(time_slot_id)}]`;
+  const ts = timeSlotById?.get?.(time_slot_id);
+  if (!ts) return `time_slot_id=${String(time_slot_id)}`;
+  const time =
+    ts.start_time && ts.end_time
+      ? `${ts.start_time}-${ts.end_time}`
+      : (ts.start_time ?? (ts.slot != null ? `slot#${ts.slot}` : "time=N/A"));
+  return `${ts.day ?? "?"} (${time}) [id=${String(time_slot_id)}]`;
 }
 
 /**
@@ -148,39 +147,37 @@ export function describeTimeSlot(time_slot_id, timeSlotById) {
  * @param {Map<number|string, { day: string|null, slot: number|null, start_time: string|null, end_time: string|null }>} timeSlotById
  */
 export function logConflicts(conflicts, timeSlotById) {
-	if (!conflicts) return;
+  if (!conflicts) return;
 
-	const { teacherConflicts, roomConflicts, classConflicts } = conflicts;
+  const { teacherConflicts, roomConflicts, classConflicts } = conflicts;
 
-	const logBucket = (label, list, keyLabel) => {
-		if (!Array.isArray(list) || list.length === 0) return;
-		// Group logs for readability in devtools
-		// eslint-disable-next-line no-console
-		console.group(
-			`[Timetable Validation] ${label} conflicts: ${list.length}`,
-		);
-		for (const item of list) {
-			const [name, tsIdStr] = String(item.key).split("::");
-			const tsId = isNaN(Number(tsIdStr)) ? tsIdStr : Number(tsIdStr);
-			// eslint-disable-next-line no-console
-			console.warn(
-				`${keyLabel}=${name} @ ${describeTimeSlot(tsId, timeSlotById)} → ${item.rows.length} entries`,
-				item.rows.map((r) => ({
-					class_name: r.class_name,
-					subject_name: r.subject_name,
-					room_id: r.room_id,
-					type: r.type,
-					teacher_name: r.teacher_name,
-				})),
-			);
-		}
-		// eslint-disable-next-line no-console
-		console.groupEnd();
-	};
+  const logBucket = (label, list, keyLabel) => {
+    if (!Array.isArray(list) || list.length === 0) return;
+    // Group logs for readability in devtools
+    // eslint-disable-next-line no-console
+    console.group(`[Timetable Validation] ${label} conflicts: ${list.length}`);
+    for (const item of list) {
+      const [name, tsIdStr] = String(item.key).split("::");
+      const tsId = isNaN(Number(tsIdStr)) ? tsIdStr : Number(tsIdStr);
+      // eslint-disable-next-line no-console
+      console.warn(
+        `${keyLabel}=${name} @ ${describeTimeSlot(tsId, timeSlotById)} → ${item.rows.length} entries`,
+        item.rows.map((r) => ({
+          class_name: r.class_name,
+          subject_name: r.subject_name,
+          room_id: r.room_id,
+          type: r.type,
+          teacher_name: r.teacher_name,
+        })),
+      );
+    }
+    // eslint-disable-next-line no-console
+    console.groupEnd();
+  };
 
-	logBucket("Teacher", teacherConflicts, "teacher");
-	logBucket("Room", roomConflicts, "room");
-	logBucket("Class", classConflicts, "class");
+  logBucket("Teacher", teacherConflicts, "teacher");
+  logBucket("Room", roomConflicts, "room");
+  logBucket("Class", classConflicts, "class");
 }
 
 /**
@@ -189,24 +186,24 @@ export function logConflicts(conflicts, timeSlotById) {
  * @param {{ name: string, emp_id: string|number }[]} teacher_profiles
  */
 export function logDuplicateTeacherEmpIds(teacher_profiles) {
-	const byEmp = new Map();
-	for (const t of Array.isArray(teacher_profiles) ? teacher_profiles : []) {
-		const emp = t?.emp_id;
-		if (emp == null) continue;
-		const list = byEmp.get(emp) || [];
-		if (t?.name) list.push(String(t.name));
-		byEmp.set(emp, list);
-	}
-	for (const [emp, names] of byEmp.entries()) {
-		const unique = [...new Set(names)];
-		if (unique.length > 1) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`[Timetable Validation] Multiple teacher names map to the same emp_id=${String(emp)}:`,
-				unique,
-			);
-		}
-	}
+  const byEmp = new Map();
+  for (const t of Array.isArray(teacher_profiles) ? teacher_profiles : []) {
+    const emp = t?.emp_id;
+    if (emp == null) continue;
+    const list = byEmp.get(emp) || [];
+    if (t?.name) list.push(String(t.name));
+    byEmp.set(emp, list);
+  }
+  for (const [emp, names] of byEmp.entries()) {
+    const unique = [...new Set(names)];
+    if (unique.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[Timetable Validation] Multiple teacher names map to the same emp_id=${String(emp)}:`,
+        unique,
+      );
+    }
+  }
 }
 
 /**
@@ -232,87 +229,87 @@ export function logDuplicateTeacherEmpIds(teacher_profiles) {
  * @throws {Error} when throwOnMissing is true and missing names are found
  */
 export function ensureTeacherNamesExist(
-	rows,
-	teacherProfiles = [],
-	{ throwOnMissing = true, log = true } = {},
+  rows,
+  teacherProfiles = [],
+  { throwOnMissing = true, log = true } = {},
 ) {
-	const validNames = new Set(
-		(Array.isArray(teacherProfiles) ? teacherProfiles : [])
-			.map((p) => p?.name)
-			.filter(Boolean)
-			.map(String),
-	);
+  const validNames = new Set(
+    (Array.isArray(teacherProfiles) ? teacherProfiles : [])
+      .map((p) => p?.name)
+      .filter(Boolean)
+      .map(String),
+  );
 
-	const missingSet = new Set();
-	const details = [];
+  const missingSet = new Set();
+  const details = [];
 
-	for (const r of Array.isArray(rows) ? rows : []) {
-		const name = r?.teacher_name;
-		const key = name != null ? String(name) : "";
-		if (!key || !validNames.has(key)) {
-			if (key) missingSet.add(key);
-			details.push({
-				teacher_name: key,
-				class_name: r?.class_name ?? "",
-				time_slot_id: r?.time_slot_id ?? null,
-			});
-		}
-	}
+  for (const r of Array.isArray(rows) ? rows : []) {
+    const name = r?.teacher_name;
+    const key = name != null ? String(name) : "";
+    if (!key || !validNames.has(key)) {
+      if (key) missingSet.add(key);
+      details.push({
+        teacher_name: key,
+        class_name: r?.class_name ?? "",
+        time_slot_id: r?.time_slot_id ?? null,
+      });
+    }
+  }
 
-	const missingNames = [...missingSet];
+  const missingNames = [...missingSet];
 
-	if (log && missingNames.length > 0) {
-		console.group(
-			`[Timetable Validation] Missing teacher_profile.name entries: ${missingNames.length}`,
-		);
-		console.warn("Missing teacher names:", missingNames);
-		console.warn("Examples:", details.slice(0, 10));
-		console.groupEnd();
-	}
+  if (log && missingNames.length > 0) {
+    console.group(
+      `[Timetable Validation] Missing teacher_profile.name entries: ${missingNames.length}`,
+    );
+    console.warn("Missing teacher names:", missingNames);
+    console.warn("Examples:", details.slice(0, 10));
+    console.groupEnd();
+  }
 
-	if (throwOnMissing && missingNames.length > 0) {
-		const sample = missingNames.slice(0, 3).join(", ");
-		throw new Error(
-			`Unknown teacher name(s) for department: ${missingNames.length} missing. Samples: ${sample}`,
-		);
-	}
+  if (throwOnMissing && missingNames.length > 0) {
+    const sample = missingNames.slice(0, 3).join(", ");
+    throw new Error(
+      `Unknown teacher name(s) for department: ${missingNames.length} missing. Samples: ${sample}`,
+    );
+  }
 
-	return { missingNames, details };
+  return { missingNames, details };
 }
 
 export function validateTimetableRows({
-	rows,
-	timeSlots = [],
-	throwOnConflict = true,
-	log = true,
-	teacher_profiles = [],
+  rows,
+  timeSlots = [],
+  throwOnConflict = true,
+  log = true,
+  teacher_profiles = [],
 }) {
-	// Optional sanity check for teacher profiles
-	if (log && Array.isArray(teacher_profiles) && teacher_profiles.length > 0) {
-		logDuplicateTeacherEmpIds(teacher_profiles);
-	}
+  // Optional sanity check for teacher profiles
+  if (log && Array.isArray(teacher_profiles) && teacher_profiles.length > 0) {
+    logDuplicateTeacherEmpIds(teacher_profiles);
+  }
 
-	const timeSlotById = buildTimeSlotLookup(timeSlots);
-	const conflicts = findConflicts(rows);
-	const totalConflicts =
-		(conflicts.teacherConflicts?.length || 0) +
-		(conflicts.roomConflicts?.length || 0) +
-		(conflicts.classConflicts?.length || 0);
+  const timeSlotById = buildTimeSlotLookup(timeSlots);
+  const conflicts = findConflicts(rows);
+  const totalConflicts =
+    (conflicts.teacherConflicts?.length || 0) +
+    (conflicts.roomConflicts?.length || 0) +
+    (conflicts.classConflicts?.length || 0);
 
-	if (log && totalConflicts > 0) {
-		logConflicts(conflicts, timeSlotById);
-	}
+  if (log && totalConflicts > 0) {
+    logConflicts(conflicts, timeSlotById);
+  }
 
-	if (throwOnConflict && totalConflicts > 0) {
-		const err = new Error(
-			`Validation failed: ${conflicts.teacherConflicts.length} teacher, ${conflicts.roomConflicts.length} room, ${conflicts.classConflicts.length} class conflicts detected.`,
-		);
-		// @ts-ignore annotate details for upstream handling
-		err.__timetableConflicts = conflicts;
-		throw err;
-	}
+  if (throwOnConflict && totalConflicts > 0) {
+    const err = new Error(
+      `Validation failed: ${conflicts.teacherConflicts.length} teacher, ${conflicts.roomConflicts.length} room, ${conflicts.classConflicts.length} class conflicts detected.`,
+    );
+    // @ts-ignore annotate details for upstream handling
+    err.__timetableConflicts = conflicts;
+    throw err;
+  }
 
-	return { conflicts, totalConflicts };
+  return { conflicts, totalConflicts };
 }
 
 /**
@@ -329,34 +326,34 @@ export function validateTimetableRows({
  * }}
  */
 export default function useTimetableValidation(
-	timeSlots,
-	teacher_profiles = [],
-	defaults = { log: true, throwOnConflict: true },
+  timeSlots,
+  teacher_profiles = [],
+  defaults = { log: true, throwOnConflict: true },
 ) {
-	const timeSlotById = useMemo(
-		() => buildTimeSlotLookup(timeSlots),
-		[timeSlots],
-	);
-	const defaultOptionsRef = useRef(defaults);
-	defaultOptionsRef.current = defaults;
+  const timeSlotById = useMemo(
+    () => buildTimeSlotLookup(timeSlots),
+    [timeSlots],
+  );
+  const defaultOptionsRef = useRef(defaults);
+  defaultOptionsRef.current = defaults;
 
-	return {
-		validate: (rows, options = {}) =>
-			validateTimetableRows({
-				rows,
-				timeSlots,
-				teacher_profiles,
-				log: options.log ?? defaultOptionsRef.current.log ?? true,
-				throwOnConflict:
-					options.throwOnConflict ??
-					defaultOptionsRef.current.throwOnConflict ??
-					true,
-			}),
-		findConflicts: (rows) => findConflicts(rows),
-		logConflicts: (conflicts) => logConflicts(conflicts, timeSlotById),
-		describeTimeSlot: (timeSlotId) =>
-			describeTimeSlot(timeSlotId, timeSlotById),
-		ensureTeacherNamesExist: (rows, options = {}) =>
-			ensureTeacherNamesExist(rows, teacher_profiles, options),
-	};
+  return {
+    validate: (rows, options = {}) =>
+      validateTimetableRows({
+        rows,
+        timeSlots,
+        teacher_profiles,
+        log: options.log ?? defaultOptionsRef.current.log ?? true,
+        throwOnConflict:
+          options.throwOnConflict ??
+          defaultOptionsRef.current.throwOnConflict ??
+          true,
+      }),
+    findConflicts: (rows) => findConflicts(rows),
+    logConflicts: (conflicts) => logConflicts(conflicts, timeSlotById),
+    describeTimeSlot: (timeSlotId) =>
+      describeTimeSlot(timeSlotId, timeSlotById),
+    ensureTeacherNamesExist: (rows, options = {}) =>
+      ensureTeacherNamesExist(rows, teacher_profiles, options),
+  };
 }

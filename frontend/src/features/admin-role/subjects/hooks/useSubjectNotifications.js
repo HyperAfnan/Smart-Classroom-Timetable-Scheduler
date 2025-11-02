@@ -28,4 +28,3 @@ export default function useSubjectNotifications({
       toast.error(`Delete failed: ${deleteStatus.error?.message}`);
   }, [createStatus, updateStatus, deleteStatus]);
 }
-
