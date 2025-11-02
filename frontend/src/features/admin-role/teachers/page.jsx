@@ -7,6 +7,7 @@ import useTeacherNotifications from "./hooks/useTeacherNotifications";
 import useFilteredTeachers from "./hooks/useFilteredTeachers";
 import useTeacherSubjects from "./hooks/useTeacherSubjects.js";
 
+// TODO: Add pagination 
 export default function Teachers() {
   const { teachers } = useTeachers();
   const { teacherSubjects } = useTeacherSubjects();

@@ -10,6 +10,7 @@ import { setAuth } from "@/Store/auth.js";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+//TODO: notification for errors
 export default function LoginForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
