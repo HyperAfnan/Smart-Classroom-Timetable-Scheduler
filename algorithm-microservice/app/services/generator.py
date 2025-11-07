@@ -94,7 +94,6 @@ class TimetableGenerator:
         inferred_num_subjects = (
             len(SUBJECT_NAMES) if SUBJECT_NAMES else len(self.SUBJECT_HOURS)
         )
-        log.info(f"Subject hours mapping: {self.SUBJECT_HOURS}")
         self.NUM_SUBJECTS: int = (
             int(TOTAL_SUBJECTS)
             if TOTAL_SUBJECTS is not None

@@ -108,7 +108,7 @@ export default function useDashboardStats(options = {}) {
   const statsQuery = useQuery({
     queryKey: queryKeys.dashboard.stats,
     queryFn: fetchDashboardStats,
-    staleTime: 60_000, // 1 minute
+    staleTime: 60_000,
     ...queryOptions,
   });
 

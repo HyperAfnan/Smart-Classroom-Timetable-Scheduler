@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import useClasses from "./hooks/useClasses";
 import ClassFilters from "./components/ClassesFilter";

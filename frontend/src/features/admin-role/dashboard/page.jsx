@@ -1,4 +1,3 @@
-import React from "react";
 import useDashboardStats from "./hooks/useDashboardStats";
 import { motion } from "framer-motion";
 import StatCard from "./components/StatCard";

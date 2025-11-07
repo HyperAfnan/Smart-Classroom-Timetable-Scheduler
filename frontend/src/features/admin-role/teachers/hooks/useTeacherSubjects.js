@@ -44,12 +44,12 @@ import { queryKeys } from "@/shared/queryKeys";
 const EMPTY_ARRAY = Object.freeze([]);
 
 async function fetchTeacherSubjects() {
-  const { data, error } = await supabase.from("teacher_subjects").select("*");
+   const { data, error } = await supabase.from("teacher_subjects").select("*");
 
-  if (error) {
-    throw new Error(error.message || `Failed to load teacher subjects`);
-  }
-  return data ?? [];
+   if (error) {
+     throw new Error(error.message || `Failed to load teacher subjects`);
+   }
+   return data ?? [];
 }
 
 /**
@@ -72,21 +72,24 @@ async function fetchTeacherSubjects() {
  * }}
  */
 export default function useTeacherSubjects(options = {}) {
+
   const { teachersSubjectQueryOptions = {} } = options;
 
   const teachersSubjectQuery = useQuery({
     queryKey: queryKeys.teacherSubjects.all,
     queryFn: fetchTeacherSubjects,
-    staleTime: 10 * 60_000,
+    staleTime: 10 * 60_000, 
     ...teachersSubjectQueryOptions,
   });
 
-  const isLoading = Boolean(teachersSubjectQuery.isLoading);
+  const isLoading = Boolean( teachersSubjectQuery.isLoading);
   const isError = Boolean(teachersSubjectQuery.isError);
   const error = teachersSubjectQuery.error ?? null;
 
   const refetch = async () => {
-    const [tRes] = await Promise.all([teachersSubjectQuery.refetch()]);
+    const [tRes] = await Promise.all([
+      teachersSubjectQuery.refetch(),
+    ]);
     return { teacherSubjects: tRes.data ?? [] };
   };
 

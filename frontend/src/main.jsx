@@ -1,5 +1,5 @@
 import "./config/wdyr.js";
-import { lazy, StrictMode, Suspense } from "react";
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import queryClient from "./config/reactQuery";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -18,46 +18,27 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ThemeProvider from "./shared/components/ThemeProvider.jsx";
 import { setupSentry } from "./config/sentry.js";
-import { Spinner } from "./components/ui/spinner.jsx";
 
-const TeacherSchedule = lazy(
-   () => import("./features/teacher-role/schedule/page.jsx"),
-);
-const TeacherNotifications = lazy(
-   () => import("./features/teacher-role/notification/page.jsx"),
-);
-const TeacherDashboard = lazy(
-   () => import("./features/teacher-role/dashboard/page"),
-);
-const Layout = lazy(() => import("./Layout"));
-const Landing = lazy(() => import("./features/landing/landing.jsx"));
-const Auth = lazy(() => import("./features/auth/auth.jsx"));
-const Classes = lazy(() => import("./features/admin-role/classes/page"));
-const Dashboard = lazy(() => import("./features/auth/dashboard.jsx"));
-const Timetable = lazy(
-   () => import("./features/admin-role/timetable/page.jsx"),
-);
-const TeacherSettings = lazy(
-   () => import("./features/teacher-role/settings/page.jsx"),
-);
-const Rooms = lazy(() => import("./features/admin-role/rooms/page"));
-const Subjects = lazy(() => import("./features/admin-role/subjects/page"));
-const Teachers = lazy(() => import("./features/admin-role/teachers/page"));
-const TimetableViewer = lazy(
-   () => import("./features/admin-role/timetableViewer/page.jsx"),
-);
-const Settings = lazy(() => import("./features/settings/page.jsx"));
+import TeacherSchedule from "./features/teacher-role/schedule/page.jsx";
+import TeacherNotifications from "./features/teacher-role/notification/page.jsx";
+import TeacherDashboard from "./features/teacher-role/dashboard/page";
+import Layout from "./Layout";
+import Landing from "./features/landing/landing.jsx";
+import Auth from "./features/auth/auth.jsx";
+import Classes from "./features/admin-role/classes/page";
+import Dashboard from "./features/auth/dashboard.jsx";
+import Timetable from "./features/admin-role/timetable/page.jsx";
+import TeacherSettings from "./features/teacher-role/settings/page.jsx";
+import Rooms from "./features/admin-role/rooms/page";
+import Subjects from "./features/admin-role/subjects/page";
+import Teachers from "./features/admin-role/teachers/page";
+import TimetableViewer from "./features/admin-role/timetableViewer/page.jsx";
+import Settings from "./features/settings/page.jsx";
 
 function RequireAuth() {
    const user = useSelector((state) => state.auth.user);
    return user ? <Outlet /> : <Navigate to="/auth" replace />;
 }
-
-const withSuspense = (Component) => (
-   <Suspense fallback={<div className="flex items-center justify-center h-full"><Spinner/></div>}>
-      <Component />
-   </Suspense>
-);
 
 const router = createBrowserRouter([
    {
@@ -65,29 +46,23 @@ const router = createBrowserRouter([
       element: <Layout />,
       children: [
          { index: true, element: <Landing /> },
-         { path: "auth", element: withSuspense(Auth) },
-         { path: "settings", element: withSuspense(Settings) },
+         { path: "auth", element: <Auth /> },
+         { path: "settings", element: <Settings /> },
          {
             path: "dashboard",
             element: <RequireAuth />,
             children: [
                { index: true, element: <Dashboard /> },
-               { path: "classes", element: withSuspense(Classes) },
-               { path: "rooms", element: withSuspense(Rooms) },
-               { path: "subjects", element: withSuspense(Subjects) },
-               { path: "teachers", element: withSuspense(Teachers) },
-               { path: "timetablegen", element: withSuspense(Timetable) },
-               { path: "timetableViewer", element: withSuspense(TimetableViewer) },
-               { path: "teacher-schedule", element: withSuspense(TeacherSchedule) },
-               {
-                  path: "teacher-notifications",
-                  element: withSuspense(TeacherNotifications),
-               },
-               {
-                  path: "teacher-dashboard",
-                  element: withSuspense(TeacherDashboard),
-               },
-               { path: "teacher-settings", element: withSuspense(TeacherSettings) },
+               { path: "classes", element: <Classes /> },
+               { path: "rooms", element: <Rooms /> },
+               { path: "subjects", element: <Subjects /> },
+               { path: "teachers", element: <Teachers /> },
+               { path: "timetablegen", element: <Timetable /> },
+               { path: "timetableViewer", element: <TimetableViewer /> },
+               { path: "teacher-schedule", element: <TeacherSchedule /> },
+               { path: "teacher-notifications", element: <TeacherNotifications />, },
+               { path: "teacher-dashboard", element: <TeacherDashboard />, },
+               { path: "teacher-settings", element: <TeacherSettings /> },
             ],
          },
       ],

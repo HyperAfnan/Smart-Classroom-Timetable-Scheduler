@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/select";
 import { Search } from "lucide-react";
 import { useState } from "react";
-import useTeachers from "../hooks/useTeachers.js";
 import useSubjects from "../../subjects/hooks/useSubjects.js";
 
 function Filters({ onSearchChange, onSubjectChange }) {

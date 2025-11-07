@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import readXlsxFile from "read-excel-file";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";

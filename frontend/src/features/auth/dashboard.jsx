@@ -15,6 +15,7 @@ const HODDashboard = lazy(() => import("../hod-role/dashboard/page.jsx"));
 
 // NOTE: when opening pages, it takes 1-2 seconds to load even on fast connections. Consider optimizing the lazy loading or code splitting strategy.
 // FIX: possibilty because we was only using suspense without lazy loading the components
+
 export default function Dashboard() {
   const roles = useSelector((state) => state.auth.roles);
   return (

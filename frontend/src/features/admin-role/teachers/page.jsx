@@ -8,6 +8,8 @@ import useFilteredTeachers from "./hooks/useFilteredTeachers";
 import useTeacherSubjects from "./hooks/useTeacherSubjects.js";
 
 // TODO: Add pagination 
+
+// BUG: fetches all the department which is supposed to not happen, can cause data leak
 export default function Teachers() {
   const { teachers } = useTeachers();
   const { teacherSubjects } = useTeacherSubjects();

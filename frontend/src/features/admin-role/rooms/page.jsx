@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRooms } from "./hooks/useRoom";
 import { RoomFilters } from "./components/Filter";
 import { RoomsTable } from "./components/RoomTable";
