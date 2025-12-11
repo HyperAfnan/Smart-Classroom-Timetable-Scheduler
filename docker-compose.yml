@@ -1,0 +1,151 @@
+version: "3.9"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  supabase-db-data:
+  supabase-storage-data:
+
+services:
+  # FRONTEND
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    depends_on:
+      - backend
+      - algorithm-microservice
+      - supabase-kong
+    networks:
+      - app-network
+
+  # ALGORITHM MICROSERVICE
+  algorithm-microservice:
+    build:
+      context: ./algorithm-microservice
+      dockerfile: Dockerfile
+    env_file:
+      - ./algorithm-microservice/.env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./algorithm-microservice:/code
+    working_dir: /code
+    networks:
+      - app-network
+
+  # BACKEND
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      SUPABASE_URL: http://supabase-kong:8000
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+    depends_on:
+      - redis
+      - supabase-kong
+    networks:
+      - app-network
+
+  # REDIS
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    networks:
+      - app-network
+
+  # SUPABASE STACK
+  supabase-db:
+    image: supabase/postgres:17.6.1.063
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_PASSWORD: supabase
+      POSTGRES_DB: postgres
+    volumes:
+      - supabase-db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  supabase-auth:
+    image: supabase/gotrue:v2.185.0-rc.1
+    depends_on:
+      - supabase-db
+    environment:
+      API_EXTERNAL_URL: http://localhost:8000
+      GOTRUE_DB_DRIVER: postgres
+      DATABASE_URL: postgres://postgres:supabase@supabase-db:5432/postgres
+      JWT_SECRET: super-secret-jwt-token
+    networks:
+      - app-network
+
+  supabase-storage:
+    image: supabase/storage-api
+    depends_on:
+      - supabase-db
+    environment:
+      PGRST_DATABASE_URL: postgres://postgres:supabase@supabase-db:5432/postgres
+      FILE_STORAGE_BACKEND: local
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+    volumes:
+      - supabase-storage-data:/var/lib/storage
+    networks:
+      - app-network
+
+  supabase-imgproxy:
+    image: supabase/imgproxy
+    networks:
+      - app-network
+
+  supabase-kong:
+    image: supabase/kong
+    environment:
+      KONG_DATABASE: off
+      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    volumes:
+      - ./supabase/kong.yml:/var/lib/kong/kong.yml
+    networks:
+      - app-network
+
+  supabase-studio:
+    image: supabase/studio
+    depends_on:
+      - supabase-kong
+    environment:
+      SUPABASE_URL: http://supabase-kong:8000
+      STUDIO_PORT: 3000
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
