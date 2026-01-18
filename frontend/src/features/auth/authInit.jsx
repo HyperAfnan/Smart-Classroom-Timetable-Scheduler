@@ -1,86 +1,99 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setAuth, clearAuth } from "@/Store/auth";
-import { supabase } from "@/config/supabase";
-import { jwtDecode } from "jwt-decode";
+import { auth, db } from "@/config/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 export default function AuthInitializer({ children }) {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getUserAndRoles = async (session) => {
-      if (!session) {
+    const getUserAndRoles = async (user) => {
+      if (!user) {
         dispatch(clearAuth());
         setLoading(false);
         return;
       }
-      let user = session.user;
-      const token = session.access_token;
-
-      let jwtClaims = {};
-      try {
-        jwtClaims = jwtDecode(token);
-      } catch {}
+      
+      const token = await user.getIdToken();
 
       let roles = [];
-      const { data: rolesData } = await supabase
-        .from("user_roles")
-        .select("roles(role_name)")
-        .eq("user_id", user.id);
+      const rolesQuery = query(
+        collection(db, "user_roles"),
+        where("user_id", "==", user.uid)
+      );
+      const rolesSnapshot = await getDocs(rolesQuery);
+      
+      rolesSnapshot.forEach((doc) => {
+        const roleData = doc.data();
+         if (roleData.role_name) {
+          roles.push(roleData.role_name);
+        }
+      });
 
-      if (rolesData) {
-        roles = rolesData.map((r) => r.roles?.role_name).filter(Boolean);
-      }
+
+      let userData = {
+          id: user.uid,
+          email: user.email,
+          ...user // spread other firebase user properties if needed
+      };
 
       if (roles.includes("admin") || roles.includes("teacher")) {
-        const { data: profileData } = await supabase
-          .from("teacher_profile")
-          .select("*")
-          .eq("email", user.email)
-          .single();
+        const teacherQuery = query(
+             collection(db, "teacher_profile"),
+             where("email", "==", user.email)
+        );
+        const teacherSnapshot = await getDocs(teacherQuery);
 
-        user = { ...user, ...profileData };
+        if (!teacherSnapshot.empty) {
+            const profileData = teacherSnapshot.docs[0].data();
+            userData = { ...userData, ...profileData };
 
-        const { data: subjectsData } = await supabase
-          .from("teacher_subjects")
-          .select("subject")
-          .eq("teacher", profileData?.name);
-
-        user = { ...user, subjects: subjectsData.map((s) => s.subject) };
+            const subjectsQuery = query(
+                 collection(db, "teacher_subjects"),
+                 where("teacher", "==", profileData.name)
+            );
+            const subjectsSnapshot = await getDocs(subjectsQuery);
+             const subjects = [];
+            subjectsSnapshot.forEach((doc) => {
+                subjects.push(doc.data().subject);
+            });
+            userData.subjects = subjects;
+        }
       } else if (roles.includes("hod")) {
-        const { data: profileData } = await supabase
-          .from("hod_profile")
-          .select("*")
-          .eq("email", user.email)
-          .single();
-
-        user = { ...user, ...profileData };
+        const hodQuery = query(
+            collection(db, "hod_profile"),
+            where("userId", "==", user.uid)
+        );
+        const hodSnapshot = await getDocs(hodQuery);
+        if (!hodSnapshot.empty) {
+            const profileData = hodSnapshot.docs[0].data();
+            userData = { ...userData, ...profileData };
+        }
       } else if (roles.includes("student")) {
-        const { data: profileData } = await supabase
-          .from("student_profile")
-          .select("*")
-          .eq("userId", user.id)
-          .single();
-        user = { ...user, ...profileData };
+         const studentQuery = query(
+             collection(db, "student_profile"),
+             where("userId", "==", user.uid)
+         );
+         const studentSnapshot = await getDocs(studentQuery);
+         if (!studentSnapshot.empty) {
+             const profileData = studentSnapshot.docs[0].data();
+             userData = { ...userData, ...profileData };
+         }
       }
 
-      dispatch(setAuth({ user, token, roles }));
+      dispatch(setAuth({ user: userData, token, roles }));
       setLoading(false);
     };
 
-    supabase.auth.getSession().then(({ data }) => {
-      getUserAndRoles(data?.session);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+        getUserAndRoles(user);
     });
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        getUserAndRoles(session);
-      },
-    );
-
     return () => {
-      listener?.subscription.unsubscribe();
+      unsubscribe();
     };
   }, [dispatch]);
 

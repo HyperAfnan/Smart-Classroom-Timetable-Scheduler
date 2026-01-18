@@ -35,7 +35,7 @@ export default function ClassFormDialog({
   isSubmitting,
 }) {
   if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
-    // eslint-disable-next-line no-console
+     
     console.warn(
       "ClassFormDialog is deprecated. Use InlineClassesTable instead.",
     );

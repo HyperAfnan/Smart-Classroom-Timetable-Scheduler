@@ -125,7 +125,7 @@ export default function useTimetableStructure(
           grouped[d] = proto.map((s) => s);
         }
 
-        // eslint-disable-next-line no-console
+         
         console.warn(
           "[useTimetableStructure] timeSlots missing 'day'; derived days from entries and replicated slot timeline.",
           { days, protoCount: proto.length },
@@ -142,7 +142,7 @@ export default function useTimetableStructure(
         grouped[d] = proto.map((s) => s);
       }
 
-      // eslint-disable-next-line no-console
+       
       console.warn(
         "[useTimetableStructure] No day info found in timeSlots or entries; defaulting to first 5 days of DAY_ORDER.",
         { days },

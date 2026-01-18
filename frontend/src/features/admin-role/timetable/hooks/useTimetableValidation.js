@@ -154,12 +154,12 @@ export function logConflicts(conflicts, timeSlotById) {
   const logBucket = (label, list, keyLabel) => {
     if (!Array.isArray(list) || list.length === 0) return;
     // Group logs for readability in devtools
-    // eslint-disable-next-line no-console
+     
     console.group(`[Timetable Validation] ${label} conflicts: ${list.length}`);
     for (const item of list) {
       const [name, tsIdStr] = String(item.key).split("::");
       const tsId = isNaN(Number(tsIdStr)) ? tsIdStr : Number(tsIdStr);
-      // eslint-disable-next-line no-console
+       
       console.warn(
         `${keyLabel}=${name} @ ${describeTimeSlot(tsId, timeSlotById)} → ${item.rows.length} entries`,
         item.rows.map((r) => ({
@@ -171,7 +171,7 @@ export function logConflicts(conflicts, timeSlotById) {
         })),
       );
     }
-    // eslint-disable-next-line no-console
+     
     console.groupEnd();
   };
 
@@ -197,7 +197,7 @@ export function logDuplicateTeacherEmpIds(teacher_profiles) {
   for (const [emp, names] of byEmp.entries()) {
     const unique = [...new Set(names)];
     if (unique.length > 1) {
-      // eslint-disable-next-line no-console
+       
       console.warn(
         `[Timetable Validation] Multiple teacher names map to the same emp_id=${String(emp)}:`,
         unique,

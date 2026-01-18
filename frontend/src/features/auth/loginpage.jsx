@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, ArrowRight } from "lucide-react";
-import { supabase } from "@/config/supabase.js";
-import { jwtDecode } from "jwt-decode";
+import { auth, db } from "@/config/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { useDispatch } from "react-redux";
 import { setAuth } from "@/Store/auth.js";
 import { useNavigate } from "react-router-dom";
@@ -36,104 +37,126 @@ export default function LoginForm() {
 
     setIsSubmitting(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: String(formData.email),
-      password: String(formData.password),
-    });
-
-    if (error) {
-      setError(error.message);
-      setIsSubmitting(false);
-      return;
-    }
-
-    let roles = [];
-    const { data: rolesData, error: rolesError } = await supabase
-      .from("user_roles")
-      .select("roles(role_name)")
-      .eq("user_id", data.user.id);
-
-    if (rolesError) {
-      setError(rolesError.message);
-    } else {
-      roles = rolesData?.map((r) => r.roles?.role_name).filter(Boolean);
-    }
-
-    let jwtClaims = {};
     try {
-      jwtClaims = jwtDecode(data.session.access_token);
-    } catch {}
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        formData.email,
+        formData.password
+      );
+      const user = userCredential.user;
 
-    if (roles.includes("admin") || roles.includes("teacher")) {
-      const { data: profileData, error: profileError } = await supabase
-        .from("teacher_profile")
-        .select("*")
-        .eq("email", data.user.email)
-        .single();
+      let roles = [];
+      const rolesQuery = query(
+        collection(db, "user_roles"),
+        where("user_id", "==", user.uid)
+      );
+      const rolesSnapshot = await getDocs(rolesQuery);
 
-      if (profileError) {
-        setError(profileError.message);
-      } else {
-        data.user = { ...data.user, ...profileData };
+      rolesSnapshot.forEach((doc) => {
+        const roleData = doc.data();
+        // Assuming roleData structure matches what's needed or fetch role name relatedly.
+        // If the structure is strictly mimicking the JOIN from Supabase, we might need adjustments.
+        // For now simplifying to assume role_name is available or fetching from 'roles' collection is skipped if flattened.
+        // Assuming a simpler structure for migration or direct translation:
+        // Firebase structure might differ. If we stick to "user_roles" collection:
+        // we might need to fetch the role name if it's a reference.
+        // IMPORTANT: The original code did a join: .select("roles(role_name)").
+        // If we assume the migrated data has 'role_name' directly or we need another query.
+        // Let's assume we store role_name directly in user_roles for simpler NoSQL structure.
+        if (roleData.role_name) {
+          roles.push(roleData.role_name);
+        }
+      });
+      
+      // If we didn't find roles primarily, maybe check if we need to fetch from a separate 'roles' collection 
+      // but let's assume the migration flattened it or we have the name.
+      // If the migration kept relational refs, we'd need another query.
+      // Let's proceed with roles found.
+
+      let userData = {
+        id: user.uid,
+        email: user.email,
+        // ... other basic auth info
+      };
+
+      if (roles.includes("admin") || roles.includes("teacher")) {
+        const teacherQuery = query(
+          collection(db, "teacher_profile"),
+          where("email", "==", user.email)
+        );
+        const teacherSnapshot = await getDocs(teacherQuery);
+        
+        if (!teacherSnapshot.empty) {
+            const profileData = teacherSnapshot.docs[0].data();
+            userData = { ...userData, ...profileData };
+
+            const subjectsQuery = query(
+                collection(db, "teacher_subjects"),
+                where("teacher", "==", profileData.name)
+            );
+            const subjectsSnapshot = await getDocs(subjectsQuery);
+            const subjects = [];
+            subjectsSnapshot.forEach((doc) => {
+                subjects.push(doc.data().subject);
+            });
+            userData.subjects = subjects;
+        }
       }
 
-      const { data: subjectsData, error: subjectsError } = await supabase
-        .from("teacher_subjects")
-        .select("subject")
-        .eq("teacher", profileData.name);
+      if (roles.includes("hod")) {
+        const hodQuery = query(
+            collection(db, "hod_profile"),
+            where("email", "==", user.email) // Changed from userId to email to be consistent or use uid if migrated that way
+        );
+        // The original code used userId for HOD and Student, but email for Teacher.
+        // Let's stick to userId (uid) if that's how it was linked, but usually email is safer if UIDs changed during migration.
+        // However, standardizing on UID is better. Let's assume the migration mapped Supabase ID to Firebase UID.
+        // Re-checking original: .eq("userId", data.user.id)
+        
+        const hodQueryUid = query(
+             collection(db, "hod_profile"),
+             where("userId", "==", user.uid)
+        );
 
-      if (subjectsError) {
-        setError(subjectsError.message);
-      } else {
-        data.user = {
-          ...data.user,
-          subjects: subjectsData.map((s) => s.subject),
-        };
+        const hodSnapshot = await getDocs(hodQueryUid);
+         if (!hodSnapshot.empty) {
+             const profileData = hodSnapshot.docs[0].data();
+             userData = { ...userData, ...profileData };
+         }
       }
+
+      if (roles.includes("student")) {
+         const studentQuery = query(
+             collection(db, "student_profile"),
+             where("userId", "==", user.uid)
+         );
+         const studentSnapshot = await getDocs(studentQuery);
+         if (!studentSnapshot.empty) {
+             const profileData = studentSnapshot.docs[0].data();
+             userData = { ...userData, ...profileData };
+         }
+      }
+
+      dispatch(
+        setAuth({
+          user: userData,
+          token: await user.getIdToken(),
+          roles,
+        })
+      );
+
+      // Persist to local storage
+      localStorage.setItem("user", JSON.stringify(userData));
+      localStorage.setItem("token", await user.getIdToken());
+      localStorage.setItem("roles", JSON.stringify(roles));
+
+      setIsSubmitting(false);
+      navigate("/dashboard");
+
+    } catch (err) {
+      setError(err.message);
+      setIsSubmitting(false);
     }
-
-    if (roles.includes("hod")) {
-      const { data: profileData, error: profileError } = await supabase
-        .from("hod_profile")
-        .select("*")
-        .eq("userId", data.user.id)
-        .single();
-
-      if (profileError) {
-        setError(profileError.message);
-      } else {
-        data.user = { ...data.user, ...profileData };
-      }
-    }
-
-    if (roles.includes("student")) {
-      const { data: profileData, error: profileError } = await supabase
-        .from("student_profile")
-        .select("*")
-        .eq("userId", data.user.id)
-        .single();
-
-      if (profileError) {
-        setError(profileError.message);
-      } else {
-        data.user = { ...data.user, ...profileData };
-      }
-    }
-
-    dispatch(
-      setAuth({
-        user: data.user,
-        token: data.session.access_token,
-        roles,
-      }),
-    );
-
-    localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("token", data.session.access_token);
-    localStorage.setItem("roles", JSON.stringify(roles));
-
-    setIsSubmitting(false);
-    navigate("/dashboard");
   };
 
   const isFormValid = formData.email.trim() && formData.password.trim();

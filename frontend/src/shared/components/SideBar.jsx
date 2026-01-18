@@ -24,7 +24,8 @@ import {
 
 import { useSelector, useDispatch } from "react-redux";
 import { clearAuth } from "@/Store/auth";
-import { supabase } from "@/config/supabase";
+import { auth } from "@/config/firebase";
+import { signOut } from "firebase/auth";
 import { useState, useEffect, useRef } from "react";
 
 const adminNavigationOptions = [
@@ -143,7 +144,7 @@ export default function SidebarMenuComponent() {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
+      await signOut(auth);
     } catch (e) {
       console.error("Logout error:", e);
     } finally {
