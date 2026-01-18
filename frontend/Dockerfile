@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM node:20-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -24,8 +24,6 @@ ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
 ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 
-# Expose port 80
-EXPOSE 8080
+EXPOSE 5173
 
-# Start Nginx
 CMD ["npm", "run", "dev"]

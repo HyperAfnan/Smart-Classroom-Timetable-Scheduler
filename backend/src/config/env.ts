@@ -19,10 +19,10 @@ const ENV: Environment = {
 const requiredKeys: (keyof Environment)[] = [
   'SUPABASE_URL',
   'SUPABASE_ANON_KEY',
-  'REDIS_HOST',
-  'REDIS_PORT',
-  'REDIS_PASSWORD',
-  'REDIS_USERNAME',
+  // 'REDIS_HOST',
+  // 'REDIS_PORT',
+  // 'REDIS_PASSWORD',
+  // 'REDIS_USERNAME',
   'DATABASE_URL',
 ];
 

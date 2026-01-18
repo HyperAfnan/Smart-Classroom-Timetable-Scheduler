@@ -1,12 +1,14 @@
 {
-  "image": "mcr.microsoft.com/devcontainers/base:latest",
-
+  "name": "Neovim Dev Container",
+  "init": true,
+  "image": "ubuntu:latest",
   "features": {
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/rails/devcontainer/features/activestorage": {},
-    "ghcr.io/rails/devcontainer/features/postgres-client": {},
-    "ghcr.io/duduribeiro/devcontainer-features/neovim:1": {
-      "version": "nightly"
-    }
-  }
+    "ghcr.io/duduribeiro/devcontainer-features/neovim:1": {},
+    "ghcr.io/s1n7ax/devcontainer-features/neovim-essentials:0": {},
+    "ghcr.io/hyperafnan/devcontainers.github.io/neovim-config:latest": {}
+    "ghcr.io/hyperafnan/devcontainers.github.io/dev-configs:latest": {}
+  },
+  "postCreateCommand": "chsh -s /usr/bin/zsh",
+  "forwardPorts": [3000, 8080],
 }

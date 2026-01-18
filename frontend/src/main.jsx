@@ -69,7 +69,7 @@ const router = createBrowserRouter([
    },
 ]);
 
-setupSentry();
+// setupSentry();
 
 createRoot(document.getElementById("root")).render(
    <StrictMode>
