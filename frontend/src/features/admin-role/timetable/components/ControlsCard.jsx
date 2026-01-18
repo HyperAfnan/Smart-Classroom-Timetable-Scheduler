@@ -10,7 +10,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Zap, Loader2, RefreshCw, Download, AlertCircle } from "lucide-react";
 import useTimetableMutation from "../hooks/useTimetableMutation.js";
-import { useSelector } from "react-redux";
+import { useUser } from "@/features/auth/hooks/useAuth";
 import useClasses from "../../classes/hooks/useClasses.js";
 import { useState } from "react";
 
@@ -32,7 +32,8 @@ export default function ControlsCard({
 	onSelectClass,
 	onExport,
 }) {
-	const departmentId = useSelector((state) => state.auth.user?.department_id);
+    const { user } = useUser();
+	const departmentId = user?.department_id;
 	const {
 		createTimetableEntryAsync,
 		isError: isTimetableError,

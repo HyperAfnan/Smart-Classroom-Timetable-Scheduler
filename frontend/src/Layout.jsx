@@ -1,7 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import SidebarMenu from "@/shared/components/SideBar";
 import { Outlet, useLocation } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useUser } from "@/features/auth/hooks/useAuth";
 import {
   ResizablePanelGroup,
   ResizablePanel,
@@ -10,7 +10,7 @@ import {
 
 export default function Layout() {
   const location = useLocation();
-  const roles = useSelector((state) => state.auth.roles) || [];
+  const { roles } = useUser();
 
   const noSidebarRoutes = ["/", "/auth"];
   const isSidebarVisible = !noSidebarRoutes.includes(location.pathname);

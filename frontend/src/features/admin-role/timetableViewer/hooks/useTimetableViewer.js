@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, getDocs, query, where, orderBy, documentId } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
-import { useSelector } from "react-redux";
+import { useUser } from "@/features/auth/hooks/useAuth";
 
 /**
  * Timetable Viewer data hook
@@ -14,49 +15,80 @@ import { useSelector } from "react-redux";
  */
 
 async function fetchClasses(department_id) {
-  const { data, error } = await supabase
-    .from("classes")
-    .select("*")
-    .eq("department_id", department_id)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw new Error(error.message || "Failed to fetch classes");
-  }
-  return data ?? [];
+  const q = query(
+    collection(db, "classes"),
+    where("department_id", "==", department_id),
+    orderBy("created_at", "desc")
+  );
+  const snapshot = await getDocs(q);
+  const classes = [];
+  snapshot.forEach((doc) => {
+    classes.push({ id: doc.id, ...doc.data() });
+  });
+  return classes;
 }
 
 async function fetchTimeslots(department_id) {
-  //TODO: aligh this data order with the existing data order
-  const { data, error } = await supabase
-    .from("time_slots")
-    .select("*")
-    .eq("department_id", department_id)
-    .order("day", { ascending: true })
-    .order("slot", { ascending: true });
-
-  if (error) {
-    throw new Error(error.message || "Failed to fetch time slots");
-  }
-  return data ?? [];
+  const q = query(
+    collection(db, "time_slots"),
+    where("department_id", "==", department_id),
+    orderBy("day", "asc"),
+    orderBy("slot", "asc")
+  );
+  const snapshot = await getDocs(q);
+  const slots = [];
+  snapshot.forEach((doc) => {
+    slots.push({ id: doc.id, ...doc.data() });
+  });
+  return slots;
 }
 
 async function fetchTimetableEntries(department_id) {
-  const { data, error } = await supabase
-    .from("timetable_entries")
-    .select("*, time_slots(*)")
-    .eq("department_id", department_id);
+  // 1. Fetch Entries
+  const entriesQ = query(
+    collection(db, "timetable_entries"),
+    where("department_id", "==", department_id)
+  );
+  const entriesSnapshot = await getDocs(entriesQ);
+  const entries = [];
+  const timeSlotIds = new Set();
+  
+  entriesSnapshot.forEach((doc) => {
+    const data = doc.data();
+    entries.push({ id: doc.id, ...data });
+    if (data.time_slot_id) timeSlotIds.add(data.time_slot_id);
+  });
 
-  if (error) {
-    console.error("Error While Fetching timetable_entries: ", error);
-    throw new Error(`Error While Fetching timetable_entries: ${error.message}`);
-  }
+  // 2. Fetch TimeSlots (if any entries exist)
+  if (timeSlotIds.size === 0) return entries;
+  
+  // Firestore 'in' query supports max 10 items, so we might need to batch or just fetch all slots for dept like above
+  // Since we already have a fetchTimeSlots function that fetches all for dept, we could reuse that logic or cache
+  // But strictly here, let's fetch all slots for the department to be safe and join, 
+  // as entries might reference slots we want to know details of.
+  
+  const slotsQ = query(
+    collection(db, "time_slots"),
+     where("department_id", "==", department_id)
+  );
+  const slotsSnapshot = await getDocs(slotsQ);
+  const slotsMap = {};
+  slotsSnapshot.forEach((doc) => {
+      slotsMap[doc.id] = { id: doc.id, ...doc.data() };
+  });
 
-  return data || [];
+  // 3. Join
+  const joinedEntries = entries.map(entry => ({
+      ...entry,
+      time_slots: slotsMap[entry.time_slot_id] || null
+  }));
+
+  return joinedEntries;
 }
 
 export default function useTimetableViewer() {
-  const department_id = useSelector((state) => state.auth.user?.department_id);
+  const { user } = useUser();
+  const department_id = user?.department_id;
 
   const classesQuery = useQuery({
     queryKey: queryKeys.classes.all,

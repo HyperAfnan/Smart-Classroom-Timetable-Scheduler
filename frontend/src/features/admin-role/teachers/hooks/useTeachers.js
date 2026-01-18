@@ -34,7 +34,8 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, getDocs } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 /**
@@ -62,12 +63,15 @@ const EMPTY_DEPARTMENTS = Object.freeze([]);
  */
 // TODO: fetch only specific department teacher_profiles only,
 // otherwise, the app will be slot and will fetch unnessesary teachers data
+// TODO: fetch only specific department teacher_profiles only,
+// otherwise, the app will be slot and will fetch unnessesary teachers data
 async function fetchTeachers() {
-  const { data, error } = await supabase.from("teacher_profile").select("*");
-  if (error) {
-    throw new Error(error.message || "Failed to load teachers");
-  }
-  return data ?? [];
+  const snapshot = await getDocs(collection(db, "teacher_profile"));
+  const teachers = [];
+  snapshot.forEach((doc) => {
+    teachers.push({ id: doc.id, ...doc.data() });
+  });
+  return teachers;
 }
 
 /**
@@ -75,11 +79,13 @@ async function fetchTeachers() {
  * @returns {Promise<string[]>}
  */
 async function fetchDepartments() {
-  const { data, error } = await supabase.from("department").select("name");
-  if (error) {
-    throw new Error(error.message || "Failed to load departments");
-  }
-  return (data ?? []).map((d) => d?.name).filter(Boolean);
+  const snapshot = await getDocs(collection(db, "department"));
+  const departments = [];
+  snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.name) departments.push(data.name);
+  });
+  return departments;
 }
 
 /**

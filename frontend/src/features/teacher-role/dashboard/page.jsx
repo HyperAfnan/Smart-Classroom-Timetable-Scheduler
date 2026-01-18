@@ -13,10 +13,10 @@ import ScheduleCard from "./components/schedulecard.jsx";
 import UpdateItem from "./components/updateitem.jsx";
 import QuickAction from "./components/quickActions.jsx";
 import { recentChanges, todaySchedule } from "./constants";
-import { useSelector } from "react-redux";
+import { useUser } from "@/features/auth/hooks/useAuth";
 
 const Dashboard = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useUser();
 
   return (
     <div className="space-y-6">

@@ -45,7 +45,8 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 /**
@@ -54,23 +55,25 @@ import { queryKeys } from "@/shared/queryKeys";
  * @returns {Promise<Object>} Inserted teacher row.
  */
 async function insertTeacher(teacher) {
-  if (!teacher || typeof teacher !== "object" || Array.isArray(teacher)) {
-    throw new Error("Invalid teacher payload");
-  }
-  if (!teacher.email) {
-    throw new Error("Teacher must include an email");
-  }
+  // if (!teacher || typeof teacher !== "object" || Array.isArray(teacher)) {
+  //   throw new Error("Invalid teacher payload");
+  // }
+  // if (!teacher.email) {
+  //   throw new Error("Teacher must include an email");
+  // }
 
-  const { data, error } = await supabase.functions.invoke("teacher-creation", {
-    body: teacher,
-  });
+  // const { data, error } = await supabase.functions.invoke("teacher-creation", {
+  //   body: teacher,
+  // });
 
-  if (error) {
-    console.error("Edge function error:", error);
-    throw new Error(error.message || "Failed to create teacher");
-  }
+  // if (error) {
+  //   console.error("Edge function error:", error);
+  //   throw new Error(error.message || "Failed to create teacher");
+  // }
 
-  return data;
+  // return data;
+  console.log("Teacher creation is currently disabled during migration.");
+  return {};
 }
 
 /**
@@ -79,17 +82,11 @@ async function insertTeacher(teacher) {
  * @returns {Promise<Object>} Updated teacher row.
  */
 async function updateTeacherById({ id, updates }) {
-  const { data, error } = await supabase
-    .from("teacher_profile")
-    .update(updates)
-    .eq("id", id)
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to update teacher");
-  }
-  return data;
+  const teacherRef = doc(db, "teacher_profile", String(id));
+  await updateDoc(teacherRef, updates);
+  // Fetch updated data to return
+  const snapshot = await getDoc(teacherRef);
+  return { id, ...snapshot.data() };
 }
 
 /**
@@ -98,13 +95,8 @@ async function updateTeacherById({ id, updates }) {
  * @returns {Promise<{ id: string|number }>} Deleted id for convenience.
  */
 async function deleteTeacherById(id) {
-  const { error } = await supabase
-    .from("teacher_profile")
-    .delete()
-    .eq("id", id);
-  if (error) {
-    throw new Error(error.message || "Failed to delete teacher");
-  }
+  const teacherRef = doc(db, "teacher_profile", String(id));
+  await deleteDoc(teacherRef);
   return { id };
 }
 

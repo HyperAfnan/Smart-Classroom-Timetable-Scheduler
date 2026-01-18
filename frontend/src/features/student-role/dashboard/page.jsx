@@ -3,7 +3,7 @@ import StudentNotificationBanner from "./components/notificationBanner.jsx";
 import StudentTodaySchedule from "./components/studentTodaySchedule.jsx";
 import StudentWeeklyTimetable from "./components/StudentWeeklyTimetable.jsx";
 import { mockSchedule } from "./constants.js";
-import { useSelector } from "react-redux";
+import { useUser } from "@/features/auth/hooks/useAuth";
 
 const mockNotifications = [];
 
@@ -20,7 +20,7 @@ const getCurrentDayClasses = () => {
 };
 
 function StudentDashboard() {
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useUser();
   const [notifications, setNotifications] = useState(mockNotifications);
   const [currentTime, setCurrentTime] = useState("10:30 AM");
   const [currentDay] = useState("Monday");

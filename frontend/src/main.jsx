@@ -11,7 +11,7 @@ import {
    RouterProvider,
 } from "react-router-dom";
 import "./index.css";
-import { Provider, useSelector } from "react-redux";
+import { Provider } from "react-redux";
 import store from "./Store/store.js";
 import AuthInitializer from "./features/auth/authInit.jsx";
 import { ToastContainer } from "react-toastify";
@@ -25,18 +25,20 @@ import ThemeProvider from "./shared/components/ThemeProvider.jsx";
 import Layout from "./Layout";
 import Landing from "./features/landing/landing.jsx";
 import Auth from "./features/auth/auth.jsx";
-// import Classes from "./features/admin-role/classes/page";
+import Classes from "./features/admin-role/classes/page";
 import Dashboard from "./features/auth/dashboard.jsx";
-// import Timetable from "./features/admin-role/timetable/page.jsx";
+import Timetable from "./features/admin-role/timetable/page.jsx";
 // import TeacherSettings from "./features/teacher-role/settings/page.jsx";
-// import Rooms from "./features/admin-role/rooms/page";
-// import Subjects from "./features/admin-role/subjects/page";
-// import Teachers from "./features/admin-role/teachers/page";
-// import TimetableViewer from "./features/admin-role/timetableViewer/page.jsx";
+import Rooms from "./features/admin-role/rooms/page";
+import Subjects from "./features/admin-role/subjects/page";
+import Teachers from "./features/admin-role/teachers/page";
+import TimetableViewer from "./features/admin-role/timetableViewer/page.jsx";
 // import Settings from "./features/settings/page.jsx";
 
+import { useUser } from "@/features/auth/hooks/useAuth";
+
 function RequireAuth() {
-   const user = useSelector((state) => state.auth.user);
+   const { user } = useUser();
    return user ? <Outlet /> : <Navigate to="/auth" replace />;
 }
 
@@ -53,12 +55,12 @@ const router = createBrowserRouter([
             element: <RequireAuth />,
             children: [
                { index: true, element: <Dashboard /> },
-               // { path: "classes", element: <Classes /> },
-               // { path: "rooms", element: <Rooms /> },
-               // { path: "subjects", element: <Subjects /> },
-               // { path: "teachers", element: <Teachers /> },
-               // { path: "timetablegen", element: <Timetable /> },
-               // { path: "timetableViewer", element: <TimetableViewer /> },
+               { path: "classes", element: <Classes /> },
+               { path: "rooms", element: <Rooms /> },
+               { path: "subjects", element: <Subjects /> },
+               { path: "teachers", element: <Teachers /> },
+               { path: "timetablegen", element: <Timetable /> },
+               { path: "timetableViewer", element: <TimetableViewer /> },
                // { path: "teacher-schedule", element: <TeacherSchedule /> },
                // { path: "teacher-notifications", element: <TeacherNotifications />, },
                // { path: "teacher-dashboard", element: <TeacherDashboard />, },

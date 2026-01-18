@@ -3,7 +3,7 @@ import ConflictsList from "./components/conflictsList.jsx";
 import QuickActions from "./components/quickActions.jsx";
 import ActivityFeed from "./components/activityFeed.jsx";
 import { useHODDashboard } from "./hooks/useHODDashboard.js";
-import { useSelector } from "react-redux";
+import { useUser } from "@/features/auth/hooks/useAuth";
 import { AlertTriangle, Users, BookOpen } from "lucide-react";
 import { MetricCard } from "./components/statsCards.jsx";
 import useTeachers from "@/features/admin-role/teachers/hooks/useTeachers.js";
@@ -20,7 +20,7 @@ const HODDashboard = () => {
     conflictSeverityClass,
   } = useHODDashboard();
 
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useUser();
   const { teachers } = useTeachers();
   const { classes } = useClasses();
 

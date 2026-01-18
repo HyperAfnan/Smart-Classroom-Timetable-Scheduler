@@ -41,7 +41,8 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDoc } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 import { normalizeSubjectType } from "@/lib/subjectType";
 
@@ -61,16 +62,9 @@ async function insertSubject(subject) {
     type: normalizedType ?? "Theory", // ensure a valid enum value
   };
 
-  const { data, error } = await supabase
-    .from("subjects")
-    .insert([prepared])
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to create subject");
-  }
-  return data;
+  const docRef = await addDoc(collection(db, "subjects"), prepared);
+  const snapshot = await getDoc(docRef);
+  return { id: docRef.id, ...snapshot.data() };
 }
 
 /**
@@ -89,17 +83,10 @@ async function updateSubjectById({ id, updates }) {
     prepared = { ...updates, type: normalizedType ?? "Theory" };
   }
 
-  const { data, error } = await supabase
-    .from("subjects")
-    .update(prepared)
-    .eq("id", id)
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to update subject");
-  }
-  return data;
+  const subjectRef = doc(db, "subjects", String(id));
+  await updateDoc(subjectRef, prepared);
+  const snapshot = await getDoc(subjectRef);
+  return { id, ...snapshot.data() };
 }
 
 /**
@@ -108,10 +95,7 @@ async function updateSubjectById({ id, updates }) {
  * @returns {Promise<{ id: string|number }>} Deleted id for convenience.
  */
 async function deleteSubjectById(id) {
-  const { error } = await supabase.from("subjects").delete().eq("id", id);
-  if (error) {
-    throw new Error(error.message || "Failed to delete subject");
-  }
+  await deleteDoc(doc(db, "subjects", String(id)));
   return { id };
 }
 

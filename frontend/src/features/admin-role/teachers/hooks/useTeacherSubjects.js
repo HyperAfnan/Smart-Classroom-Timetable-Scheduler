@@ -38,18 +38,19 @@
  *  - You can override any React Query option through `queryOptions`.
  */
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, getDocs } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 const EMPTY_ARRAY = Object.freeze([]);
 
 async function fetchTeacherSubjects() {
-   const { data, error } = await supabase.from("teacher_subjects").select("*");
-
-   if (error) {
-     throw new Error(error.message || `Failed to load teacher subjects`);
-   }
-   return data ?? [];
+   const snapshot = await getDocs(collection(db, "teacher_subjects"));
+   const data = [];
+   snapshot.forEach((doc) => {
+       data.push({ id: doc.id, ...doc.data() });
+   });
+   return data;
 }
 
 /**

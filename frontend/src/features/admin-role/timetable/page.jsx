@@ -6,12 +6,13 @@ import ControlsCard from "./components/ControlsCard";
 import TimetableTable from "./components/TimetableTable";
 import { days, times } from "./constants";
 import useClasses from "../classes/hooks/useClasses.js";
-import { useSelector } from "react-redux";
+import { useUser } from "@/features/auth/hooks/useAuth";
 import Loader from "@/shared/components/Loader.jsx";
 
 export default function Timetable() {
 	const [selectedClass, setSelectedClass] = useState("");
-	const departmentId = useSelector((state) => state.auth.user?.department_id);
+	const { user } = useUser();
+    const departmentId = user?.department_id;
 	const { classes, isLoading: classLoading } = useClasses();
 
 	const selectedClassObj = classes.find((c) => String(c.id) === selectedClass);

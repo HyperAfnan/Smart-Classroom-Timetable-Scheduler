@@ -24,7 +24,8 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, getCountFromServer } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 /**
@@ -50,33 +51,19 @@ const DEFAULT_STATS = Object.freeze({
 async function fetchDashboardStats() {
   const [teachersRes, roomsRes, subjectsRes, classesRes, timeSlotsRes] =
     await Promise.all([
-      supabase
-        .from("teacher_profile")
-        .select("*", { count: "exact", head: true }),
-      supabase.from("room").select("*", { count: "exact", head: true }),
-      supabase.from("subjects").select("*", { count: "exact", head: true }),
-      supabase.from("classes").select("*", { count: "exact", head: true }),
-      supabase.from("time_slots").select("*", { count: "exact", head: true }),
+      getCountFromServer(collection(db, "teacher_profile")),
+      getCountFromServer(collection(db, "room")),
+      getCountFromServer(collection(db, "subjects")),
+      getCountFromServer(collection(db, "classes")),
+      getCountFromServer(collection(db, "time_slots")),
     ]);
 
-  // If any individual query has an error, throw the first error to surface it
-  const firstError =
-    teachersRes.error ||
-    roomsRes.error ||
-    subjectsRes.error ||
-    classesRes.error ||
-    timeSlotsRes.error;
-
-  if (firstError) {
-    throw new Error(firstError.message || "Failed to load dashboard stats");
-  }
-
   return {
-    teachers: teachersRes.count ?? 0,
-    rooms: roomsRes.count ?? 0,
-    subjects: subjectsRes.count ?? 0,
-    classes: classesRes.count ?? 0,
-    timeSlots: timeSlotsRes.count ?? 0,
+    teachers: teachersRes.data().count,
+    rooms: roomsRes.data().count,
+    subjects: subjectsRes.data().count,
+    classes: classesRes.data().count,
+    timeSlots: timeSlotsRes.data().count,
   };
 }
 

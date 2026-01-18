@@ -30,7 +30,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, orderBy } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 const EMPTY_CLASSES = Object.freeze([]);
@@ -54,14 +55,13 @@ const EMPTY_CLASSES = Object.freeze([]);
  */
 // TODO: fetch only department level classes
 async function fetchClasses() {
-	const { data, error } = await supabase
-		.from("classes")
-		.select("*")
-		.order("created_at", { ascending: false });
-	if (error) {
-		throw new Error(error.message || "Failed to load classes");
-	}
-	return data ?? [];
+  const q = query(collection(db, "classes"), orderBy("created_at", "desc"));
+  const snapshot = await getDocs(q);
+  const classes = [];
+  snapshot.forEach((doc) => {
+    classes.push({ id: doc.id, ...doc.data() });
+  });
+  return classes;
 }
 
 /**
@@ -70,15 +70,9 @@ async function fetchClasses() {
  * @returns {Promise<ClassEntity>}
  */
 async function insertClass(classPayload) {
-	const { data, error } = await supabase
-		.from("classes")
-		.insert([classPayload])
-		.select("*")
-		.single();
-	if (error) {
-		throw new Error(error.message || "Failed to create class");
-	}
-	return data;
+  const docRef = await addDoc(collection(db, "classes"), classPayload);
+  const snapshot = await getDoc(docRef);
+  return { id: docRef.id, ...snapshot.data() };
 }
 
 /**
@@ -87,16 +81,10 @@ async function insertClass(classPayload) {
  * @returns {Promise<ClassEntity>}
  */
 async function updateClassById({ id, updates }) {
-	const { data, error } = await supabase
-		.from("classes")
-		.update(updates)
-		.eq("id", id)
-		.select("*")
-		.single();
-	if (error) {
-		throw new Error(error.message || "Failed to update class");
-	}
-	return data;
+  const classRef = doc(db, "classes", String(id));
+  await updateDoc(classRef, updates);
+  const snapshot = await getDoc(classRef);
+  return { id, ...snapshot.data() };
 }
 
 /**
@@ -105,11 +93,8 @@ async function updateClassById({ id, updates }) {
  * @returns {Promise<{ id: string|number }>}
  */
 async function deleteClassById(id) {
-	const { error } = await supabase.from("classes").delete().eq("id", id);
-	if (error) {
-		throw new Error(error.message || "Failed to delete class");
-	}
-	return { id };
+  await deleteDoc(doc(db, "classes", String(id)));
+  return { id };
 }
 
 /**

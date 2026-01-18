@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 import {
   EMPTY_TEACHERSPROFILE,
@@ -7,27 +8,28 @@ import {
 } from "@/features/teacher-role/settings/constants";
 
 async function fetchTeacherProfile(email) {
-  const { data, error } = await supabase
-    .from("teacher_profile")
-    .select("*")
-    .eq("email", email)
-    .single();
-  if (error) {
-    throw new Error(error.message || "Failed to fetch teacher profile");
-  }
-  return data ?? [];
+  const q = query(
+      collection(db, "teacher_profile"),
+      where("email", "==", email),
+      limit(1)
+  );
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) return null;
+  const doc = snapshot.docs[0];
+  return { id: doc.id, ...doc.data() };
 }
 
 async function fetchTeacherSubjects(name) {
-  const { data, error } = await supabase
-    .from("teacher_subjects")
-    .select("*")
-    .eq("teacher", name)
-    .single();
-  if (error) {
-    throw new Error(error.message || "Failed to fetch teacher subjects");
-  }
-  return data ?? [];
+  // teacher_subjects has 'teacher' field which is the name?
+  const q = query(
+      collection(db, "teacher_subjects"),
+      where("teacher", "==", name),
+      limit(1)
+  );
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) return null;
+  const doc = snapshot.docs[0];
+  return { id: doc.id, ...doc.data() };
 }
 
 export default function useTeacherProfile(options = {}) {
