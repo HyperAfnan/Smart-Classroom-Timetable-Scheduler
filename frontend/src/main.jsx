@@ -33,6 +33,7 @@ import Rooms from "./features/admin-role/rooms/page";
 import Subjects from "./features/admin-role/subjects/page";
 import Teachers from "./features/admin-role/teachers/page";
 import TimetableViewer from "./features/admin-role/timetableViewer/page.jsx";
+import Unauthorized from "./features/auth/unauthorized.jsx";
 // import Settings from "./features/settings/page.jsx";
 
 import { useUser } from "@/features/auth/hooks/useAuth";
@@ -49,6 +50,7 @@ const router = createBrowserRouter([
       children: [
          { index: true, element: <Landing /> },
          { path: "auth", element: <Auth /> },
+         { path: "unauthorized", element: <Unauthorized /> },
          // { path: "settings", element: <Settings /> },
          {
             path: "dashboard",

@@ -17,13 +17,14 @@ const HODDashboard = lazy(() => import("../hod-role/dashboard/page.jsx"));
 // FIX: possibilty because we was only using suspense without lazy loading the components
 
 export default function Dashboard() {
-  const { roles } = useUser();
+  const { role } = useUser();
   return (
     <Suspense fallback={<div className="flex items-center justify-center h-full"><Spinner/></div>}>
-      {roles.includes("admin") && <AdminDashboard />}
-      {roles.includes("teacher") && <TeacherDashboard />}
-      {roles.includes("student") && <StudentDashboard />}
-      {roles.includes("hod") && <HODDashboard />}
+      {role === "admin" && <AdminDashboard />}
+      {role === "teacher" && <TeacherDashboard />}
+      {role === "student" && <StudentDashboard />}
+      {role === "hod" && <HODDashboard />}
     </Suspense>
   );
 }
+

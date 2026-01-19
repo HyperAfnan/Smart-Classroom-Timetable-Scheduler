@@ -78,16 +78,16 @@ export function RoomsTable({ rooms, loading }) {
 
    const handleEditClick = (room) => {
       setEditingRoomId(room.id);
-      setEditValue("room_number", room.room_number);
-      setEditValue("room_type", room.room_type);
+      setEditValue("roomNumber", room.roomNumber);
+      setEditValue("roomType", room.roomType);
       setEditValue("capacity", room.capacity);
    };
 
    const onCreateSubmit = async (data) => {
       try {
          await createRoomAsync({
-            room_number: data.room_number.trim(),
-            room_type: data.room_type,
+            roomNumber: data.roomNumber.trim(),
+            roomType: data.roomType,
             capacity: parseInt(data.capacity, 10),
          });
          toast.success("Room created successfully!");
@@ -103,8 +103,8 @@ export function RoomsTable({ rooms, loading }) {
          await updateRoomAsync({
             id: editingRoomId,
             updates: {
-               room_number: data.room_number.trim(),
-               room_type: data.room_type,
+               roomNumber: data.roomNumber.trim(),
+               roomType: data.roomType,
                capacity: parseInt(data.capacity, 10),
             },
          });
@@ -204,7 +204,7 @@ export function RoomsTable({ rooms, loading }) {
                                           <>
                                              <TableCell>
                                                 <input
-                                                   {...editRegister("room_number", {
+                                                   {...editRegister("roomNumber", {
                                                       required: true,
                                                    })}
                                                    className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
@@ -213,7 +213,7 @@ export function RoomsTable({ rooms, loading }) {
                                              </TableCell>
                                              <TableCell>
                                                 <Controller
-                                                   name="room_type"
+                                                   name="roomType"
                                                    control={editControl}
                                                    rules={{ required: true }}
                                                    render={({ field }) => (
@@ -278,7 +278,7 @@ export function RoomsTable({ rooms, loading }) {
                                           <>
                                              <TableCell>
                                                 <div className="font-medium">
-                                                   {room.room_number}
+                                                   {room.roomNumber}
                                                 </div>
                                                 {room.name && (
                                                    <div className="text-xs text-muted-foreground mt-1">
@@ -290,11 +290,11 @@ export function RoomsTable({ rooms, loading }) {
                                                 <Badge
                                                    variant="outline"
                                                    className={
-                                                      TYPE_COLORS[room.room_type] ||
+                                                      TYPE_COLORS[room.roomType] ||
                                                       "bg-muted text-muted-foreground border-border"
                                                    }
                                                 >
-                                                   {room.room_type}
+                                                   {room.roomType}
                                                 </Badge>
                                              </TableCell>
                                              <TableCell>
@@ -344,12 +344,12 @@ export function RoomsTable({ rooms, loading }) {
                                           type="text"
                                           placeholder="Room Number"
                                           className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
-                                          {...register("room_number", { required: true })}
+                                          {...register("roomNumber", { required: true })}
                                        />
                                     </TableCell>
                                     <TableCell>
                                        <Controller
-                                          name="room_type"
+                                          name="roomType"
                                           control={control}
                                           rules={{ required: true }}
                                           render={({ field }) => (

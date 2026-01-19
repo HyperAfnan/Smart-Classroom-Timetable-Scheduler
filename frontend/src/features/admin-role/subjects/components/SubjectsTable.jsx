@@ -34,7 +34,7 @@ import useTeachers from "../../teachers/hooks/useTeachers.js";
 import useSubjects from "../hooks/useSubjects.js";
 import { useState } from "react";
 import useSubjectMutations from "../hooks/useSubjectMutations.js";
-// import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 import ExcelUploader from "./SubjectsExcelUploader.jsx";
 import Loader from "@/shared/components/Loader.jsx";
 
@@ -72,13 +72,13 @@ export default function SubjectsTable({ subjects }) {
          variant="outline"
          onClick={() => {
             setEditingSubjectId(subject.id);
-            setValue("subject_name", subject.subject_name);
-            setValue("subject_code", subject.subject_code);
+            setValue("subjectName", subject.subjectName);
+            setValue("subjectCode", subject.subjectCode);
             setValue("department", subject.department);
             setValue("semester", subject.semester);
             setValue("type", subject.type);
             setValue("credits", subject.credits);
-            setValue("hours_per_week", subject.hours_per_week);
+            setValue("hoursPerWeek", subject.hoursPerWeek);
          }}
       >
          <Edit className="w-3 h-3" />
@@ -88,7 +88,16 @@ export default function SubjectsTable({ subjects }) {
       <Button
          size="sm"
          variant="outline"
-         onClick={async () => await deleteSubjectAsync(subjectId)}
+         onClick={async () => {
+             if(confirm("Are you sure you want to delete this subject?")) {
+                 try {
+                    await deleteSubjectAsync(subjectId);
+                    toast.success("Subject deleted successfully");
+                 } catch (err) {
+                    toast.error("Failed to delete subject");
+                 }
+             }
+         }}
          className="text-red-600 hover:text-red-700"
       >
          {" "}
@@ -97,19 +106,25 @@ export default function SubjectsTable({ subjects }) {
    );
 
    const onEditSubmit = async (data) => {
-      await updateSubjectAsync({ id: editingSubject, updates: data });
-      setEditingSubjectId(null);
-      resetEditForm();
+      try {
+        await updateSubjectAsync({ id: editingSubject, updates: data });
+        toast.success("Subject updated successfully");
+        setEditingSubjectId(null);
+        resetEditForm();
+      } catch (err) {
+        toast.error(`Failed to update subject: ${err.message}`);
+      }
    };
    const onSubmit = async (data) => {
-      await createSubjectAsync(data);
-      reset();
-      setRenderNewRow(false);
+      try {
+        await createSubjectAsync(data);
+        toast.success("Subject created successfully");
+        reset();
+        setRenderNewRow(false);
+      } catch (err) {
+        toast.error(`Failed to create subject: ${err.message}`);
+      }
    };
-
-   if (errors || editErrors) {
-      // toast.error("Please fill all required fields correctly.");
-   }
 
    return (
       <Card className="bg-card text-card-foreground border border-border shadow-sm">
@@ -173,22 +188,22 @@ export default function SubjectsTable({ subjects }) {
                                        {editingSubject === subject.id
                                           ? columns.map((col) => (
                                              <TableCell key={col.key}>
-                                                {col.key === "subject_name" && (
+                                                {col.key === "subjectName" && (
                                                    <input
                                                       type="text"
                                                       placeholder="Subject Name"
                                                       className="w-full border px-2 py-1 rounded"
-                                                      {...editRegister("subject_name", {
+                                                      {...editRegister("subjectName", {
                                                          required: true,
                                                       })}
                                                    />
                                                 )}
-                                                {col.key === "subject_code" && (
+                                                {col.key === "subjectCode" && (
                                                    <input
                                                       type="text"
                                                       placeholder="Subject Code"
                                                       className="w-full border px-2 py-1 rounded"
-                                                      {...editRegister("subject_code", {
+                                                      {...editRegister("subjectCode", {
                                                          required: true,
                                                       })}
                                                    />
@@ -276,138 +291,141 @@ export default function SubjectsTable({ subjects }) {
                                                       })}
                                                    />
                                                 )}
-                                                {col.key === "hours_per_week" && (
+                                                {col.key === "hoursPerWeek" && (
                                                    <input
                                                       placeholder="Hr/week"
                                                       className="w-full border px-2 py-1 rounded"
-                                                      {...editRegister("hours_per_week", {
+                                                      {...editRegister("hoursPerWeek", {
                                                          required: true,
                                                       })}
                                                    />
                                                 )}
-                                                {col.key === "actions" && (
-                                                   <div className="flex gap-2">
-                                                      <Button
-                                                         size="sm"
-                                                         variant="outline"
-                                                         onClick={() => {
-                                                            setEditingSubjectId(null);
-                                                            resetEditForm();
-                                                         }}
-                                                      >
-                                                         <X className="w-3 h-3" />
-                                                      </Button>
-                                                      <Button
-                                                         size="sm"
-                                                         className="bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500"
-                                                         onClick={handleEditSubmit(onEditSubmit)}
-                                                      >
-                                                         <Check className="w-3 h-3" />
-                                                      </Button>
-                                                   </div>
-                                                )}
-                                             </TableCell>
-                                          ))
-                                          : columns.map((col) => (
-                                             <TableCell key={col.key}>
-                                                {col.key === "subject_name" && (
-                                                   <div className="font-medium">
-                                                      {subject.subject_name}
-                                                   </div>
-                                                )}
-                                                {col.key === "subject_code" &&
-                                                   subject.subject_code}
-                                                {col.key === "department" && (
-                                                   <Badge
-                                                      variant="outline"
-                                                      className="bg-muted text-muted-foreground border-border"
-                                                   >
-                                                      {subject.department}
-                                                   </Badge>
-                                                )}
-                                                {col.key === "semester" && (
-                                                   <div className="flex items-center gap-1">
-                                                      <Mail className="w-3 h-3 text-muted-foreground" />
-                                                      {subject.semester}
-                                                   </div>
-                                                )}
-                                                {col.key === "type" && (
-                                                   <Badge
-                                                      variant="outline"
-                                                      className={getTypeColor(subject.type)}
-                                                   >
-                                                      {" "}
-                                                      {subject.type}{" "}
-                                                   </Badge>
-                                                )}
-                                                {col.key === "credits" && subject.credits}
-                                                {col.key === "hours_per_week" && (
-                                                   <div className="flex items-center gap-1">
-                                                      <Clock className="w-3 h-3 text-muted-foreground" />
-                                                      {subject.hours_per_week}h
-                                                   </div>
-                                                )}
-                                                {col.key === "actions" && (
-                                                   <div className="flex gap-2">
-                                                      {hoveredRowId === subject.id ? (
-                                                         <>
-                                                            <EditButton subject={subject} />
-                                                            <DeleteButton
-                                                               subjectId={subject.id}
-                                                            />
-                                                         </>
-                                                      ) : (
-                                                         <>
-                                                            <span
-                                                               style={{ visibility: "hidden" }}
-                                                            >
-                                                               <Button size="sm" variant="outline">
-                                                                  <Edit className="w-3 h-3" />
-                                                               </Button>
-                                                            </span>
-                                                            <span
-                                                               style={{ visibility: "hidden" }}
-                                                            >
-                                                               <Button size="sm" variant="outline">
-                                                                  <Trash2 className="w-3 h-3" />
-                                                               </Button>
-                                                            </span>
-                                                         </>
-                                                      )}
-                                                   </div>
-                                                )}
-                                             </TableCell>
-                                          ))}
-                                    </motion.tr>
-                                 ))
-                              )}
-                           </AnimatePresence>
-                           {renderNewRow && (
-                              <motion.tr
-                                 initial={{ opacity: 0, y: 20 }}
-                                 animate={{ opacity: 1, y: 0 }}
-                                 exit={{ opacity: 0, y: -20 }}
-                                 transition={{ duration: 0.3 }}
-                              >
-                                 {columns.map((col) => (
-                                    <TableCell key={col.key}>
-                                       {col.key === "subject_name" && (
-                                          <input
-                                             type="text"
-                                             placeholder="Subject Name"
-                                             className="w-full border px-2 py-1 rounded"
-                                             {...register("subject_name", { required: true })}
-                                          />
-                                       )}
-                                       {col.key === "subject_code" && (
-                                          <input
-                                             type="text"
-                                             placeholder="Subject Code"
-                                             className="w-full border px-2 py-1 rounded"
-                                             {...register("subject_code", { required: true })}
-                                          />
-                                       )}
-                                       {col.key === "department" && (
+                                                 {col.key === "actions" && (
+                                                    <div className="flex gap-2">
+                                                       <Button
+                                                          size="sm"
+                                                          variant="outline"
+                                                          onClick={() => {
+                                                             setEditingSubjectId(null);
+                                                             resetEditForm();
+                                                          }}
+                                                       >
+                                                          <X className="w-3 h-3" />
+                                                       </Button>
+                                                       <Button
+                                                          size="sm"
+                                                          className="bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500"
+                                                          onClick={handleEditSubmit(onEditSubmit, (err) => {
+                                                              console.error("Edit validation failed", err);
+                                                              toast.error("Please fill all required fields");
+                                                          })}
+                                                       >
+                                                          <Check className="w-3 h-3" />
+                                                       </Button>
+                                                    </div>
+                                                 )}
+                                              </TableCell>
+                                           ))
+                                           : columns.map((col) => (
+                                              <TableCell key={col.key}>
+                                                 {col.key === "subjectName" && (
+                                                    <div className="font-medium">
+                                                       {subject.subjectName}
+                                                    </div>
+                                                 )}
+                                                 {col.key === "subjectCode" &&
+                                                    subject.subjectCode}
+                                                 {col.key === "department" && (
+                                                    <Badge
+                                                       variant="outline"
+                                                       className="bg-muted text-muted-foreground border-border"
+                                                    >
+                                                       {subject.department}
+                                                    </Badge>
+                                                 )}
+                                                 {col.key === "semester" && (
+                                                    <div className="flex items-center gap-1">
+                                                       <Mail className="w-3 h-3 text-muted-foreground" />
+                                                       {subject.semester}
+                                                    </div>
+                                                 )}
+                                                 {col.key === "type" && (
+                                                    <Badge
+                                                       variant="outline"
+                                                       className={getTypeColor(subject.type)}
+                                                    >
+                                                       {" "}
+                                                       {subject.type}{" "}
+                                                    </Badge>
+                                                 )}
+                                                 {col.key === "credits" && subject.credits}
+                                                 {col.key === "hoursPerWeek" && (
+                                                    <div className="flex items-center gap-1">
+                                                       <Clock className="w-3 h-3 text-muted-foreground" />
+                                                       {subject.hoursPerWeek}h
+                                                    </div>
+                                                 )}
+                                                 {col.key === "actions" && (
+                                                    <div className="flex gap-2">
+                                                       {hoveredRowId === subject.id ? (
+                                                          <>
+                                                             <EditButton subject={subject} />
+                                                             <DeleteButton
+                                                                subjectId={subject.id}
+                                                             />
+                                                          </>
+                                                       ) : (
+                                                          <>
+                                                             <span
+                                                                style={{ visibility: "hidden" }}
+                                                             >
+                                                                <Button size="sm" variant="outline">
+                                                                   <Edit className="w-3 h-3" />
+                                                                </Button>
+                                                             </span>
+                                                             <span
+                                                                style={{ visibility: "hidden" }}
+                                                             >
+                                                                <Button size="sm" variant="outline">
+                                                                   <Trash2 className="w-3 h-3" />
+                                                                </Button>
+                                                             </span>
+                                                          </>
+                                                       )}
+                                                    </div>
+                                                 )}
+                                              </TableCell>
+                                           ))}
+                                     </motion.tr>
+                                  ))
+                               )}
+                            </AnimatePresence>
+                            {renderNewRow && (
+                               <motion.tr
+                                  initial={{ opacity: 0, y: 20 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -20 }}
+                                  transition={{ duration: 0.3 }}
+                               >
+                                  {columns.map((col) => (
+                                     <TableCell key={col.key}>
+                                        {col.key === "subjectName" && (
+                                           <input
+                                              type="text"
+                                              placeholder="Subject Name"
+                                              className="w-full border px-2 py-1 rounded"
+                                              {...register("subjectName", { required: true })}
+                                           />
+                                        )}
+                                        {col.key === "subjectCode" && (
+                                           <input
+                                              type="text"
+                                              placeholder="Subject Code"
+                                              className="w-full border px-2 py-1 rounded"
+                                              {...register("subjectCode", { required: true })}
+                                           />
+                                        )}
+                                        {col.key === "department" && (
                                           <Controller
                                              name="department"
                                              control={control}
@@ -482,11 +500,11 @@ export default function SubjectsTable({ subjects }) {
                                              {...register("credits", { required: true })}
                                           />
                                        )}
-                                       {col.key === "hours_per_week" && (
+                                       {col.key === "hoursPerWeek" && (
                                           <input
                                              placeholder="Hr/week"
                                              className="w-full border px-2 py-1 rounded"
-                                             {...register("hours_per_week", {
+                                             {...register("hoursPerWeek", {
                                                 required: true,
                                              })}
                                           />
@@ -506,7 +524,10 @@ export default function SubjectsTable({ subjects }) {
                                              <Button
                                                 size="sm"
                                                 className="bg-indigo-600 hover:bg-indigo-700 text-white dark:bg-indigo-600 dark:hover:bg-indigo-500"
-                                                onClick={handleSubmit(onSubmit)}
+                                                onClick={handleSubmit(onSubmit, (err) => {
+                                                    console.error("Create validation failed", err);
+                                                    toast.error("Please fill all required fields");
+                                                })}
                                              >
                                                 <Check className="w-3 h-3" />
                                              </Button>

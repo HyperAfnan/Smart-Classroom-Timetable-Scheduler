@@ -14,11 +14,11 @@ import { useUser } from "@/features/auth/hooks/useAuth";
  *
  */
 
-async function fetchClasses(department_id) {
+async function fetchClasses(departmentId) {
   const q = query(
     collection(db, "classes"),
-    where("department_id", "==", department_id),
-    orderBy("created_at", "desc")
+    where("departmentId", "==", departmentId),
+    orderBy("createdAt", "desc")
   );
   const snapshot = await getDocs(q);
   const classes = [];
@@ -28,10 +28,10 @@ async function fetchClasses(department_id) {
   return classes;
 }
 
-async function fetchTimeslots(department_id) {
+async function fetchTimeslots(departmentId) {
   const q = query(
     collection(db, "time_slots"),
-    where("department_id", "==", department_id),
+    where("departmentId", "==", departmentId),
     orderBy("day", "asc"),
     orderBy("slot", "asc")
   );
@@ -43,11 +43,11 @@ async function fetchTimeslots(department_id) {
   return slots;
 }
 
-async function fetchTimetableEntries(department_id) {
+async function fetchTimetableEntries(departmentId) {
   // 1. Fetch Entries
   const entriesQ = query(
     collection(db, "timetable_entries"),
-    where("department_id", "==", department_id)
+    where("departmentId", "==", departmentId)
   );
   const entriesSnapshot = await getDocs(entriesQ);
   const entries = [];
@@ -56,7 +56,7 @@ async function fetchTimetableEntries(department_id) {
   entriesSnapshot.forEach((doc) => {
     const data = doc.data();
     entries.push({ id: doc.id, ...data });
-    if (data.time_slot_id) timeSlotIds.add(data.time_slot_id);
+    if (data.timeSlotId) timeSlotIds.add(data.timeSlotId);
   });
 
   // 2. Fetch TimeSlots (if any entries exist)
@@ -69,7 +69,7 @@ async function fetchTimetableEntries(department_id) {
   
   const slotsQ = query(
     collection(db, "time_slots"),
-     where("department_id", "==", department_id)
+     where("departmentId", "==", departmentId)
   );
   const slotsSnapshot = await getDocs(slotsQ);
   const slotsMap = {};
@@ -80,7 +80,7 @@ async function fetchTimetableEntries(department_id) {
   // 3. Join
   const joinedEntries = entries.map(entry => ({
       ...entry,
-      time_slots: slotsMap[entry.time_slot_id] || null
+      time_slots: slotsMap[entry.timeSlotId] || null
   }));
 
   return joinedEntries;
@@ -88,23 +88,23 @@ async function fetchTimetableEntries(department_id) {
 
 export default function useTimetableViewer() {
   const { user } = useUser();
-  const department_id = user?.department_id;
+  const departmentId = user?.departmentId;
 
   const classesQuery = useQuery({
     queryKey: queryKeys.classes.all,
     staleTime: 60_000, // 1 minute
-    queryFn: () => fetchClasses(department_id),
+    queryFn: () => fetchClasses(departmentId),
   });
 
   const timeSlotsQuery = useQuery({
     queryKey: queryKeys.timeSlots.all,
     staleTime: 60_000,
-    queryFn: () => fetchTimeslots(department_id),
+    queryFn: () => fetchTimeslots(departmentId),
   });
 
   const timetableQuery = useQuery({
     queryKey: [queryKeys.timetableEntries.all],
-    queryFn: () => fetchTimetableEntries(department_id),
+    queryFn: () => fetchTimetableEntries(departmentId),
     staleTime: 60_000,
   });
 

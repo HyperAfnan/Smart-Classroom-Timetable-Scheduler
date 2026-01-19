@@ -11,9 +11,9 @@ import { toast } from "react-toastify";
  * RoomExcelUploader
  *
  * Features:
- * - Validates presence of required columns: room_number, capacity, room_type
+ * - Validates presence of required columns: roomNumber, capacity, roomType
  * - Accepts optional "name" column if present
- * - Creates new rooms or updates existing rooms (matched by room_number, case-insensitive)
+ * - Creates new rooms or updates existing rooms (matched by roomNumber, case-insensitive)
  * - Displays aggregated success + error feedback
  *
  * Usage:
@@ -72,9 +72,9 @@ export default function RoomExcelUploader() {
         // Skip blank lines
         if (!row || row.every((cell) => cell === null || cell === "")) continue;
 
-        const rawRoomNumber = row[colIndex["room_number"]];
+        const rawRoomNumber = row[colIndex["roomNumber"]];
         const rawCapacity = row[colIndex["capacity"]];
-        const rawType = row[colIndex["room_type"]];
+        const rawType = row[colIndex["roomType"]];
         const rawName = hasName ? row[colIndex["name"]] : undefined;
 
         // Basic validation
@@ -89,26 +89,26 @@ export default function RoomExcelUploader() {
           continue;
         }
 
-        const room_type = String(rawType).trim();
-        if (!ROOM_TYPES.includes(room_type)) {
+        const roomType = String(rawType).trim();
+        if (!ROOM_TYPES.includes(roomType)) {
           // Skip unknown room type
           continue;
         }
 
-        const room_number = String(rawRoomNumber).trim();
+        const roomNumber = String(rawRoomNumber).trim();
         const roomPayload = {
-          room_number,
+          roomNumber,
           capacity,
-          room_type,
+          roomType,
         };
 
         if (hasName && rawName) {
           roomPayload.name = String(rawName).trim();
         }
 
-        // Match existing by room_number (case-insensitive)
+        // Match existing by roomNumber (case-insensitive)
         const existing = rooms.find(
-          (r) => r.room_number?.toLowerCase() === room_number.toLowerCase(),
+          (r) => r.roomNumber?.toLowerCase() === roomNumber.toLowerCase(),
         );
 
         if (existing) {
@@ -135,7 +135,7 @@ export default function RoomExcelUploader() {
           createdCount++;
         } catch (err) {
           errorMessages.push(
-            `Create error for ${room.room_number}: ${err?.message || err}`,
+            `Create error for ${room.roomNumber}: ${err?.message || err}`,
           );
         }
       }
@@ -146,7 +146,7 @@ export default function RoomExcelUploader() {
           updatedCount++;
         } catch (err) {
           errorMessages.push(
-            `Update error for ${updates.room_number}: ${err?.message || err}`,
+            `Update error for ${updates.roomNumber}: ${err?.message || err}`,
           );
         }
       }

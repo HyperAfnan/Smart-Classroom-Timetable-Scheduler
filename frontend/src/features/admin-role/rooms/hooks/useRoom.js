@@ -50,7 +50,7 @@ const EMPTY_ROOMS = Object.freeze([]);
  * @returns {Promise<Room[]>}
  */
 async function fetchRooms() {
-  const snapshot = await getDocs(collection(db, "room"));
+  const snapshot = await getDocs(collection(db, "rooms"));
   const rooms = [];
   snapshot.forEach((doc) => {
     rooms.push({ id: doc.id, ...doc.data() });
@@ -64,7 +64,7 @@ async function fetchRooms() {
  * @returns {Promise<Room>}
  */
 async function insertRoom(room) {
-  const docRef = await addDoc(collection(db, "room"), room);
+  const docRef = await addDoc(collection(db, "rooms"), room);
   const snapshot = await getDoc(docRef);
   return { id: docRef.id, ...snapshot.data() };
 }
@@ -75,7 +75,7 @@ async function insertRoom(room) {
  * @returns {Promise<Room>}
  */
 async function updateRoomById({ id, updates }) {
-  const roomRef = doc(db, "room", String(id));
+  const roomRef = doc(db, "rooms", String(id));
   await updateDoc(roomRef, updates);
   const snapshot = await getDoc(roomRef);
   return { id, ...snapshot.data() };
@@ -87,7 +87,7 @@ async function updateRoomById({ id, updates }) {
  * @returns {Promise<{ id: string|number }>}
  */
 async function deleteRoomById(id) {
-  await deleteDoc(doc(db, "room", String(id)));
+  await deleteDoc(doc(db, "rooms", String(id)));
   return { id };
 }
 

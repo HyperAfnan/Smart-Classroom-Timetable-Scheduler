@@ -18,13 +18,15 @@ async function insertTeacherSubject(payload) {
  * @returns {Promise<Object>} Updated teacher row.
  */
 async function updateTeacherSubjectById({ teacher, subject }) {
-  // Logic from original code: update 'subject' for all docs where 'teacher' == teacher.
-  // This seems odd (updating all subjects for a teacher to one subject?), but replicating.
+  // Logic: update 'subject' for all docs where 'teacher' == teacher.
+  // If no docs exist, create a new one (Upsert behavior).
   const q = query(collection(db, "teacher_subjects"), where("teacher", "==", teacher));
   const snapshot = await getDocs(q);
   
   if (snapshot.empty) {
-      throw new Error("No teacher subject found to update");
+      // Upsert: Create new if not exists
+      await addDoc(collection(db, "teacher_subjects"), { teacher, subject });
+      return { teacher, subject };
   }
 
   const batch = writeBatch(db);

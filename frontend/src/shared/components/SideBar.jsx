@@ -114,7 +114,6 @@ const teacherNavigationOptions = [
 
 export default function SidebarMenuComponent() {
   const location = useLocation();
-  const navigate = useNavigate();
   const { user, roles } = useUser();
   const { logout } = useAuth();
   console.log("User Roles", roles);

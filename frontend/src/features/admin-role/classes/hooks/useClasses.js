@@ -31,7 +31,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { db } from "@/config/firebase";
-import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, orderBy } from "firebase/firestore";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc, query, orderBy, serverTimestamp } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 const EMPTY_CLASSES = Object.freeze([]);
@@ -55,7 +55,7 @@ const EMPTY_CLASSES = Object.freeze([]);
  */
 // TODO: fetch only department level classes
 async function fetchClasses() {
-  const q = query(collection(db, "classes"), orderBy("created_at", "desc"));
+  const q = query(collection(db, "classes"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(q);
   const classes = [];
   snapshot.forEach((doc) => {
@@ -70,7 +70,11 @@ async function fetchClasses() {
  * @returns {Promise<ClassEntity>}
  */
 async function insertClass(classPayload) {
-  const docRef = await addDoc(collection(db, "classes"), classPayload);
+  const prepared = {
+      ...classPayload,
+      createdAt: serverTimestamp(),
+  };
+  const docRef = await addDoc(collection(db, "classes"), prepared);
   const snapshot = await getDoc(docRef);
   return { id: docRef.id, ...snapshot.data() };
 }
@@ -81,8 +85,12 @@ async function insertClass(classPayload) {
  * @returns {Promise<ClassEntity>}
  */
 async function updateClassById({ id, updates }) {
+  const prepared = {
+      ...updates,
+      updatedAt: serverTimestamp(),
+  };
   const classRef = doc(db, "classes", String(id));
-  await updateDoc(classRef, updates);
+  await updateDoc(classRef, prepared);
   const snapshot = await getDoc(classRef);
   return { id, ...snapshot.data() };
 }

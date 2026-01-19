@@ -11,10 +11,10 @@ export default function Subjects() {
   const filteredSubjects = useMemo(() => {
     return subjects.filter((s) => {
       const matchesSearch =
-        s.subject_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        s.subject_code.toLowerCase().includes(searchTerm.toLowerCase());
+        s.subjectName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.subjectCode?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesDept =
-        !selectedDepartment || s.department === selectedDepartment;
+        !selectedDepartment || s.departmentId === selectedDepartment;
       return matchesSearch && matchesDept;
     });
   }, [subjects, searchTerm, selectedDepartment]);

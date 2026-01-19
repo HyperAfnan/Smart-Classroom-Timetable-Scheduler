@@ -72,11 +72,11 @@ export default function InlineClassesTable({
       formState: { errors },
    } = useForm({
       defaultValues: {
-         class_name: "",
+         className: "",
          semester: undefined,
          section: "A",
          students: 30,
-         academic_year: "2024-25",
+         academicYear: "2024-25",
       },
    });
 
@@ -91,11 +91,11 @@ export default function InlineClassesTable({
 
    const handleEditClick = (cls) => {
       setEditingClassId(cls.id);
-      setEditValue("class_name", cls.class_name || "");
+      setEditValue("className", cls.className || "");
       setEditValue("semester", cls.semester?.toString() || "");
       setEditValue("section", cls.section || "");
       setEditValue("students", cls.students || 0);
-      setEditValue("academic_year", cls.academic_year || "");
+      setEditValue("academicYear", cls.academicYear || "");
    };
 
    const handleDelete = async (id) => {
@@ -111,11 +111,11 @@ export default function InlineClassesTable({
    const onCreateSubmit = async (data) => {
       try {
          await createClassAsync({
-            class_name: data.class_name.trim(),
+            className: data.className.trim(),
             semester: parseInt(data.semester, 10),
             section: data.section.trim(),
             students: parseInt(data.students, 10),
-            academic_year: data.academic_year.trim(),
+            academicYear: data.academicYear.trim(),
          });
          toast.success("Class created successfully!");
          reset();
@@ -130,11 +130,11 @@ export default function InlineClassesTable({
          await updateClassAsync({
             id: editingClassId,
             updates: {
-               class_name: data.class_name.trim(),
+               className: data.className.trim(),
                semester: parseInt(data.semester, 10),
                section: data.section.trim(),
                students: parseInt(data.students, 10),
-               academic_year: data.academic_year.trim(),
+               academicYear: data.academicYear.trim(),
             },
          });
          toast.success("Class updated successfully!");
@@ -204,7 +204,108 @@ export default function InlineClassesTable({
 
                   <TableBody>
                      <AnimatePresence>
-                        {classes.map((cls, index) => (
+                        {renderNewRow && (
+                           <motion.tr
+                              initial={{ opacity: 0, y: -20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, y: -20 }}
+                              transition={{ duration: 0.3 }}
+                           >
+                              <TableCell>
+                                 <Input
+                                    {...register("className", { required: true })}
+                                    placeholder="Class Name"
+                                    className="bg-background text-foreground border-border"
+                                    autoFocus
+                                 />
+                              </TableCell>
+                              <TableCell>
+                                 <Controller
+                                    name="semester"
+                                    control={control}
+                                    rules={{ required: true }}
+                                    render={({ field }) => (
+                                       <Select
+                                          value={field.value ? String(field.value) : ""}
+                                          onValueChange={field.onChange}
+                                       >
+                                          <SelectTrigger className="bg-background text-foreground border-border">
+                                             <SelectValue placeholder="Sem" />
+                                          </SelectTrigger>
+                                          <SelectContent className="bg-popover text-popover-foreground border border-border">
+                                             {semesters.map((s) => (
+                                                <SelectItem key={s} value={s.toString()}>
+                                                   Sem {s}
+                                                </SelectItem>
+                                             ))}
+                                          </SelectContent>
+                                       </Select>
+                                    )}
+                                 />
+                              </TableCell>
+                              <TableCell>
+                                 <Input
+                                    {...register("section", { required: true })}
+                                    placeholder="Section"
+                                    className="bg-background text-foreground border-border"
+                                 />
+                              </TableCell>
+                              <TableCell>
+                                 <Input
+                                    type="number"
+                                    min={1}
+                                    {...register("students", {
+                                       required: true,
+                                       min: 1,
+                                    })}
+                                    placeholder="Count"
+                                    className="bg-background text-foreground border-border"
+                                 />
+                              </TableCell>
+                              <TableCell>
+                                 <Input
+                                    {...register("academicYear", {
+                                       required: true,
+                                    })}
+                                    placeholder="2024-25"
+                                    className="bg-background text-foreground border-border"
+                                 />
+                              </TableCell>
+                              <TableCell>
+                                 <div className="flex gap-2">
+                                    <Button
+                                       size="sm"
+                                       variant="outline"
+                                       onClick={() => {
+                                          reset();
+                                          setRenderNewRow(false);
+                                       }}
+                                    >
+                                       <X className="w-3 h-3" />
+                                    </Button>
+                                    <Button
+                                       size="sm"
+                                       className="bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-600 dark:hover:bg-violet-500"
+                                       onClick={handleSubmit(onCreateSubmit, (err) => {
+                                           console.error("Create validation failed", err);
+                                           toast.error("Please fill all required fields");
+                                       })}
+                                    >
+                                       <Check className="w-3 h-3" />
+                                    </Button>
+                                 </div>
+                              </TableCell>
+                           </motion.tr>
+                        )}
+                        
+                        {classes.length === 0 && !renderNewRow ? (
+                            <TableRow>
+                                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                    No classes found. Click "Add Class" to create one.
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            classes.map((cls, index) => (
                            <motion.tr
                               key={cls.id}
                               initial={{ opacity: 0, y: 20 }}
@@ -214,6 +315,8 @@ export default function InlineClassesTable({
                               className="hover:bg-accent hover:text-accent-foreground transition-colors cursor-pointer"
                               onClick={(e) => {
                                  if (e.target.closest("button")) return; // Prevent trigger when clicking buttons
+                                 if (e.target.closest("input")) return; // Prevent trigger when clicking inputs
+                                 if (editingClassId === cls.id) return; // Prevent trigger when editing
                                  handleOpenTeachersPanel(cls);
                               }}
                               onMouseEnter={() => setHoveredRowId(cls.id)}
@@ -223,7 +326,7 @@ export default function InlineClassesTable({
                                  <>
                                     <TableCell>
                                        <Input
-                                          {...editRegister("class_name", {
+                                          {...editRegister("className", {
                                              required: true,
                                           })}
                                           placeholder="Class Name"
@@ -238,7 +341,7 @@ export default function InlineClassesTable({
                                           rules={{ required: true }}
                                           render={({ field }) => (
                                              <Select
-                                                value={field.value}
+                                                value={field.value ? String(field.value) : ""}
                                                 onValueChange={field.onChange}
                                              >
                                                 <SelectTrigger className="bg-background text-foreground border-border">
@@ -279,7 +382,7 @@ export default function InlineClassesTable({
 
                                     <TableCell>
                                        <Input
-                                          {...editRegister("academic_year", {
+                                          {...editRegister("academicYear", {
                                              required: true,
                                           })}
                                           placeholder="2024-25"
@@ -302,7 +405,10 @@ export default function InlineClassesTable({
                                           <Button
                                              size="sm"
                                              className="bg-violet-600 hover:bg-violet-700 text-white dark:bg-violet-600 dark:hover:bg-violet-500"
-                                             onClick={handleEditSubmit(onEditSubmit)}
+                                             onClick={handleEditSubmit(onEditSubmit, (err) => {
+                                                 console.error("Edit validation failed", err);
+                                                 toast.error("Please fill all required fields");
+                                             })}
                                           >
                                              <Check className="w-3 h-3" />
                                           </Button>
@@ -315,7 +421,7 @@ export default function InlineClassesTable({
                                        <div className="flex items-center gap-2">
                                           <Layers className="w-3 h-3 text-muted-foreground" />
                                           <span className="font-medium">
-                                             {cls.class_name || cls.name}
+                                             {cls.className || cls.name}
                                           </span>
                                        </div>
                                     </TableCell>
@@ -346,7 +452,7 @@ export default function InlineClassesTable({
                                     <TableCell>
                                        <div className="flex items-center gap-1">
                                           <Calendar className="w-3 h-3 text-muted-foreground" />
-                                          {cls.academic_year}
+                                          {cls.academicYear}
                                        </div>
                                     </TableCell>
 
@@ -376,7 +482,8 @@ export default function InlineClassesTable({
                                  </>
                               )}
                            </motion.tr>
-                        ))}
+                        )))
+                        }
                      </AnimatePresence>
                   </TableBody>
                </Table>
@@ -387,7 +494,7 @@ export default function InlineClassesTable({
          {selectedClass && (
             <ClassTeachersPanel
                classId={selectedClass.id}
-               className={selectedClass.class_name}
+               className={selectedClass.className}
                isOpen={isPanelOpen}
                onClose={handleCloseTeachersPanel}
             />

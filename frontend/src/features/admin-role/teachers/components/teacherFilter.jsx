@@ -50,10 +50,10 @@ function Filters({ onSearchChange, onSubjectChange }) {
               <SelectItem value="all">All Subjects</SelectItem>
               {subjects.map((subject) => (
                 <SelectItem
-                  key={subject.subject_name}
-                  value={subject.subject_name}
+                  key={subject.subjectName}
+                  value={subject.subjectName}
                 >
-                  {subject.subject_name}
+                  {subject.subjectName}
                 </SelectItem>
               ))}
             </SelectContent>

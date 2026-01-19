@@ -66,7 +66,7 @@ const EMPTY_DEPARTMENTS = Object.freeze([]);
  * @returns {Promise<Subject[]>}
  */
 async function fetchSubjects() {
-  const q = query(collection(db, "subjects"), orderBy("created_at", "desc"));
+  const q = query(collection(db, "subjects"), orderBy("createdAt", "desc"));
   const snapshot = await getDocs(q);
   const subjects = [];
   snapshot.forEach((doc) => {
@@ -80,7 +80,7 @@ async function fetchSubjects() {
  * @returns {Promise<string[]>}
  */
 async function fetchDepartments() {
-  const q = query(collection(db, "department"), orderBy("name", "asc"));
+  const q = query(collection(db, "departments"), orderBy("name", "asc"));
   const snapshot = await getDocs(q);
   const departments = [];
   snapshot.forEach((doc) => {

@@ -9,33 +9,33 @@ export default function AuthInitializer({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getUserAndRoles = async (user) => {
-      if (!user) {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!firebaseUser) {
         queryClient.setQueryData(["user"], null);
         setLoading(false);
         return;
       }
-      
+
       try {
-        const token = await user.getIdToken();
-        const { userData, roles } = await getUserData(user);
-        
-        queryClient.setQueryData(["user"], { user: userData, token, roles });
+        const token = await firebaseUser.getIdToken();
+        const { userData, roles } = await getUserData(firebaseUser);
+
+        queryClient.setQueryData(["user"], {
+          user: userData,
+          token,
+          roles,
+        });
       } catch (err) {
         console.error("Auth init error:", err);
-         queryClient.setQueryData(["user"], null);
+        queryClient.setQueryData(["user"], null);
       }
-      setLoading(false);
-    };
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-        getUserAndRoles(user);
+      setLoading(false);
     });
 
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, [queryClient]);
 
   return loading ? null : children;
 }
+

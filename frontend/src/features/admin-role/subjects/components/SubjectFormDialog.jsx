@@ -50,16 +50,16 @@ export default function SubjectFormDialog({
             <div className="space-y-2">
               <Label>Subject Name</Label>
               <Input
-                value={formData.subject_name}
-                onChange={handleChange("subject_name")}
+                value={formData.subjectName}
+                onChange={handleChange("subjectName")}
                 required
               />
             </div>
             <div className="space-y-2">
               <Label>Subject Code</Label>
               <Input
-                value={formData.subject_code}
-                onChange={handleChange("subject_code")}
+                value={formData.subjectCode}
+                onChange={handleChange("subjectCode")}
                 required
               />
             </div>
@@ -136,9 +136,9 @@ export default function SubjectFormDialog({
                 type="number"
                 min="1"
                 max="10"
-                value={formData.hours_per_week}
+                value={formData.hoursPerWeek}
                 onChange={(e) =>
-                  handleChange("hours_per_week")(parseInt(e.target.value))
+                  handleChange("hoursPerWeek")(parseInt(e.target.value))
                 }
                 required
               />

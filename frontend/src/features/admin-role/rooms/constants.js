@@ -6,9 +6,9 @@ export const TYPE_COLORS = {
 };
 
 export const ROOM_DEFAULTS = {
-  room_number: "",
+  roomNumber: "",
   capacity: 1,
-  room_type: "",
+  roomType: "",
 };
 
-export const ROOM_REQUIRED_COLUMNS = ["room_number", "capacity", "room_type"];
+export const ROOM_REQUIRED_COLUMNS = ["roomNumber", "capacity", "roomType"];

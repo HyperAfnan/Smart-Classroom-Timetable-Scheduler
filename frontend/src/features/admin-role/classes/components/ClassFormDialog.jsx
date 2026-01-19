@@ -133,9 +133,9 @@ export default function ClassFormDialog({
             <div className="space-y-2">
               <Label>Academic Year</Label>
               <Input
-                value={formData.academic_year}
+                value={formData.academicYear}
                 onChange={(e) =>
-                  setFormData({ ...formData, academic_year: e.target.value })
+                  setFormData({ ...formData, academicYear: e.target.value })
                 }
                 required
               />

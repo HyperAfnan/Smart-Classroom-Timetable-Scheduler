@@ -60,9 +60,9 @@ export function RoomFormDialog({
               <Label>Room Number</Label>
               <Input
                 placeholder="e.g., A101, Lab-B2"
-                value={formData.room_number}
+                value={formData.roomNumber}
                 onChange={(e) =>
-                  setFormData({ ...formData, room_number: e.target.value })
+                  setFormData({ ...formData, roomNumber: e.target.value })
                 }
                 required
               />
@@ -85,9 +85,9 @@ export function RoomFormDialog({
             <div className="space-y-2">
               <Label>Room Type</Label>
               <Select
-                value={formData.room_type}
+                value={formData.roomType}
                 onValueChange={(value) =>
-                  setFormData({ ...formData, room_type: value })
+                  setFormData({ ...formData, roomType: value })
                 }
               >
                 <SelectTrigger>

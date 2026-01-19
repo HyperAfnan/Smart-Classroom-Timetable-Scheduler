@@ -1,74 +1,95 @@
-import { auth } from "@/config/firebase";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { useQuery, useQueryClient , useMutation } from "@tanstack/react-query";
+import { auth, db } from "@/config/firebase";
+import { 
+  signInWithEmailAndPassword, 
+  signOut 
+} from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { getUserData } from "../api/getUserData";
 
 const USER_QUERY_KEY = ["user"];
 
+/**
+ * Hook to access current user state
+ */
 export function useUser() {
   const { data, isLoading, error } = useQuery({
     queryKey: USER_QUERY_KEY,
     queryFn: () => {
-        // This queryFn is technically optional if we always manually set data,
-        // but can be useful for persistence/rehydration logic if needed.
-        // For now, we rely on authInit setting the data.
-        const storedUser = localStorage.getItem("user");
-        const storedRoles = localStorage.getItem("roles");
-        const storedToken = localStorage.getItem("token");
-        
-        if (storedUser && storedToken) {
-           return {
-               user: JSON.parse(storedUser),
-               roles: JSON.parse(storedRoles || "[]"),
-               token: storedToken
-           };
-        }
-        return null;
+      // This will be populated by AuthInitializer
+      return null;
     },
-    staleTime: Infinity, // User data rarely changes automatically
-    gcTime: Infinity, // Keep in cache
+    staleTime: Infinity,
+    gcTime: Infinity,
     initialData: null,
   });
 
-  return { 
-      user: data?.user || null,
-      roles: data?.roles || [],
-      token: data?.token || null,
-      isAuthenticated: !!data?.user,
-      isLoading,
-      error
+  return {
+    user: data?.user || null,
+    roles: data?.roles || [],
+    role: data?.user?.role || null,
+    token: data?.token || null,
+    isAuthenticated: !!data?.user,
+    isLoading,
+    error,
   };
 }
 
+/**
+ * Hook for authentication actions (login, logout)
+ */
 export function useAuth() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }) => {
-      // 1. Firebase Auth Login
+      // Sign in with Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+      const firebaseUser = userCredential.user;
 
-      // 2. Fetch Roles & Profile (includes RBAC Seeding)
-      const { userData, roles } = await getUserData(user);
-      
-      const token = await user.getIdToken();
-      
-      return { user: userData, roles, token };
+      // Fetch user profile from Firestore
+      const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+
+      if (!userDoc.exists()) {
+        throw new Error("User profile not found. Please contact administrator.");
+      }
+
+      const userData = userDoc.data();
+      const token = await firebaseUser.getIdToken();
+
+      return {
+        user: {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          ...userData,
+        },
+        roles: [userData.role],
+        token,
+      };
     },
+
     onSuccess: (data) => {
-      // 3. Update React Query Cache
       queryClient.setQueryData(USER_QUERY_KEY, data);
 
-      // 4. Persist to LocalStorage
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("roles", JSON.stringify(data.roles));
-
-      // 5. Navigate
-      navigate("/dashboard");
+      // Navigate based on role
+      const role = data.user.role;
+      switch (role) {
+        case "admin":
+          navigate("/dashboard");
+          break;
+        case "teacher":
+          navigate("/dashboard");
+          break;
+        case "student":
+          navigate("/dashboard");
+          break;
+        case "hod":
+          navigate("/dashboard");
+          break;
+        default:
+          navigate("/dashboard");
+      }
     },
   });
 
@@ -76,11 +97,10 @@ export function useAuth() {
     mutationFn: async () => {
       await signOut(auth);
     },
+
     onSuccess: () => {
       queryClient.setQueryData(USER_QUERY_KEY, null);
-      localStorage.clear();
-      // queryClient.clear(); // Careful clearing everything if not intended
-      queryClient.removeQueries(); // Clear all queries
+      queryClient.clear();
       navigate("/");
     },
   });
@@ -90,8 +110,9 @@ export function useAuth() {
     loginAsync: loginMutation.mutateAsync,
     isLoggingIn: loginMutation.isPending,
     loginError: loginMutation.error,
-    
     logout: logoutMutation.mutate,
+    logoutAsync: logoutMutation.mutateAsync,
     isLoggingOut: logoutMutation.isPending,
   };
 }
+

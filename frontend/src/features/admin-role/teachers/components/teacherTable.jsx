@@ -76,11 +76,15 @@ function TeachersTable({ filteredTeacher }) {
    const handleEditClick = (teacher) => {
       setEditingTeacherId(teacher.id);
       setValue("name", teacher.name);
-      setValue("emp_id", teacher.emp_id);
-      setValue("subjects", teacher.subjects || "");
+      setValue("empId", teacher.empId);
+      
+      // Fix: Try to find subject from teacherSubjects list if not on the teacher object
+      const linkedSubject = teacherSubjects.find(ts => ts.teacher === teacher.name);
+      setValue("subjects", teacher.subjects || linkedSubject?.subject || "");
+      
       setValue("designation", teacher.designation);
       setValue("email", teacher.email);
-      setValue("max_hours", teacher.max_hours);
+      setValue("maxHours", teacher.maxHours);
    };
 
    const onSubmit = async (data) => {
@@ -88,23 +92,45 @@ function TeachersTable({ filteredTeacher }) {
          toast.error("Please fill all required fields correctly.");
          return;
       }
-      const { subjects, ...teacherData } = data;
-      await createTeacherAsync(teacherData);
-      await createTeacherSubjectAsync({ teacher: data.name, subject: subjects });
-      reset();
-      setRenderNewRow(false);
+      try {
+         const { subjects, ...teacherData } = data;
+         const result = await createTeacherAsync(teacherData);
+         await createTeacherSubjectAsync({ teacher: data.name, subject: subjects });
+         
+         // Display signup instructions
+         toast.success(
+            `Teacher profile created! Please ask ${data.name} to sign up at the registration page using email: ${data.email}`,
+            {
+               autoClose: 8000,
+            }
+         );
+         
+         reset();
+         setRenderNewRow(false);
+      } catch (error) {
+         toast.error(`Failed to create teacher: ${error.message}`);
+         console.error("Teacher creation error:", error);
+      }
    };
 
    const onEditSubmit = async (data) => {
-      if (editErrors && Object.keys(editErrors).length > 0) {
-         toast.error("Please fill all required fields correctly.");
-         return;
+      // NOTE: editErrors check here is not reliable as handleSubmit prevents this function from running if there are errors.
+      // We rely on the second argument of handleSubmit (onInvalid) for error handling.
+      try {
+         const { subjects: subject, ...teacherData } = data;
+         await updateTeacherAsync({ id: editingTeacherId, updates: teacherData });
+         // Update the subject link if changed
+         // Note: proper implementation would check if subject changed, delete old, create new etc.
+         // For now assuming simplified update behavior
+         await editTeacherSubjectAsync({ teacher: data.name, subject: subject });
+         
+         toast.success("Teacher updated successfully");
+         setEditingTeacherId(null);
+         resetEditForm();
+      } catch (error) {
+         toast.error(`Failed to update teacher: ${error.message}`);
+         console.error("Teacher update error:", error);
       }
-      const { subjects: subject, ...teacherData } = data;
-      await updateTeacherAsync({ id: editingTeacherId, updates: teacherData });
-      await editTeacherSubjectAsync({ teacher: data.name, subject: subject });
-      setEditingTeacherId(null);
-      resetEditForm();
    };
 
    const EditButton = ({ onClick }) => (
@@ -192,9 +218,9 @@ function TeachersTable({ filteredTeacher }) {
                                                       className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                                                    />
                                                 )}
-                                                {col.key === "emp_id" && (
+                                                {col.key === "empId" && (
                                                    <input
-                                                      {...editRegister("emp_id", {
+                                                      {...editRegister("empId", {
                                                          required: true,
                                                       })}
                                                       className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
@@ -225,15 +251,15 @@ function TeachersTable({ filteredTeacher }) {
                                                             <SelectContent>
                                                                {subjects.map((subject) => (
                                                                   <SelectItem
-                                                                     key={subject.subject_name}
-                                                                     value={subject.subject_name}
+                                                                     key={subject.subjectName}
+                                                                     value={subject.subjectName}
                                                                   >
                                                                      <Badge
-                                                                        key={subject.subject_name}
+                                                                        key={subject.subjectName}
                                                                         variant="outline"
                                                                         className="bg-muted text-muted-foreground border-border"
                                                                      >
-                                                                        {subject.subject_name}
+                                                                        {subject.subjectName}
                                                                      </Badge>
                                                                   </SelectItem>
                                                                ))}
@@ -275,10 +301,10 @@ function TeachersTable({ filteredTeacher }) {
                                                       className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
                                                    />
                                                 )}
-                                                {col.key === "max_hours" && (
+                                                {col.key === "maxHours" && (
                                                    <input
                                                       type="number"
-                                                      {...editRegister("max_hours", {
+                                                      {...editRegister("maxHours", {
                                                          required: true,
                                                       })}
                                                       className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
@@ -299,8 +325,10 @@ function TeachersTable({ filteredTeacher }) {
                                                       <Button
                                                          size="sm"
                                                          className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
-                                                         // onClick={handleEditSubmit(onEditSubmit)}
-                                                         type="submit"
+                                                         onClick={handleEditSubmit(onEditSubmit, (err) => {
+                                                             console.error("Edit validation failed", err);
+                                                             toast.error("Please fill all required fields");
+                                                         })}
                                                       >
                                                          <Check className="w-3 h-3" />
                                                       </Button>
@@ -315,7 +343,7 @@ function TeachersTable({ filteredTeacher }) {
                                                       {teacher.name}
                                                    </div>
                                                 )}
-                                                {col.key === "emp_id" && teacher.emp_id}
+                                                {col.key === "empId" && teacher.empId}
                                                 {col.key === "subjects" && (
                                                    <div className="flex flex-wrap gap-1">
                                                       {teacherSubjects
@@ -343,8 +371,8 @@ function TeachersTable({ filteredTeacher }) {
                                                       {teacher.email}
                                                    </div>
                                                 )}
-                                                {col.key === "max_hours" &&
-                                                   `${teacher.max_hours} hrs`}
+                                                {col.key === "maxHours" &&
+                                                   `${teacher.maxHours} hrs`}
                                                 {col.key === "actions" && (
                                                    <div className="flex gap-2">
                                                       {hoveredRowId === teacher.id ? (
@@ -398,12 +426,12 @@ function TeachersTable({ filteredTeacher }) {
                                                 {...register("name", { required: true })}
                                              />
                                           )}
-                                          {col.key === "emp_id" && (
+                                          {col.key === "empId" && (
                                              <input
                                                 type="text"
                                                 placeholder="Employee ID"
                                                 className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
-                                                {...register("emp_id", { required: true })}
+                                                {...register("empId", { required: true })}
                                              />
                                           )}
                                           {col.key === "subjects" && (
@@ -422,15 +450,15 @@ function TeachersTable({ filteredTeacher }) {
                                                       <SelectContent>
                                                          {subjects.map((subject) => (
                                                             <SelectItem
-                                                               key={subject.subject_name}
-                                                               value={subject.subject_name}
+                                                               key={subject.subjectName}
+                                                               value={subject.subjectName}
                                                             >
                                                                <Badge
-                                                                  key={subject.subject_name}
+                                                                  key={subject.subjectName}
                                                                   variant="outline"
                                                                   className="bg-muted text-muted-foreground border-border"
                                                                >
-                                                                  {subject.subject_name}
+                                                                  {subject.subjectName}
                                                                </Badge>
                                                             </SelectItem>
                                                          ))}
@@ -474,11 +502,11 @@ function TeachersTable({ filteredTeacher }) {
                                                 })}
                                              />
                                           )}
-                                          {col.key === "max_hours" && (
+                                          {col.key === "maxHours" && (
                                              <input
                                                 placeholder="Max Hours"
                                                 className="w-full border px-2 py-1 rounded bg-background text-foreground border-border"
-                                                {...register("max_hours", {
+                                                {...register("maxHours", {
                                                    required: true,
                                                    min: 1,
                                                    max: 40,

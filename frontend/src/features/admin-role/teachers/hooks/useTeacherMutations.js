@@ -46,34 +46,58 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { db } from "@/config/firebase";
-import { doc, updateDoc, deleteDoc, getDoc } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, deleteDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 /**
+ * Generate a random password for new teachers
+ */
+function generatePassword() {
+  const length = 12;
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+  return password;
+}
+
+/**
  * Insert a new teacher row.
+ * Note: This only creates the teacher profile. The teacher will need to sign up separately.
+ * 
  * @param {Object} teacher - The teacher payload to insert.
- * @returns {Promise<Object>} Inserted teacher row.
+ * @returns {Promise<Object>} Inserted teacher row with signup instructions.
  */
 async function insertTeacher(teacher) {
-  // if (!teacher || typeof teacher !== "object" || Array.isArray(teacher)) {
-  //   throw new Error("Invalid teacher payload");
-  // }
-  // if (!teacher.email) {
-  //   throw new Error("Teacher must include an email");
-  // }
+  if (!teacher || typeof teacher !== "object" || Array.isArray(teacher)) {
+    throw new Error("Invalid teacher payload");
+  }
+  if (!teacher.email) {
+    throw new Error("Teacher must include an email");
+  }
 
-  // const { data, error } = await supabase.functions.invoke("teacher-creation", {
-  //   body: teacher,
-  // });
-
-  // if (error) {
-  //   console.error("Edge function error:", error);
-  //   throw new Error(error.message || "Failed to create teacher");
-  // }
-
-  // return data;
-  console.log("Teacher creation is currently disabled during migration.");
-  return {};
+  try {
+    // Create teacher profile in Firestore
+    const teacherData = {
+      ...teacher,
+      createdAt: serverTimestamp(),
+    };
+    
+    const docRef = await addDoc(collection(db, "teacher_profile"), teacherData);
+    
+    // Fetch and return the created teacher
+    const snapshot = await getDoc(docRef);
+    return { 
+      id: docRef.id, 
+      ...snapshot.data(),
+      // Return signup instructions
+      signupInstructions: `Teacher account created. Please ask the teacher to sign up at the registration page using email: ${teacher.email}`,
+    };
+  } catch (error) {
+    console.error("Teacher creation error:", error);
+    throw error;
+  }
 }
 
 /**

@@ -52,7 +52,7 @@ async function fetchDashboardStats() {
   const [teachersRes, roomsRes, subjectsRes, classesRes, timeSlotsRes] =
     await Promise.all([
       getCountFromServer(collection(db, "teacher_profile")),
-      getCountFromServer(collection(db, "room")),
+      getCountFromServer(collection(db, "rooms")),
       getCountFromServer(collection(db, "subjects")),
       getCountFromServer(collection(db, "classes")),
       getCountFromServer(collection(db, "time_slots")),
