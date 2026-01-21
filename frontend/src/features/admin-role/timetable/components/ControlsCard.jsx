@@ -10,7 +10,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Zap, Loader2, RefreshCw, Download, AlertCircle } from "lucide-react";
 import useTimetableMutation from "../hooks/useTimetableMutation.js";
-import { useSelector } from "react-redux";
+import { useUser } from "@/features/auth/hooks/useAuth";
 import useClasses from "../../classes/hooks/useClasses.js";
 import { useState } from "react";
 
@@ -32,7 +32,8 @@ export default function ControlsCard({
 	onSelectClass,
 	onExport,
 }) {
-	const departmentId = useSelector((state) => state.auth.user?.department_id);
+    const { user } = useUser();
+	const departmentId = user?.department_id;
 	const {
 		createTimetableEntryAsync,
 		isError: isTimetableError,
@@ -87,8 +88,8 @@ export default function ControlsCard({
 							<SelectContent className="bg-popover text-popover-foreground border border-border shadow-md">
 								{classes.map((c) => (
 									<SelectItem key={c.id} value={String(c.id)}>
-										{c.class_name}
-										{c.semester ? `(Sem ${c.semester})` : ""}
+										{c.className || c.class_name || c.name}
+										{c.semester ? ` (Sem ${c.semester})` : ""}
 									</SelectItem>
 								))}
 							</SelectContent>

@@ -22,9 +22,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 
-import { useSelector, useDispatch } from "react-redux";
-import { clearAuth } from "@/Store/auth";
-import { supabase } from "@/config/supabase";
+import { useUser, useAuth } from "@/features/auth/hooks/useAuth";
 import { useState, useEffect, useRef } from "react";
 
 const adminNavigationOptions = [
@@ -116,9 +114,10 @@ const teacherNavigationOptions = [
 
 export default function SidebarMenuComponent() {
   const location = useLocation();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth);
+  const { user, roles } = useUser();
+  const { logout } = useAuth();
+  console.log("User Roles", roles);
+  console.log("User", user);
 
   // Track collapse state: hide labels when width is below threshold
   const sidebarRef = useRef(null);
@@ -141,20 +140,8 @@ export default function SidebarMenuComponent() {
     return () => ro.disconnect();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (e) {
-      console.error("Logout error:", e);
-    } finally {
-      dispatch(clearAuth());
-      try {
-        localStorage.clear();
-      } catch {
-        void 0;
-      }
-      navigate("/");
-    }
+  const handleLogout = () => {
+      logout();
   };
 
   return (
@@ -186,7 +173,7 @@ export default function SidebarMenuComponent() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {user.roles.includes("admin") &&
+              {roles.includes("admin") &&
                 adminNavigationOptions.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <Link
@@ -206,7 +193,7 @@ export default function SidebarMenuComponent() {
                     </Link>
                   </SidebarMenuItem>
                 ))}
-              {user.roles.includes("teacher") &&
+              {roles.includes("teacher") &&
                 teacherNavigationOptions.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <Link
@@ -226,7 +213,7 @@ export default function SidebarMenuComponent() {
                     </Link>
                   </SidebarMenuItem>
                 ))}
-              {user.roles.includes("student") &&
+              {roles.includes("student") &&
                 studentNavigationOptions.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <Link
@@ -246,7 +233,7 @@ export default function SidebarMenuComponent() {
                     </Link>
                   </SidebarMenuItem>
                 ))}
-              {user.roles.includes("hod") &&
+              {roles.includes("hod") &&
                 HODNavigationOptions.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <Link
@@ -279,18 +266,18 @@ export default function SidebarMenuComponent() {
             className={`w-8 h-8 bg-muted rounded-full flex items-center justify-center ${isCollapsed ? "hidden" : "flex"}`}
           >
             <span className="text-foreground font-medium text-sm">
-              {user?.user?.first_name?.charAt(0)}
+              {user?.first_name?.charAt(0)}
             </span>
           </div>
           <div className={`flex-1 min-w-0 ${isCollapsed ? "hidden" : "block"}`}>
             <p className="text-sm font-medium text-foreground truncate">
-              {[user?.user?.first_name, user?.user?.last_name]
+              {[user?.first_name, user?.last_name]
                 .filter(Boolean)
                 .join(" ")}
             </p>
             <p className="text-xs text-muted-foreground truncate">
-              {user?.roles?.[0]?.charAt(0)?.toUpperCase()}
-              {user?.roles?.[0]?.slice(1)?.toLowerCase()}
+              {roles?.[0]?.charAt(0)?.toUpperCase()}
+              {roles?.[0]?.slice(1)?.toLowerCase()}
             </p>
           </div>
           {/*  TODO: add a confirm dialog to logout */}

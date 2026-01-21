@@ -1,49 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
-// TODO: test this first before actually using it
+// TODO: migration - avatar upload needs Firebase Storage
 async function updateProfilePic(id, file) {
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${Date.now()}.${fileExt}`;
-
-  // Upload the new profile picture
-  const { error: uploadError, data: uploadData } = await supabase.storage
-    .from("avatars")
-    .upload(`teacher/${fileName}`, profilePicPath);
-
-  if (uploadError) {
-    console.error("Upload failed:", uploadError.message);
-    return;
-  }
-
-  const { data, error: updateError } = await supabase
-    .from("profiles")
-    .update({
-      avatar_url: uploadData.fullPath,
-    })
-    .eq("id", id);
-
-  if (updateError) {
-    console.error("Profile update failed:", updateError.message);
-    return;
-  }
-
-  return data;
+  console.warn("Profile picture upload is currently disabled during migration.");
+  return null;
 }
 
 async function updateTeacherById({ id, updates }) {
-  const { data, error } = await supabase
-    .from("teacher_profile")
-    .update(updates)
-    .eq("id", id)
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to update teacher");
-  }
-  return data;
+  const teacherRef = doc(db, "teacher_profile", String(id));
+  await updateDoc(teacherRef, updates);
+  const snapshot = await getDoc(teacherRef);
+  return { id, ...snapshot.data() };
 }
 
 export default function useTeacherProfileMutations({

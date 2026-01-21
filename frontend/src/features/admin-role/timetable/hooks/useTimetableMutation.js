@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, getDocs, query, where, writeBatch, doc } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 import axios from "axios";
 import { times as TIMES, days as DAYS } from "../constants.js";
@@ -37,31 +38,30 @@ function transformTimetableData(response) {
 }
 
 async function fetchTimeSlots(department_id) {
-  const { data, error } = await supabase
-    .from("time_slots")
-    .select("*")
-    .eq("department_id", department_id);
-
-  if (error) {
-    console.error("Error fetching time slots:", error);
-    throw new Error("Failed to fetch time slots");
-  }
-
-  return data || [];
+  const q = query(
+      collection(db, "time_slots"),
+      where("department_id", "==", department_id)
+  );
+  const snapshot = await getDocs(q);
+  const data = [];
+  snapshot.forEach((doc) => {
+      data.push({ id: doc.id, ...doc.data() });
+  });
+  return data;
 }
 
 async function fetchTeacheProfiles(department_id) {
-  const { data, error } = await supabase
-    .from("teacher_profile")
-    .select("*")
-    .eq("department_id", department_id);
+  const q = query(
+      collection(db, "teacher_profile"),
+      where("department_id", "==", department_id)
+  );
+  const snapshot = await getDocs(q);
+  const data = [];
+  snapshot.forEach((doc) => {
+      data.push({ id: doc.id, ...doc.data() });
+  });
 
-  if (error) {
-    console.error("Error fetching time slots:", error);
-    throw new Error("Failed to fetch time slots");
-  }
-
-  return data || [];
+  return data;
 }
 
 /**
@@ -187,62 +187,54 @@ async function createTimetableEntry(department_id, queryClient, body) {
     log: true,
   });
   console.log("Making the selection query to check existing entries");
-  supabase
-    .from("timetable_entries")
-    .select("*")
-    .eq("department_id", department_id)
-    .then(({ data: selectionData, error: selectionError }) => {
-      console.log("Selection Data:", selectionData);
-
-      if (selectionError) {
-        console.error(
-          "Error checking existing timetable entries:",
-          selectionError,
-        );
-        throw new Error("Failed to check existing timetable entries");
-      }
-
-      if (selectionData.length > 0) {
-        console.log(
-          `Existing timetable entries found for department_id ${department_id}. They will be deleted before inserting new entries.`,
-        );
-        // Delete existing entries for the department
-        return supabase
-          .from("timetable_entries")
-          .delete("*")
-          .eq("department_id", department_id);
+  console.log("Making the selection query to check existing entries");
+  
+  // Check and delete existing entries
+  try {
+      const q = query(
+          collection(db, "timetable_entries"),
+          where("department_id", "==", department_id)
+      );
+      const snapshot = await getDocs(q);
+      
+      if (!snapshot.empty) {
+          console.log(
+            `Existing timetable entries found (${snapshot.size}) for department_id ${department_id}. Deleting...`
+          );
+          // Delete in batches of 500
+          const batch = writeBatch(db);
+          let count = 0;
+          snapshot.forEach((doc) => {
+              batch.delete(doc.ref);
+              count++;
+              // Firestore batch limit is 500, simplified here assuming total < 500 or just one batch
+              // If likely > 500, we'd need loop/multiple batches.
+          });
+          await batch.commit();
       } else {
-        console.log(
-          `No existing timetable entries found for department_id ${department_id}. Proceeding to insert new entries.`,
-        );
+          console.log(
+            `No existing timetable entries found for department_id ${department_id}. Proceeding to insert.`
+          );
       }
-      // If no entries to delete, resolve with null
-      return Promise.resolve(null);
-    })
-    .then((deletionResult) => {
-      if (deletionResult && deletionResult.error) {
-        console.error(
-          "Error deleting existing timetable entries:",
-          deletionResult.error,
-        );
-        throw new Error("Failed to delete existing timetable entries");
+      
+      // Insert new entries
+      // FireStore batch limit is 500 operations.
+      // Timetables can be large, so we should chunk them.
+      const chunkSize = 400; 
+      for (let i = 0; i < timetableRows.length; i += chunkSize) {
+          const chunk = timetableRows.slice(i, i + chunkSize);
+          const batch = writeBatch(db);
+          chunk.forEach((row) => {
+              const newRef = doc(collection(db, "timetable_entries"));
+              batch.set(newRef, row);
+          });
+          await batch.commit();
       }
-      // Upsert the transformed timetable data into the database
-      return supabase
-        .from("timetable_entries")
-        .insert(timetableRows, { onConflict: "class_name,time_slot_id" })
-        .select();
-    })
-    .then(({ error: insertionError }) => {
-      if (insertionError) {
-        console.error("Error upserting timetable entries:", insertionError);
-        throw new Error("Failed to upsert timetable entries");
-      }
-    })
-    .catch((err) => {
-      // Handle any errors from the chain
-      console.error("Error in timetable mutation:", err);
-    });
+      
+  } catch (err) {
+      console.error("Error in timetable mutation DB ops:", err);
+      throw new Error(`Failed to save timetable: ${err.message}`);
+  }
   const transformedTimetable = transformTimetableData(rawTimetable);
   return transformedTimetable;
 }

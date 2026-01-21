@@ -1,10 +1,10 @@
 const DEFAULT_SUBJECT = {
-  subject_name: "",
-  subject_code: "",
+  subjectName: "",
+  subjectCode: "",
   credits: 3,
   semester: 1,
   type: "Theory",
-  hours_per_week: 3,
+  hoursPerWeek: 3,
 };
 
 const colors = {
@@ -15,21 +15,22 @@ const colors = {
 const subjectTypes = ["Theory", "Lab"];
 
 const requiredColumns = [
-  "subject_name",
-  "subject_code",
+  "subjectName",
+  "subjectCode",
   "credits",
   "semester",
   "type",
-  "hours_per_week",
+  "hoursPerWeek",
 ];
 
 const columns = [
-  { key: "subject_name", label: "Name", width: "w-[18%]" },
-  { key: "subject_code", label: "Code", width: "w-[10%]" },
+  { key: "subjectName", label: "Name", width: "w-[18%]" },
+  { key: "subjectCode", label: "Code", width: "w-[10%]" },
+  { key: "department", label: "Department", width: "w-[15%]" },
   { key: "semester", label: "Semester", width: "w-[10%]" },
   { key: "type", label: "Type", width: "w-[12%]" },
   { key: "credits", label: "Credits", width: "w-[8%]" },
-  { key: "hours_per_week", label: "Hours/Week", width: "w-[12%]" },
+  { key: "hoursPerWeek", label: "Hours/Week", width: "w-[12%]" },
   { key: "actions", label: "", width: "w-[10%]" },
 ];
 

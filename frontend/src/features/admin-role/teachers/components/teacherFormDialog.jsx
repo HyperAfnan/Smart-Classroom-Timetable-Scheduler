@@ -68,9 +68,9 @@ function TeacherFormDialog({
             <div className="space-y-2">
               <Label>Employee ID</Label>
               <Input
-                value={formData.emp_id}
+                value={formData.empId}
                 onChange={(e) =>
-                  setFormData({ ...formData, emp_id: e.target.value })
+                  setFormData({ ...formData, empId: e.target.value })
                 }
                 required
               />
@@ -119,11 +119,11 @@ function TeacherFormDialog({
               <Label>Max Hours/Week</Label>
               <Input
                 type="number"
-                value={formData.max_hours}
+                value={formData.maxHours}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    max_hours: parseInt(e.target.value),
+                    maxHours: parseInt(e.target.value),
                   })
                 }
               />

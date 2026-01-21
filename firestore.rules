@@ -1,0 +1,136 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ============================================
+    // Helper Functions
+    // ============================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    function hasRole(role) {
+      return isAuthenticated() && getUserData().role == role;
+    }
+    
+    function isAdmin() {
+      return hasRole('admin');
+    }
+    
+    function isHOD() {
+      return hasRole('hod');
+    }
+    
+    function isTeacher() {
+      return hasRole('teacher');
+    }
+    
+    function isStudent() {
+      return hasRole('student');
+    }
+    
+    function sameDepartment(departmentId) {
+      return getUserData().departmentId == departmentId;
+    }
+    
+    // ============================================
+    // Collection Rules
+    // ============================================
+    
+    // Users Collection
+    match /users/{userId} {
+      // Users can read their own document
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      
+      // Allow creating first user when no users exist (bootstrap)
+      // OR allow admins to create any user
+      allow create: if (request.auth != null && 
+                        !exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+                        request.resource.data.role == 'admin') ||
+                       isAdmin();
+      
+      // Only admins can update/delete users
+      allow update, delete: if isAdmin();
+    }
+    
+    // Departments Collection
+    match /departments/{departmentId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Teacher Profiles
+    match /teacher_profile/{teacherId} {
+      allow read, get: if isAuthenticated();
+      allow create, update, delete: if isAdmin() || (isHOD() && sameDepartment(resource.data.departmentId));
+    }
+    
+    // Student Profiles
+    match /student_profile/{studentId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // HOD Profiles
+    match /hod_profile/{hodId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Subjects
+    match /subjects/{subjectId} {
+      allow read, get: if isAuthenticated();
+      allow write: if isAdmin() || (isHOD() && sameDepartment(resource.data.departmentId));
+    }
+    
+    // Classes
+    match /classes/{classId} {
+      allow read, get: if isAuthenticated();
+      allow write: if isAdmin() || (isHOD() && sameDepartment(resource.data.departmentId));
+    }
+    
+    // Rooms
+    match /rooms/{roomId} {
+      allow read, get: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+    
+    // Time Slots
+    match /time_slots/{slotId} {
+      allow read, get: if isAuthenticated();
+      allow write: if isAdmin() || isHOD();
+    }
+    
+    // Timetable Entries
+    match /timetable_entries/{entryId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin() || (isHOD() && sameDepartment(resource.data.departmentId));
+      allow delete: if isAdmin();
+    }
+    
+    // Teacher Subjects
+    match /teacher_subjects/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || (isHOD() && sameDepartment(resource.data.departmentId));
+    }
+    
+    // Teacher Per Class
+    match /teacher_per_class/{id} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin() || (isHOD() && sameDepartment(resource.data.departmentId));
+    }
+    
+    // Roles (read-only for most users)
+    match /roles/{roleId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+  }
+}
+

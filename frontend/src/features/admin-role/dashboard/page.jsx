@@ -4,11 +4,11 @@ import StatCard from "./components/StatCard";
 import QuickActions from "./components/QuickActions";
 import SystemStatus from "./components/SystemStatus";
 import { Users, MapPin, BookOpen, GraduationCap } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useUser } from "@/features/auth/hooks/useAuth";
 
 export default function AdminDashboard() {
   const { stats, isLoading } = useDashboardStats();
-  const adminData = useSelector((state) => state.auth.user);
+  const { user: adminData } = useUser();
 
   const statCards = [
     {

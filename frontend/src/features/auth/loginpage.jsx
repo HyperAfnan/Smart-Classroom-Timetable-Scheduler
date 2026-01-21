@@ -3,23 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Mail, Lock, ArrowRight } from "lucide-react";
-import { supabase } from "@/config/supabase.js";
-import { jwtDecode } from "jwt-decode";
-import { useDispatch } from "react-redux";
-import { setAuth } from "@/Store/auth.js";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "./hooks/useAuth";
 
 //TODO: notification for errors
 export default function LoginForm() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const { loginAsync, isLoggingIn, loginError } = useAuth();
+  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(null);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -30,111 +24,18 @@ export default function LoginForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-
     if (!formData.email || !formData.password) return;
 
-    setIsSubmitting(true);
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: String(formData.email),
-      password: String(formData.password),
-    });
-
-    if (error) {
-      setError(error.message);
-      setIsSubmitting(false);
-      return;
-    }
-
-    let roles = [];
-    const { data: rolesData, error: rolesError } = await supabase
-      .from("user_roles")
-      .select("roles(role_name)")
-      .eq("user_id", data.user.id);
-
-    if (rolesError) {
-      setError(rolesError.message);
-    } else {
-      roles = rolesData?.map((r) => r.roles?.role_name).filter(Boolean);
-    }
-
-    let jwtClaims = {};
     try {
-      jwtClaims = jwtDecode(data.session.access_token);
-    } catch {}
-
-    if (roles.includes("admin") || roles.includes("teacher")) {
-      const { data: profileData, error: profileError } = await supabase
-        .from("teacher_profile")
-        .select("*")
-        .eq("email", data.user.email)
-        .single();
-
-      if (profileError) {
-        setError(profileError.message);
-      } else {
-        data.user = { ...data.user, ...profileData };
-      }
-
-      const { data: subjectsData, error: subjectsError } = await supabase
-        .from("teacher_subjects")
-        .select("subject")
-        .eq("teacher", profileData.name);
-
-      if (subjectsError) {
-        setError(subjectsError.message);
-      } else {
-        data.user = {
-          ...data.user,
-          subjects: subjectsData.map((s) => s.subject),
-        };
-      }
+      await loginAsync({ email: formData.email, password: formData.password });
+    } catch (err) {
+      console.error("Login failed:", err);
+      // loginError will be available from the hook
     }
-
-    if (roles.includes("hod")) {
-      const { data: profileData, error: profileError } = await supabase
-        .from("hod_profile")
-        .select("*")
-        .eq("userId", data.user.id)
-        .single();
-
-      if (profileError) {
-        setError(profileError.message);
-      } else {
-        data.user = { ...data.user, ...profileData };
-      }
-    }
-
-    if (roles.includes("student")) {
-      const { data: profileData, error: profileError } = await supabase
-        .from("student_profile")
-        .select("*")
-        .eq("userId", data.user.id)
-        .single();
-
-      if (profileError) {
-        setError(profileError.message);
-      } else {
-        data.user = { ...data.user, ...profileData };
-      }
-    }
-
-    dispatch(
-      setAuth({
-        user: data.user,
-        token: data.session.access_token,
-        roles,
-      }),
-    );
-
-    localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("token", data.session.access_token);
-    localStorage.setItem("roles", JSON.stringify(roles));
-
-    setIsSubmitting(false);
-    navigate("/dashboard");
   };
+
+  const error = loginError ? (loginError.message || "Failed to login") : null;
+  const isSubmitting = isLoggingIn;
 
   const isFormValid = formData.email.trim() && formData.password.trim();
   if (error) console.log(error);

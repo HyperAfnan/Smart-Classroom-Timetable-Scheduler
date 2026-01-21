@@ -50,13 +50,13 @@ export default function ExcelUploader() {
         if (row.every((cell) => cell === null || cell === "")) continue;
 
         const subject = {
-          subject_name: row[columnMap["subject_name"]] || "",
-          subject_code: row[columnMap["subject_code"]] || "",
+          subjectName: row[columnMap["subjectName"]] || "",
+          subjectCode: row[columnMap["subjectCode"]] || "",
           credits: parseInt(row[columnMap["credits"]] || ""),
           department: row[columnMap["department"]] || "",
           semester: row[columnMap["semester"]] || "",
           type: row[columnMap["type"]] || "",
-          hours_per_week: parseInt(row[columnMap["hours_per_week"]]) || 3,
+          hoursPerWeek: parseInt(row[columnMap["hoursPerWeek"]]) || 3,
         };
 
         const existing = subjects.find(
@@ -65,8 +65,8 @@ export default function ExcelUploader() {
             t.department === subject.department ||
             t.semester === subject.semester ||
             t.type === subject.type ||
-            t.hours_per_week === subject.hours_per_week ||
-            t.subject_code.toLowerCase() === subject.subject_code.toLowerCase(),
+            t.hoursPerWeek === subject.hoursPerWeek ||
+            t.subjectCode.toLowerCase() === subject.subjectCode.toLowerCase(),
         );
 
         if (existing) {
@@ -92,7 +92,7 @@ export default function ExcelUploader() {
           addedCount++;
         } catch (error) {
           errorMessages.push(
-            `Add error for ${subject.subject_name}: ${error.message}`,
+            `Add error for ${subject.subjectName}: ${error.message}`,
           );
         }
       }
@@ -103,7 +103,7 @@ export default function ExcelUploader() {
           updatedCount++;
         } catch (error) {
           errorMessages.push(
-            `Update error for ${updates.subject_name}: ${error.message}`,
+            `Update error for ${updates.subjectName}: ${error.message}`,
           );
         }
       }

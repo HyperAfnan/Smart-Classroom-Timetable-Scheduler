@@ -11,12 +11,12 @@ export default function RoomsPage() {
   const filteredRooms = useMemo(() => {
     return rooms.filter((room) => {
       const matchesSearch =
-        (room.room_number ?? "")
+        (room.roomNumber ?? "")
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
         (room.name ?? "").toLowerCase().includes(searchTerm.toLowerCase());
       const matchesType =
-        selectedType === "all" || room.room_type === selectedType;
+        selectedType === "all" || room.roomType === selectedType;
       return matchesSearch && matchesType;
     });
   }, [rooms, searchTerm, selectedType]);

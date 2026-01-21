@@ -30,7 +30,8 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, getDoc } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 const EMPTY_ROOMS = Object.freeze([]);
@@ -49,11 +50,12 @@ const EMPTY_ROOMS = Object.freeze([]);
  * @returns {Promise<Room[]>}
  */
 async function fetchRooms() {
-  const { data, error } = await supabase.from("room").select("*");
-  if (error) {
-    throw new Error(error.message || "Failed to load rooms");
-  }
-  return data ?? [];
+  const snapshot = await getDocs(collection(db, "rooms"));
+  const rooms = [];
+  snapshot.forEach((doc) => {
+    rooms.push({ id: doc.id, ...doc.data() });
+  });
+  return rooms;
 }
 
 /**
@@ -62,15 +64,9 @@ async function fetchRooms() {
  * @returns {Promise<Room>}
  */
 async function insertRoom(room) {
-  const { data, error } = await supabase
-    .from("room")
-    .insert([room])
-    .select("*")
-    .single();
-  if (error) {
-    throw new Error(error.message || "Failed to create room");
-  }
-  return data;
+  const docRef = await addDoc(collection(db, "rooms"), room);
+  const snapshot = await getDoc(docRef);
+  return { id: docRef.id, ...snapshot.data() };
 }
 
 /**
@@ -79,16 +75,10 @@ async function insertRoom(room) {
  * @returns {Promise<Room>}
  */
 async function updateRoomById({ id, updates }) {
-  const { data, error } = await supabase
-    .from("room")
-    .update(updates)
-    .eq("id", id)
-    .select("*")
-    .single();
-  if (error) {
-    throw new Error(error.message || "Failed to update room");
-  }
-  return data;
+  const roomRef = doc(db, "rooms", String(id));
+  await updateDoc(roomRef, updates);
+  const snapshot = await getDoc(roomRef);
+  return { id, ...snapshot.data() };
 }
 
 /**
@@ -97,10 +87,7 @@ async function updateRoomById({ id, updates }) {
  * @returns {Promise<{ id: string|number }>}
  */
 async function deleteRoomById(id) {
-  const { error } = await supabase.from("room").delete().eq("id", id);
-  if (error) {
-    throw new Error(error.message || "Failed to delete room");
-  }
+  await deleteDoc(doc(db, "rooms", String(id)));
   return { id };
 }
 

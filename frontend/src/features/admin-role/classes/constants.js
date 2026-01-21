@@ -17,29 +17,29 @@ const ROOM_DEFAULT = {
   semester: 1,
   section: "A",
   students: 30,
-  academic_year: "2024-25",
+  academicYear: "2024-25",
   subjects: [],
   class_coordinator: "",
 };
 
 const CLASS_DEFAULT = {
-  class_name: "",
+  className: "",
   department: "",
   semester: 1,
   section: "A",
   students: 30,
-  academic_year: "2024-25",
+  academicYear: "2024-25",
   subjects: [],
   class_coordinator: "",
 };
 
 const CLASS_REQUIRED_COLUMNS = [
-  "class_name",
+  "className",
   "department",
   "semester",
   "section",
   "students",
-  "academic_year",
+  "academicYear",
 ];
 
 const semesters = [1, 2, 3, 4, 5, 6, 7, 8];

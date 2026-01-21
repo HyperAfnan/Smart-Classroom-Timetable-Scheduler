@@ -34,7 +34,8 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 /**
@@ -65,15 +66,13 @@ const EMPTY_DEPARTMENTS = Object.freeze([]);
  * @returns {Promise<Subject[]>}
  */
 async function fetchSubjects() {
-  const { data, error } = await supabase
-    .from("subjects")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw new Error(error.message || "Failed to load subjects");
-  }
-  return data ?? [];
+  const q = query(collection(db, "subjects"), orderBy("createdAt", "desc"));
+  const snapshot = await getDocs(q);
+  const subjects = [];
+  snapshot.forEach((doc) => {
+    subjects.push({ id: doc.id, ...doc.data() });
+  });
+  return subjects;
 }
 
 /**
@@ -81,15 +80,14 @@ async function fetchSubjects() {
  * @returns {Promise<string[]>}
  */
 async function fetchDepartments() {
-  const { data, error } = await supabase
-    .from("department")
-    .select("name")
-    .order("name", { ascending: true });
-
-  if (error) {
-    throw new Error(error.message || "Failed to load departments");
-  }
-  return (data ?? []).map((d) => d?.name).filter(Boolean);
+  const q = query(collection(db, "departments"), orderBy("name", "asc"));
+  const snapshot = await getDocs(q);
+  const departments = [];
+  snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.name) departments.push(data.name);
+  });
+  return departments;
 }
 
 /**

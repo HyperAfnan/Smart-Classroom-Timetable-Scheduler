@@ -13,7 +13,7 @@ export default function Classes() {
   // Filter classes. Note: students_count was renamed to students across the codebase.
   // For backward compatibility we still look at a legacy students_count field if present.
   const filteredClasses = classes.filter((c) => {
-    const name = (c.class_name || c.name || "").toLowerCase();
+    const name = (c.className || c.name || "").toLowerCase();
     const studentsValue = c.students ?? c.students_count; // legacy fallback
     const searchLower = searchTerm.toLowerCase();
 

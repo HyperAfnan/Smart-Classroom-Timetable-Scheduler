@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, addDoc, updateDoc, deleteDoc, getDocs, query, where, writeBatch, doc } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 /**
@@ -7,16 +8,8 @@ import { queryKeys } from "@/shared/queryKeys";
  * @param {{ teacher: string, subject: string }} payload
  */
 async function insertTeacherSubject(payload) {
-  const { data, error } = await supabase
-    .from("teacher_subjects")
-    .insert([payload])
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to link teacher with subject");
-  }
-  return data;
+  const docRef = await addDoc(collection(db, "teacher_subjects"), payload);
+  return { id: docRef.id, ...payload };
 }
 
 /**
@@ -25,17 +18,24 @@ async function insertTeacherSubject(payload) {
  * @returns {Promise<Object>} Updated teacher row.
  */
 async function updateTeacherSubjectById({ teacher, subject }) {
-  const { data, error } = await supabase
-    .from("teacher_subjects")
-    .update({ subject })
-    .eq("teacher", teacher)
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to update teacher");
+  // Logic: update 'subject' for all docs where 'teacher' == teacher.
+  // If no docs exist, create a new one (Upsert behavior).
+  const q = query(collection(db, "teacher_subjects"), where("teacher", "==", teacher));
+  const snapshot = await getDocs(q);
+  
+  if (snapshot.empty) {
+      // Upsert: Create new if not exists
+      await addDoc(collection(db, "teacher_subjects"), { teacher, subject });
+      return { teacher, subject };
   }
-  return data;
+
+  const batch = writeBatch(db);
+  snapshot.forEach((doc) => {
+      batch.update(doc.ref, { subject });
+  });
+  await batch.commit();
+
+  return { teacher, subject };
 }
 
 /**
@@ -43,15 +43,19 @@ async function updateTeacherSubjectById({ teacher, subject }) {
  * @param {{ teacher: string, subject: string }}
  */
 async function deleteTeacherSubject({ teacher, subject }) {
-  const { error } = await supabase
-    .from("teacher_subjects")
-    .delete()
-    .eq("teacher", teacher)
-    .eq("subject", subject);
+  const q = query(
+      collection(db, "teacher_subjects"), 
+      where("teacher", "==", teacher),
+      where("subject", "==", subject)
+  );
+  const snapshot = await getDocs(q);
+  
+  const batch = writeBatch(db);
+  snapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+  });
+  await batch.commit();
 
-  if (error) {
-    throw new Error(error.message || "Failed to unlink teacher from subject");
-  }
   return { teacher, subject };
 }
 
@@ -60,26 +64,25 @@ async function deleteTeacherSubject({ teacher, subject }) {
  * @param {{ teacher: string, subject: string[] }}
  */
 async function bulkReplaceTeacherSubjects({ teacher, subject }) {
-  const { error: delError } = await supabase
-    .from("teacher_subjects")
-    .delete()
-    .eq("teacher", teacher);
-
-  if (delError) {
-    throw new Error(delError.message || "Failed to reset teacher subjects");
+  // 1. Delete all existing for teacher
+  const q = query(collection(db, "teacher_subjects"), where("teacher", "==", teacher));
+  const snapshot = await getDocs(q);
+  
+  const batch = writeBatch(db);
+  snapshot.forEach((doc) => {
+      batch.delete(doc.ref);
+  });
+  
+  // 2. Insert new ones
+  if (subject && subject.length > 0) {
+      subject.forEach((s) => {
+          const newRef = doc(collection(db, "teacher_subjects"));
+          batch.set(newRef, { teacher, subject: s });
+      });
   }
-
-  if (!subject || subject.length === 0) return [];
-
-  const { data, error } = await supabase
-    .from("teacher_subjects")
-    .insert(subject.map((s) => ({ teacher, subject: s })))
-    .select("*");
-
-  if (error) {
-    throw new Error(error.message || "Failed to insert teacher subjects");
-  }
-  return data;
+  
+  await batch.commit();
+  return subject.map(s => ({ teacher, subject: s }));
 }
 //
 export default function useTeacherSubjectMutations({

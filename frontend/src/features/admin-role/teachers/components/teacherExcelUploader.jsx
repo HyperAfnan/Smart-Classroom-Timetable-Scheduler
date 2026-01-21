@@ -52,18 +52,18 @@ export default function ExcelUploader({}) {
         const teacher = {
           name: row[columnMap["name"]] || "",
           email: row[columnMap["email"]] || "",
-          emp_id: String(row[columnMap["emp_id"]] || ""),
+          empId: String(row[columnMap["empId"]] || ""),
           department: row[columnMap["department"]] || "",
           designation: row[columnMap["designation"]] || "",
-          max_hours: parseInt(row[columnMap["max_hours"]]) || 20,
+          maxHours: parseInt(row[columnMap["maxHours"]]) || 20,
           subjects: [],
         };
 
-        if (!teacher?.name || !teacher?.email || !teacher?.emp_id) continue;
+        if (!teacher?.name || !teacher?.email || !teacher?.empId) continue;
 
         const existing = teachers.find(
           (t) =>
-            t?.emp_id === teacher?.emp_id ||
+            t?.empId === teacher?.empId ||
             t?.email?.toLowerCase() === teacher?.email?.toLowerCase(),
         );
 

@@ -45,13 +45,29 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, addDoc, doc, updateDoc, deleteDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 
 /**
+ * Generate a random password for new teachers
+ */
+function generatePassword() {
+  const length = 12;
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += charset.charAt(Math.floor(Math.random() * charset.length));
+  }
+  return password;
+}
+
+/**
  * Insert a new teacher row.
+ * Note: This only creates the teacher profile. The teacher will need to sign up separately.
+ * 
  * @param {Object} teacher - The teacher payload to insert.
- * @returns {Promise<Object>} Inserted teacher row.
+ * @returns {Promise<Object>} Inserted teacher row with signup instructions.
  */
 async function insertTeacher(teacher) {
   if (!teacher || typeof teacher !== "object" || Array.isArray(teacher)) {
@@ -61,16 +77,27 @@ async function insertTeacher(teacher) {
     throw new Error("Teacher must include an email");
   }
 
-  const { data, error } = await supabase.functions.invoke("teacher-creation", {
-    body: teacher,
-  });
-
-  if (error) {
-    console.error("Edge function error:", error);
-    throw new Error(error.message || "Failed to create teacher");
+  try {
+    // Create teacher profile in Firestore
+    const teacherData = {
+      ...teacher,
+      createdAt: serverTimestamp(),
+    };
+    
+    const docRef = await addDoc(collection(db, "teacher_profile"), teacherData);
+    
+    // Fetch and return the created teacher
+    const snapshot = await getDoc(docRef);
+    return { 
+      id: docRef.id, 
+      ...snapshot.data(),
+      // Return signup instructions
+      signupInstructions: `Teacher account created. Please ask the teacher to sign up at the registration page using email: ${teacher.email}`,
+    };
+  } catch (error) {
+    console.error("Teacher creation error:", error);
+    throw error;
   }
-
-  return data;
 }
 
 /**
@@ -79,17 +106,11 @@ async function insertTeacher(teacher) {
  * @returns {Promise<Object>} Updated teacher row.
  */
 async function updateTeacherById({ id, updates }) {
-  const { data, error } = await supabase
-    .from("teacher_profile")
-    .update(updates)
-    .eq("id", id)
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to update teacher");
-  }
-  return data;
+  const teacherRef = doc(db, "teacher_profile", String(id));
+  await updateDoc(teacherRef, updates);
+  // Fetch updated data to return
+  const snapshot = await getDoc(teacherRef);
+  return { id, ...snapshot.data() };
 }
 
 /**
@@ -98,13 +119,8 @@ async function updateTeacherById({ id, updates }) {
  * @returns {Promise<{ id: string|number }>} Deleted id for convenience.
  */
 async function deleteTeacherById(id) {
-  const { error } = await supabase
-    .from("teacher_profile")
-    .delete()
-    .eq("id", id);
-  if (error) {
-    throw new Error(error.message || "Failed to delete teacher");
-  }
+  const teacherRef = doc(db, "teacher_profile", String(id));
+  await deleteDoc(teacherRef);
   return { id };
 }
 

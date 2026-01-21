@@ -12,11 +12,11 @@ import { toast } from "react-toastify";
  *
  * Features:
  * - Validates presence of required columns (case-insensitive):
- *     class_name, department, semester, section, students, academic_year
+ *     className, department, semester, section, students, academicYear
  * - Accepts extra/unknown columns (ignored)
  * - Parses integers for semester & students
  * - Determines whether to create or update based on a composite identity:
- *     class_name + department + semester + section (case-insensitive for class_name & section)
+ *     className + department + semester + section (case-insensitive for className & section)
  * - Aggregates successes & errors and provides user feedback
  *
  * Usage:
@@ -70,12 +70,12 @@ export default function ClassExcelUploader() {
         const row = rows[i];
         if (!row || row.every((cell) => cell === null || cell === "")) continue;
 
-        const rawClassName = row[colIndex["class_name"]];
+        const rawClassName = row[colIndex["className"]];
         const rawDept = row[colIndex["department"]];
         const rawSemester = row[colIndex["semester"]];
         const rawSection = row[colIndex["section"]];
         const rawStudents = row[colIndex["students"]];
-        const rawYear = row[colIndex["academic_year"]];
+        const rawYear = row[colIndex["academicYear"]];
 
         // Basic required field presence check
         if (
@@ -102,26 +102,26 @@ export default function ClassExcelUploader() {
           continue; // skip invalid numeric row
         }
 
-        const class_name = String(rawClassName).trim();
+        const className = String(rawClassName).trim();
         const department = String(rawDept).trim();
         const section = String(rawSection).trim();
-        const academic_year = String(rawYear).trim();
+        const academicYear = String(rawYear).trim();
 
-        if (!class_name || !department || !section || !academic_year) continue;
+        if (!className || !department || !section || !academicYear) continue;
 
         const payload = {
-          class_name,
+          className,
           department,
           semester,
           section,
           students,
-          academic_year,
+          academicYear,
         };
 
-        // Identify existing by composite (case-insensitive for class_name & section)
+        // Identify existing by composite (case-insensitive for className & section)
         const existing = classes.find(
           (c) =>
-            c.class_name?.toLowerCase() === class_name.toLowerCase() &&
+            c.className?.toLowerCase() === className.toLowerCase() &&
             c.department === department &&
             c.semester === semester &&
             (c.section || "").toLowerCase() === section.toLowerCase(),
@@ -151,7 +151,7 @@ export default function ClassExcelUploader() {
           createdCount++;
         } catch (err) {
           errorMessages.push(
-            `Create error for ${c.class_name} (${c.department} Sem ${c.semester} Sec ${c.section}): ${
+            `Create error for ${c.className} (${c.department} Sem ${c.semester} Sec ${c.section}): ${
               err?.message || err
             }`,
           );
@@ -164,7 +164,7 @@ export default function ClassExcelUploader() {
           updatedCount++;
         } catch (err) {
           errorMessages.push(
-            `Update error for ${updates.class_name} (${updates.department} Sem ${updates.semester} Sec ${updates.section}): ${
+            `Update error for ${updates.className} (${updates.department} Sem ${updates.semester} Sec ${updates.section}): ${
               err?.message || err
             }`,
           );

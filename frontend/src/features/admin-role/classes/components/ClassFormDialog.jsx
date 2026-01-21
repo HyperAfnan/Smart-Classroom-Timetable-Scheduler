@@ -35,7 +35,7 @@ export default function ClassFormDialog({
   isSubmitting,
 }) {
   if (typeof window !== "undefined" && process.env.NODE_ENV !== "production") {
-    // eslint-disable-next-line no-console
+     
     console.warn(
       "ClassFormDialog is deprecated. Use InlineClassesTable instead.",
     );
@@ -133,9 +133,9 @@ export default function ClassFormDialog({
             <div className="space-y-2">
               <Label>Academic Year</Label>
               <Input
-                value={formData.academic_year}
+                value={formData.academicYear}
                 onChange={(e) =>
-                  setFormData({ ...formData, academic_year: e.target.value })
+                  setFormData({ ...formData, academicYear: e.target.value })
                 }
                 required
               />

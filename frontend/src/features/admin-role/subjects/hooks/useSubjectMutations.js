@@ -41,7 +41,8 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/config/supabase";
+import { db } from "@/config/firebase";
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { queryKeys } from "@/shared/queryKeys";
 import { normalizeSubjectType } from "@/lib/subjectType";
 
@@ -59,18 +60,16 @@ async function insertSubject(subject) {
   const prepared = {
     ...subject,
     type: normalizedType ?? "Theory", // ensure a valid enum value
+    createdAt: serverTimestamp(),
   };
 
-  const { data, error } = await supabase
-    .from("subjects")
-    .insert([prepared])
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to create subject");
-  }
-  return data;
+  const docRef = await addDoc(collection(db, "subjects"), prepared);
+  const snapshot = await getDoc(docRef);
+  
+  // Return a local approximation of the timestamp for immediate UI feedback if needed, 
+  // though the refetch invalidation will eventually fix it. 
+  // Ideally, getDoc(docRef) returns the server timestamp if we wait, or null if pending.
+  return { id: docRef.id, ...snapshot.data() };
 }
 
 /**
@@ -80,26 +79,19 @@ async function insertSubject(subject) {
  */
 async function updateSubjectById({ id, updates }) {
   // Normalize only if a type (or alias) is provided; avoid overwriting when absent
-  let prepared = updates;
+  let prepared = { ...updates, updatedAt: serverTimestamp() };
   const candidateType = updates?.type ?? updates?.subject_type;
   if (candidateType !== undefined) {
     const normalizedType = normalizeSubjectType(candidateType, {
       fallback: "Theory",
     });
-    prepared = { ...updates, type: normalizedType ?? "Theory" };
+    prepared = { ...prepared, type: normalizedType ?? "Theory" };
   }
 
-  const { data, error } = await supabase
-    .from("subjects")
-    .update(prepared)
-    .eq("id", id)
-    .select("*")
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to update subject");
-  }
-  return data;
+  const subjectRef = doc(db, "subjects", String(id));
+  await updateDoc(subjectRef, prepared);
+  const snapshot = await getDoc(subjectRef);
+  return { id, ...snapshot.data() };
 }
 
 /**
@@ -108,10 +100,7 @@ async function updateSubjectById({ id, updates }) {
  * @returns {Promise<{ id: string|number }>} Deleted id for convenience.
  */
 async function deleteSubjectById(id) {
-  const { error } = await supabase.from("subjects").delete().eq("id", id);
-  if (error) {
-    throw new Error(error.message || "Failed to delete subject");
-  }
+  await deleteDoc(doc(db, "subjects", String(id)));
   return { id };
 }
 

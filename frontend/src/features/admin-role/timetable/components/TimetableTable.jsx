@@ -24,6 +24,8 @@ export default function TimetableTable({
     enabled: !!departmentId,
   });
 
+  console.log("TimetableTable Debug:", { departmentId, className, timetableLength: timetable?.length });
+
   const normalizeToHHMM = (val) => {
     if (!val) return val;
     let str = String(val);
@@ -57,10 +59,10 @@ export default function TimetableTable({
       return new Map();
     }
     return timetable
-      .filter((e) => e?.class_name === className && e?.time_slots)
+      .filter((e) => e?.className === className && e?.time_slots)
       .reduce((acc, e) => {
         const day = e.time_slots?.day;
-        const start = normalizeToHHMM(e.time_slots?.start_time);
+        const start = normalizeToHHMM(e.time_slots?.startTime);
         if (day && start) {
           acc.set(`${day}|${start}`, e);
         }

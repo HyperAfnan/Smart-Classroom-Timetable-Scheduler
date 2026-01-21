@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: calvio-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
