@@ -16,7 +16,7 @@ export default function Timetable() {
 	const { classes, isLoading: classLoading } = useClasses();
 
 	const selectedClassObj = classes.find((c) => String(c.id) === selectedClass);
-	const className = selectedClassObj?.class_name ?? "";
+	const className = selectedClassObj?.className || selectedClassObj?.class_name || selectedClassObj?.name || "";
 
 	if (classLoading)return ( <Loader />);
 

@@ -88,8 +88,8 @@ export default function ControlsCard({
 							<SelectContent className="bg-popover text-popover-foreground border border-border shadow-md">
 								{classes.map((c) => (
 									<SelectItem key={c.id} value={String(c.id)}>
-										{c.class_name}
-										{c.semester ? `(Sem ${c.semester})` : ""}
+										{c.className || c.class_name || c.name}
+										{c.semester ? ` (Sem ${c.semester})` : ""}
 									</SelectItem>
 								))}
 							</SelectContent>

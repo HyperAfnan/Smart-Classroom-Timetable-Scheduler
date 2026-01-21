@@ -9,7 +9,7 @@ async function fetchTimetableEntries(department_id) {
   // 1. Fetch Entires
   const entriesQ = query(
       collection(db, "timetable_entries"),
-      where("department_id", "==", department_id)
+      where("departmentId", "==", department_id)
   );
   const entriesSnapshot = await getDocs(entriesQ);
   const entries = [];
@@ -18,7 +18,7 @@ async function fetchTimetableEntries(department_id) {
   entriesSnapshot.forEach((doc) => {
       const data = doc.data();
       entries.push({ id: doc.id, ...data });
-      if (data.time_slot_id) timeSlotIds.add(data.time_slot_id);
+      if (data.timeSlotId) timeSlotIds.add(data.timeSlotId);
   });
 
   // 2. Fetch TimeSlots (if any)
@@ -26,7 +26,7 @@ async function fetchTimetableEntries(department_id) {
   
   const slotsQ = query(
       collection(db, "time_slots"),
-      where("department_id", "==", department_id)
+      where("departmentId", "==", department_id)
   );
   const slotsSnapshot = await getDocs(slotsQ);
   const slotsMap = {};
@@ -37,8 +37,11 @@ async function fetchTimetableEntries(department_id) {
   // 3. Join
   const joinedEntries = entries.map(entry => ({
       ...entry,
-      time_slots: slotsMap[entry.time_slot_id] || null
+      time_slots: slotsMap[entry.timeSlotId] || null
   }));
+
+  console.log("Fetched Timetable Entries:", entries);
+  console.log("Joined Timetable Entries:", joinedEntries);
 
   return joinedEntries;
 }
