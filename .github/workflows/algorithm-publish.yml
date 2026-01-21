@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - firebase-setup
     paths:
       - 'algorithm-microservice/**'
 
