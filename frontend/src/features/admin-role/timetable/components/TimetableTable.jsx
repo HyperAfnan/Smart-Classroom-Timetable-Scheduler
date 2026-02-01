@@ -24,8 +24,6 @@ export default function TimetableTable({
     enabled: !!departmentId,
   });
 
-  console.log("TimetableTable Debug:", { departmentId, className, timetableLength: timetable?.length });
-
   const normalizeToHHMM = (val) => {
     if (!val) return val;
     let str = String(val);

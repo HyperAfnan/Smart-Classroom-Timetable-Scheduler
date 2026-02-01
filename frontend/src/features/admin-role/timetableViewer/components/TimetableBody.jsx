@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useMemo, useEffect } from "react";
 import { normalizeToHHMM } from "../utils/time";
 import { TimetableCell } from "./TimetableCell";
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
@@ -25,6 +25,7 @@ function TimetableBody({
   breakIndexByDay,
   classLabels,
   timetableEntries,
+  classes,
   selectedDay,
   activeTeacherName,
 }) {
@@ -32,30 +33,59 @@ function TimetableBody({
   const toLecture = (entry) =>
     entry
       ? {
-          subject: entry.subject_name ?? entry.subject ?? "—",
-          teacher: entry.teacher_name ?? entry.teacher ?? "—",
-          room: entry.room_name ?? entry.room ?? String(entry.room_id ?? "—"),
+          subject:
+             entry.subjectName ??
+             entry.subject_name ??
+             entry.subject ??
+             "—",
+          teacher:
+             entry.teacherName ??
+             entry.teacher_name ??
+             entry.teacher ??
+             "—",
+          room:
+             entry.roomNumber ??
+             entry.room_name ??
+             entry.room ??
+             String(entry.room_id ?? entry.roomId ?? "—"),
           type: entry.type ?? "Lecture",
         }
       : null;
+
+  // Helper to resolve canonical class name
+  const resolveClassName = (e) => {
+    if (!e) return "Unknown";
+    // If e.class_name matches one of our labels directly, use it
+    const rawName = e.class_name || e.className || e.name;
+    if (rawName && classLabels.includes(rawName)) return rawName;
+
+    // Otherwise try to lookup via classId
+    if (e.classId && Array.isArray(classes)) {
+      const cls = classes.find((c) => String(c.id) === String(e.classId));
+      if (cls) {
+        return (cls.class_name || cls.className || cls.name || "").trim();
+      }
+    }
+    return rawName || "Unknown";
+  };
 
   // Build fast lookup maps
   const entryByTime = useMemo(() => {
     const m = new Map();
     for (const e of Array.isArray(timetableEntries) ? timetableEntries : []) {
-      const cls = e?.class_name ?? "Unknown";
+      const cls = resolveClassName(e);
       const day = e?.time_slots?.day;
       const start = normalizeToHHMM(e?.time_slots?.start_time);
       if (!cls || !day || !start) continue;
       m.set(`${cls}|${day}|${start}`, e);
     }
     return m;
-  }, [timetableEntries]);
+  }, [timetableEntries, classes, classLabels]);
 
   const entryBySlot = useMemo(() => {
     const m = new Map();
     for (const e of Array.isArray(timetableEntries) ? timetableEntries : []) {
-      const cls = e?.class_name ?? "Unknown";
+      const cls = resolveClassName(e);
       const day = e?.time_slots?.day;
       const slotNum =
         typeof e?.time_slots?.slot === "number" ? e.time_slots.slot : null;
@@ -63,7 +93,7 @@ function TimetableBody({
       m.set(`${cls}|${day}|${slotNum}`, e);
     }
     return m;
-  }, [timetableEntries]);
+  }, [timetableEntries, classes, classLabels]);
 
   const isTeacherFilterActive = Boolean(activeTeacherName);
   const norm = (s) =>

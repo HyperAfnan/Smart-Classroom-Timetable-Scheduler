@@ -1,9 +1,9 @@
 /**
- * React Query powered hook to fetch teachers and departments from Supabase.
+ * React Query powered hook to fetch teachers and departments from Firebase.
  *
  * Requirements:
  * - Your app must be wrapped with React Query's QueryClientProvider.
- * - Supabase client must be configured and exported from "@/config/supabase".
+ * - Firebase client must be configured and exported from "@/config/firebase".
  *
  * Example:
  *   import useTeachers from "./hooks/useTeachers";
@@ -58,7 +58,7 @@ const EMPTY_DEPARTMENTS = Object.freeze([]);
  */
 
 /**
- * Fetch all teachers from Supabase.
+ * Fetch all teachers from Firebase.
  * @returns {Promise<Teacher[]>}
  */
 // TODO: fetch only specific department teacher_profiles only,
@@ -75,7 +75,7 @@ async function fetchTeachers() {
 }
 
 /**
- * Fetch department names from Supabase.
+ * Fetch department names from Firebase.
  * @returns {Promise<string[]>}
  */
 async function fetchDepartments() {

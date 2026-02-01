@@ -47,7 +47,7 @@ export default function TimetableViewer() {
 
   const selectedClassName = useMemo(() => {
     const cls = (classes ?? []).find((c) => String(c.id) === selectedClass);
-    return cls?.class_name || undefined;
+    return cls ? (cls.class_name || cls.className || cls.name) : undefined;
   }, [classes, selectedClass]);
 
   const classTeacherOptions = useMemo(() => {

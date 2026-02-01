@@ -1,9 +1,9 @@
 /**
- * React Query powered hook to fetch subjects and departments from Supabase.
+ * React Query powered hook to fetch subjects and departments from Firebase.
  *
  * Requirements:
  * - Your app must be wrapped with React Query's QueryClientProvider.
- * - Supabase client must be configured and exported from "@/config/supabase".
+ * - Firebase client must be configured and exported from "@/config/firebase".
  *
  * Example:
  *   import useSubjects, { queryKeys } from "./hooks/useSubjects";

@@ -15,7 +15,6 @@ const algoUrl = import.meta.env.VITE_BACKEND_URL;
 function transformTimetableData(response) {
   const result = {};
   if (!response || !response.student_timetables) {
-    console.log("No response or student_timetables found.");
     return result;
   }
   for (const classObj of response.student_timetables) {
@@ -79,7 +78,6 @@ function transformGeneratorOutputToRows(
   teacherNameToEmpId,
   department_id,
 ) {
-  console.log("Transforming generator output to rows:", timeSlots);
   const rows = [];
   const dayToIndex = {
     Monday: 0,
@@ -186,8 +184,6 @@ async function createTimetableEntry(department_id, queryClient, body) {
     throwOnConflict: true,
     log: true,
   });
-  console.log("Making the selection query to check existing entries");
-  console.log("Making the selection query to check existing entries");
   
   // Check and delete existing entries
   try {
@@ -255,7 +251,7 @@ export default function useTimetableMutation(department_id) {
     ],
     mutationFn: () =>
       // NOTE: Replace hardcoded values with dynamic input as needed, put thees setting in the
-      //  department table in supabase, and have a ui for this to get from the user
+      //  department table in firebase, and have a ui for this to get from the user
       createTimetableEntry(department_id, queryClient, {
         days: 5,
         slots_per_day: 7,

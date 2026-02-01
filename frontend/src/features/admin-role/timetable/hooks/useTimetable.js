@@ -40,9 +40,6 @@ async function fetchTimetableEntries(department_id) {
       time_slots: slotsMap[entry.timeSlotId] || null
   }));
 
-  console.log("Fetched Timetable Entries:", entries);
-  console.log("Joined Timetable Entries:", joinedEntries);
-
   return joinedEntries;
 }
 

@@ -3,7 +3,7 @@ import { useMemo } from "react";
 export default function useClassLabels(classes, timetableEntries) {
   return useMemo(() => {
     const fromClasses = (classes || [])
-      .map((c) => (c?.class_name ?? c?.name ?? `Class ${c?.id ?? ""}`).trim())
+      .map((c) => (c?.class_name ?? c?.className ?? c?.name ?? `Class ${c?.id ?? ""}`).trim())
       .filter(Boolean);
 
     if (fromClasses.length > 0) {

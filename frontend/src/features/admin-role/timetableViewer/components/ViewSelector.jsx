@@ -40,8 +40,8 @@ export function ClassSelector({
                >
                   {classes?.map((c) => (
                      <SelectItem key={c.id} value={String(c.id)}>
-                        {c.class_name}
-                        {c.semester ? `(Sem ${c.semester})` : ""}
+                        {c.class_name || c.className || c.name}
+                        {c.semester ? ` (Sem ${c.semester})` : ""}
                      </SelectItem>
                   ))}
                </SelectContent>
@@ -54,7 +54,10 @@ export function ClassSelector({
                >
                   Selected Class:
                   <span className="">
-                     {classes?.find((c) => String(c.id) === selectedClass)?.class_name}
+                     {(() => {
+                        const cls = classes?.find((c) => String(c.id) === selectedClass);
+                        return cls ? (cls.class_name || cls.className || cls.name) : "";
+                     })()}
                   </span>
                   <X className="ml-2 h-4 w-4" />
                </Badge>

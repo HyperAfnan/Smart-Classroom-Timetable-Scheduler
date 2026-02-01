@@ -17,7 +17,7 @@ import { useUser } from "@/features/auth/hooks/useAuth";
 async function fetchClasses(departmentId) {
   const q = query(
     collection(db, "classes"),
-    where("departmentId", "==", departmentId),
+    // where("departmentId", "==", departmentId),
     orderBy("createdAt", "desc")
   );
   const snapshot = await getDocs(q);
@@ -31,7 +31,7 @@ async function fetchClasses(departmentId) {
 async function fetchTimeslots(departmentId) {
   const q = query(
     collection(db, "time_slots"),
-    where("departmentId", "==", departmentId),
+    // where("departmentId", "==", departmentId),
     orderBy("day", "asc"),
     orderBy("slot", "asc")
   );
@@ -44,10 +44,9 @@ async function fetchTimeslots(departmentId) {
 }
 
 async function fetchTimetableEntries(departmentId) {
-  // 1. Fetch Entries
   const entriesQ = query(
     collection(db, "timetable_entries"),
-    where("departmentId", "==", departmentId)
+    // where("departmentId", "==", departmentId)
   );
   const entriesSnapshot = await getDocs(entriesQ);
   const entries = [];
@@ -59,17 +58,11 @@ async function fetchTimetableEntries(departmentId) {
     if (data.timeSlotId) timeSlotIds.add(data.timeSlotId);
   });
 
-  // 2. Fetch TimeSlots (if any entries exist)
   if (timeSlotIds.size === 0) return entries;
-  
-  // Firestore 'in' query supports max 10 items, so we might need to batch or just fetch all slots for dept like above
-  // Since we already have a fetchTimeSlots function that fetches all for dept, we could reuse that logic or cache
-  // But strictly here, let's fetch all slots for the department to be safe and join, 
-  // as entries might reference slots we want to know details of.
   
   const slotsQ = query(
     collection(db, "time_slots"),
-     where("departmentId", "==", departmentId)
+    //  where("departmentId", "==", departmentId)
   );
   const slotsSnapshot = await getDocs(slotsQ);
   const slotsMap = {};
@@ -77,22 +70,21 @@ async function fetchTimetableEntries(departmentId) {
       slotsMap[doc.id] = { id: doc.id, ...doc.data() };
   });
 
-  // 3. Join
   const joinedEntries = entries.map(entry => ({
       ...entry,
       time_slots: slotsMap[entry.timeSlotId] || null
   }));
-
+  
   return joinedEntries;
 }
 
 export default function useTimetableViewer() {
   const { user } = useUser();
   const departmentId = user?.departmentId;
-
+  
   const classesQuery = useQuery({
     queryKey: queryKeys.classes.all,
-    staleTime: 60_000, // 1 minute
+    staleTime: 60_000,
     queryFn: () => fetchClasses(departmentId),
   });
 
@@ -107,7 +99,7 @@ export default function useTimetableViewer() {
     queryFn: () => fetchTimetableEntries(departmentId),
     staleTime: 60_000,
   });
-
+  
   return {
     isLoading:
       timetableQuery.isPending ||

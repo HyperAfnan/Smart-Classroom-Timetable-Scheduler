@@ -8,7 +8,7 @@
  *
  * Requirements:
  * - App must be wrapped in React Query's QueryClientProvider.
- * - Supabase client must be configured and exported from "@/config/supabase".
+ * - Firebase client must be configured and exported from "@/config/firebase".
  *
  * Usage example:
  *

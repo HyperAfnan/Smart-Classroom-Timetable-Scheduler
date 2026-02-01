@@ -25,7 +25,7 @@ export async function getUserData(firebaseUser) {
     firstName: data.firstName || "",
     lastName: data.lastName || "",
     role: data.role,
-    departmentId: data.departmentId || null,
+    departmentId: data.departmentId || data.department_id || null,
   };
 
   return {

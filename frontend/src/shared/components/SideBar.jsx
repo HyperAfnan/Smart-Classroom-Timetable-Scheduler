@@ -116,8 +116,6 @@ export default function SidebarMenuComponent() {
   const location = useLocation();
   const { user, roles } = useUser();
   const { logout } = useAuth();
-  console.log("User Roles", roles);
-  console.log("User", user);
 
   // Track collapse state: hide labels when width is below threshold
   const sidebarRef = useRef(null);

@@ -1,7 +1,7 @@
 /**
  * React Query powered hook for Rooms feature.
  *
- * - Centralizes all reads (fetch) and writes (create/update/delete) to Supabase.
+ * - Centralizes all reads (fetch) and writes (create/update/delete) to Firebase.
  * - Exposes mutation status flags so UI can disable submit/delete while pending.
  * - Returns stable empty arrays to avoid unnecessary re-render loops.
  *
@@ -46,7 +46,7 @@ const EMPTY_ROOMS = Object.freeze([]);
  */
 
 /**
- * Fetch rooms from Supabase.
+ * Fetch rooms from Firebase.
  * @returns {Promise<Room[]>}
  */
 async function fetchRooms() {
