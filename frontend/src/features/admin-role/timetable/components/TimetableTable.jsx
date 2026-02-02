@@ -24,8 +24,6 @@ export default function TimetableTable({
     enabled: !!departmentId,
   });
 
-  console.log("TimetableTable Debug:", { departmentId, className, timetableLength: timetable?.length });
-
   const normalizeToHHMM = (val) => {
     if (!val) return val;
     let str = String(val);
@@ -128,6 +126,8 @@ export default function TimetableTable({
                 className && byKey.size
                   ? (byKey.get(`${day}|${hhmm}`) ?? null)
                   : null;
+
+                     console.log("Rendering slot ", slot, " for key ", `${day}|${hhmm}`);
 
               return (
                 <TableCell

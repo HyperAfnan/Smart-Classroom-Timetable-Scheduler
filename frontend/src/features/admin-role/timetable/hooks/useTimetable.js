@@ -40,15 +40,12 @@ async function fetchTimetableEntries(department_id) {
       time_slots: slotsMap[entry.timeSlotId] || null
   }));
 
-  console.log("Fetched Timetable Entries:", entries);
-  console.log("Joined Timetable Entries:", joinedEntries);
-
   return joinedEntries;
 }
 
 export default function useTimetable(department_id, options = {}) {
   const timetableQueries = useQuery({
-    queryKey: [queryKeys.timetableEntries.all],
+    queryKey: queryKeys.timetableEntries.detail(department_id),
     queryFn: () => fetchTimetableEntries(department_id),
     staleTime: 60_000_000,
     ...options,

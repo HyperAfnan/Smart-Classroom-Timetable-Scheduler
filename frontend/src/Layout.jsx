@@ -8,21 +8,15 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 
+import { ROLE_TITLES, NO_SIDEBAR_ROUTES } from "@/config/roles";
+
 export default function Layout() {
   const location = useLocation();
   const { roles } = useUser();
 
-  const noSidebarRoutes = ["/", "/auth"];
-  const isSidebarVisible = !noSidebarRoutes.includes(location.pathname);
+  const isSidebarVisible = !NO_SIDEBAR_ROUTES.includes(location.pathname);
 
-  const roleTitleMap = {
-    admin: "Calvio",
-    teacher: "Teacher Portal",
-    hod: "HOD Portal",
-    student: "Student Portal",
-  };
-
-  const currentRole = Object.keys(roleTitleMap).find((role) =>
+  const currentRole = Object.keys(ROLE_TITLES).find((role) =>
     roles.includes(role),
   );
 
@@ -63,7 +57,7 @@ export default function Layout() {
                       <SidebarTrigger className="hover:bg-muted p-2 rounded-lg transition-colors duration-200" />
                     )}
                     <h1 className="text-xl font-semibold text-foreground">
-                      {roleTitleMap[currentRole]}
+                      {ROLE_TITLES[currentRole]}
                     </h1>
                   </div>
                 </header>
@@ -81,7 +75,7 @@ export default function Layout() {
                   <SidebarTrigger className="hover:bg-muted p-2 rounded-lg transition-colors duration-200" />
                 )}
                 <h1 className="text-xl font-semibold text-foreground">
-                  {roleTitleMap[currentRole]}
+                  {ROLE_TITLES[currentRole]}
                 </h1>
               </div>
             </header>

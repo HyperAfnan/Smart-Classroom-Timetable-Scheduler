@@ -1,3 +1,11 @@
 docs/Questions for college timetabler.md
 algorithm-microservice/.venv
+.agents/
+.agent/
+.vscode/
+.gemini/
+.firebase/
+functions/
+function/
+serviceAccountKey.json
 

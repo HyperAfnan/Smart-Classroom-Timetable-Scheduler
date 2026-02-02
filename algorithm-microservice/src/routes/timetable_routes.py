@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import traceback
-from typing import TypedDict
+from typing_extensions import TypedDict
 
 from ..services.fetch_details import get_department_resources
 from fastapi import APIRouter, HTTPException
@@ -88,11 +88,21 @@ async def generate_timetable_teacherwise(request: TimetableRequest):
     response_model=StudentTimetableResponse,
 )
 async def generate_timetable_across_department(
-    department_id: int, request: TimetableRequest
+    department_id: str, request: TimetableRequest
 ):
     try:
         request.department_id = department_id
         resources = await get_department_resources(department_id)
+        
+        if resources["total_classes"] == 0:
+             raise HTTPException(status_code=404, detail=f"No classes found for department {department_id}")
+        if resources["total_rooms"] == 0:
+             raise HTTPException(status_code=404, detail=f"No rooms found for department {department_id}")
+        if resources["total_teachers"] == 0:
+             raise HTTPException(status_code=404, detail=f"No teachers found for department {department_id}")
+        if resources["total_subjects"] == 0:
+             raise HTTPException(status_code=404, detail=f"No subjects found for department {department_id}")
+             
         gen = TimetableGenerator(
             request,
             TOTAL_ROOMS=resources["total_rooms"],

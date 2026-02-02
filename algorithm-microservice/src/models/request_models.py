@@ -24,7 +24,7 @@ class TimetableRequest(BaseModel):
 
     max_hours_per_day: int = 6
     max_hours_per_week: int = 20
-    department_id: int = 132
+    department_id: str = "UhmONhtTSYAyWlWQoUn0"
 
     population_size: int = 50
     generations: int = 100

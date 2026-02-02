@@ -12,7 +12,7 @@ import Loader from "@/shared/components/Loader.jsx";
 export default function Timetable() {
 	const [selectedClass, setSelectedClass] = useState("");
 	const { user } = useUser();
-    const departmentId = user?.department_id;
+    const departmentId = user?.departmentId || user?.department_id;
 	const { classes, isLoading: classLoading } = useClasses();
 
 	const selectedClassObj = classes.find((c) => String(c.id) === selectedClass);

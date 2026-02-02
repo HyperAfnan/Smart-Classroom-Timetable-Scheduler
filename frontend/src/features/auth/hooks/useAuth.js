@@ -6,6 +6,7 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { getUserData } from "../api/getUserData";
 
 const USER_QUERY_KEY = ["user"];
 
@@ -48,23 +49,13 @@ export function useAuth() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const firebaseUser = userCredential.user;
 
-      // Fetch user profile from Firestore
-      const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-
-      if (!userDoc.exists()) {
-        throw new Error("User profile not found. Please contact administrator.");
-      }
-
-      const userData = userDoc.data();
+      // Use centralized getUserData to ensure consistency with AuthInitializer
+      const { userData, roles } = await getUserData(firebaseUser);
       const token = await firebaseUser.getIdToken();
 
       return {
-        user: {
-          uid: firebaseUser.uid,
-          email: firebaseUser.email,
-          ...userData,
-        },
-        roles: [userData.role],
+        user: userData,
+        roles,
         token,
       };
     },

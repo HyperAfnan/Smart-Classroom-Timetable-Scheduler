@@ -25,8 +25,8 @@ export default function TimetableViewer() {
     const seen = new Set();
     const unique = [];
     for (const s of slots) {
-      const start = normalizeToHHMM(s?.start_time);
-      const end = normalizeToHHMM(s?.end_time);
+      const start = normalizeToHHMM(s?.startTime || s?.start_time);
+      const end = normalizeToHHMM(s?.endTime || s?.end_time);
       const key = `${start}|${end}`;
       if (start && end && !seen.has(key)) {
         seen.add(key);
@@ -47,15 +47,16 @@ export default function TimetableViewer() {
 
   const selectedClassName = useMemo(() => {
     const cls = (classes ?? []).find((c) => String(c.id) === selectedClass);
-    return cls?.class_name || undefined;
+    return cls ? (cls.class_name || cls.className || cls.name) : undefined;
   }, [classes, selectedClass]);
 
   const classTeacherOptions = useMemo(() => {
     if (!selectedClassName) return [];
     const set = new Set();
     for (const e of Array.isArray(timetableEntries) ? timetableEntries : []) {
-      if (e?.class_name === selectedClassName) {
-        const name = String(e?.teacher_name ?? e?.teacher ?? "").trim();
+      const entryClassName = e?.className || e?.class_name;
+      if (entryClassName === selectedClassName) {
+        const name = String(e?.teacherName ?? e?.teacher_name ?? e?.teacher ?? "").trim();
         if (name) set.add(name);
       }
     }

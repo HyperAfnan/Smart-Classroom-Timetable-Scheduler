@@ -10,7 +10,7 @@
  *
  * Requirements:
  * - Wrap your app with React Query's QueryClientProvider.
- * - Ensure Supabase client is configured and exported from "@/config/supabase".
+ * - Ensure Firebase client is configured and exported from "@/config/firebase".
  *
  * Example:
  *   import useDashboardStats from "./hooks/useDashboardStats";
@@ -45,7 +45,7 @@ const DEFAULT_STATS = Object.freeze({
 });
 
 /**
- * Fetch counts for dashboard entities from Supabase in parallel.
+ * Fetch counts for dashboard entities from Firebase in parallel.
  * @returns {Promise<DashboardStats>}
  */
 async function fetchDashboardStats() {

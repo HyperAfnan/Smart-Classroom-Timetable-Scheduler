@@ -1,7 +1,7 @@
 /**
  * React Query hooks for Classes feature: fetching and mutations using shared query keys.
  *
- * - Centralizes reads (fetch) and writes (create/update/delete) to the Supabase "classes" table.
+ * - Centralizes reads (fetch) and writes (create/update/delete) to the Firebase "classes" collection.
  * - Uses shared query keys when available for cross-feature cache alignment.
  * - Exposes mutation status flags to control UI (e.g., disable submit/delete while pending).
  *
@@ -50,7 +50,7 @@ const EMPTY_CLASSES = Object.freeze([]);
  */
 
 /**
- * Fetch classes from Supabase.
+ * Fetch classes from Firebase.
  * @returns {Promise<ClassEntity[]>}
  */
 // TODO: fetch only department level classes

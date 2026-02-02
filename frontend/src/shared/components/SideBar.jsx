@@ -41,12 +41,12 @@ const adminNavigationOptions = [
     url: "/dashboard/timetableViewer",
     icon: LayoutGrid,
   },
-  {
-    id: "settings",
-    title: "Settings",
-    icon: Settings,
-    url: "/settings",
-  },
+  // {
+  //   id: "settings",
+  //   title: "Settings",
+  //   icon: Settings,
+  //   url: "/settings",
+  // },
 ];
 
 const studentNavigationOptions = [
@@ -56,12 +56,12 @@ const studentNavigationOptions = [
     icon: LayoutDashboard,
     url: "/dashboard",
   },
-  {
-    id: "settings",
-    title: "Settings",
-    icon: Settings,
-    url: "/settings",
-  },
+  // {
+  //   id: "settings",
+  //   title: "Settings",
+  //   icon: Settings,
+  //   url: "/settings",
+  // },
 ];
 
 const HODNavigationOptions = [
@@ -71,12 +71,12 @@ const HODNavigationOptions = [
     icon: LayoutDashboard,
     url: "/dashboard",
   },
-  {
-    id: "settings",
-    title: "Settings",
-    icon: Settings,
-    url: "/settings",
-  },
+  // {
+  //   id: "settings",
+  //   title: "Settings",
+  //   icon: Settings,
+  //   url: "/settings",
+  // },
 ];
 
 const teacherNavigationOptions = [
@@ -98,26 +98,24 @@ const teacherNavigationOptions = [
     icon: Bell,
     url: "/dashboard/teacher-notifications",
   },
-  {
-    id: "settings",
-    title: "Settings",
-    icon: Settings,
-    url: "/dashboard/teacher-settings",
-  },
-  {
-    id: "Settings",
-    title: "New Settings",
-    icon: Settings,
-    url: "/settings",
-  },
+  // {
+  //   id: "settings",
+  //   title: "Settings",
+  //   icon: Settings,
+  //   url: "/dashboard/teacher-settings",
+  // },
+  // {
+  //   id: "Settings",
+  //   title: "New Settings",
+  //   icon: Settings,
+  //   url: "/settings",
+  // },
 ];
 
 export default function SidebarMenuComponent() {
   const location = useLocation();
   const { user, roles } = useUser();
   const { logout } = useAuth();
-  console.log("User Roles", roles);
-  console.log("User", user);
 
   // Track collapse state: hide labels when width is below threshold
   const sidebarRef = useRef(null);

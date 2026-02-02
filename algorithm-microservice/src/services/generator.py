@@ -19,7 +19,7 @@ import random
 from typing import cast
 
 import numpy as np
-from app.core.utils import get_logger
+from src.core.utils import get_logger
 from numpy.typing import NDArray
 
 from ..models.request_models import TimetableRequest

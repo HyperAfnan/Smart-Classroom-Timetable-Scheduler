@@ -6,13 +6,13 @@ export default function TimetableSlot({ slot }) {
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg border border-blue-200 text-left h-full dark:bg-secondary dark:bg-none dark:border-border shadow-sm hover:shadow-md transition-all">
       <div className="font-semibold text-blue-900 text-sm dark:text-foreground">
-        {String(slot?.subject_name ?? "")}
+        {String(slot?.subjectName ?? "")}
       </div>
       <div className="text-xs text-blue-600 mt-1 dark:text-muted-foreground">
-        {String(slot?.teacher_name ?? "")}
+        {String(slot?.teacherName ?? "")}
       </div>
       <div className="text-xs text-blue-500 mt-1 dark:text-muted-foreground">
-        Room: {String(slot?.room_id ?? "")}
+        Room: {String(slot?.roomNumber ?? "")}
       </div>
       {slot?.type ? (
         <Badge

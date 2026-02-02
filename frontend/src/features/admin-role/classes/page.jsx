@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import useClasses from "./hooks/useClasses";
 import ClassFilters from "./components/ClassesFilter";
@@ -12,23 +12,25 @@ export default function Classes() {
 
   // Filter classes. Note: students_count was renamed to students across the codebase.
   // For backward compatibility we still look at a legacy students_count field if present.
-  const filteredClasses = classes.filter((c) => {
-    const name = (c.className || c.name || "").toLowerCase();
-    const studentsValue = c.students ?? c.students_count; // legacy fallback
-    const searchLower = searchTerm.toLowerCase();
+  const filteredClasses = useMemo(() => {
+    return classes.filter((c) => {
+      const name = (c.className || c.name || "").toLowerCase();
+      const studentsValue = c.students ?? c.students_count; // legacy fallback
+      const searchLower = searchTerm.toLowerCase();
 
-    // Allow searching by class name OR (numeric) students value
-    const matchesSearch =
-      name.includes(searchLower) ||
-      (!!searchLower &&
-        !isNaN(Number(searchLower)) &&
-        studentsValue != null &&
-        studentsValue.toString() === searchLower);
+      // Allow searching by class name OR (numeric) students value
+      const matchesSearch =
+        name.includes(searchLower) ||
+        (!!searchLower &&
+          !isNaN(Number(searchLower)) &&
+          studentsValue != null &&
+          studentsValue.toString() === searchLower);
 
-    const matchesDepartment =
-      selectedDepartment === "all" || c.department === selectedDepartment;
-    return matchesSearch && matchesDepartment;
-  });
+      const matchesDepartment =
+        selectedDepartment === "all" || c.department === selectedDepartment;
+      return matchesSearch && matchesDepartment;
+    });
+  }, [classes, searchTerm, selectedDepartment]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 dark:from-background dark:via-background dark:to-background">

@@ -11,3 +11,4 @@ venv
 .gitignore
 Dockerfile
 README.md
+serviceAccountKey.json
