@@ -19,6 +19,7 @@ import os
 import random
 import time
 import uuid
+import re
 from contextvars import ContextVar
 from datetime import datetime, timezone
 from types import TracebackType
@@ -375,6 +376,34 @@ def set_random_seed(seed: Optional[int] = None) -> None:
         pass
 
 
+def to_snake_case(name: str) -> str:
+    """
+    Convert camelCase string to snake_case.
+    e.g. departmentId -> department_id
+    """
+    return re.sub(r'(?<!^)(?=[A-Z])', '_', name).lower()
+
+
+def map_keys_to_snake_case(data: dict[str, Any]) -> dict[str, Any]:
+    """
+    recursively map proper keys of a dict to snake_case.
+    """
+    if not isinstance(data, dict):
+        return data
+        
+    new_dict = {}
+    for k, v in data.items():
+        new_key = to_snake_case(k)
+        if isinstance(v, dict):
+            new_dict[new_key] = map_keys_to_snake_case(v)
+        elif isinstance(v, list):
+            new_dict[new_key] = [map_keys_to_snake_case(i) if isinstance(i, dict) else i for i in v]
+        else:
+            new_dict[new_key] = v
+    return new_dict
+
+
+
 __all__ = [
     # logging
     "configure_logging",
@@ -397,4 +426,7 @@ __all__ = [
     "now_utc_iso",
     "parse_comma_separated",
     "set_random_seed",
+    "set_random_seed",
+    "to_snake_case",
+    "map_keys_to_snake_case",
 ]

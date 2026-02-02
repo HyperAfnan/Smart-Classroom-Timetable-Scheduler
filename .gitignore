@@ -5,3 +5,7 @@ algorithm-microservice/.venv
 .vscode/
 .gemini/
 .firebase/
+functions/
+function/
+serviceAccountKey.json
+

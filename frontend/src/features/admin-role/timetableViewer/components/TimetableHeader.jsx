@@ -30,8 +30,8 @@ function TimetableHeader({
     (breakIndexByDay?.[day] ?? -1) !== -1 && idx === breakIndexByDay[day];
 
   const labelForSlot = (slot) => {
-    const start = normalizeToHHMM(slot?.start_time);
-    const end = normalizeToHHMM(slot?.end_time);
+    const start = normalizeToHHMM(slot?.startTime || slot?.start_time);
+    const end = normalizeToHHMM(slot?.endTime || slot?.end_time);
     if (start && end) return `${start}-${end}`;
     if (typeof slot?.slot === "number") return `Slot ${slot.slot + 1}`;
     return "Time";

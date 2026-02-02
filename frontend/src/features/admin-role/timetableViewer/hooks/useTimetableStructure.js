@@ -53,6 +53,15 @@ export default function useTimetableStructure(
   return useMemo(() => {
     // Helper: sort slots within a day
     const sortSlots = (a, b) => {
+      // Priority 1: Sort by start time if available
+      const aStart = normalizeToHHMM(a?.startTime || a?.start_time);
+      const bStart = normalizeToHHMM(b?.startTime || b?.start_time);
+
+      if (aStart && bStart && aStart !== bStart) {
+        return aStart < bStart ? -1 : 1;
+      }
+
+      // Priority 2: Fall back to slot field if times are equal or missing
       const aHas = typeof a?.slot === "number";
       const bHas = typeof b?.slot === "number";
 
@@ -60,17 +69,11 @@ export default function useTimetableStructure(
       if (aHas && !bHas) return -1;
       if (!aHas && bHas) return 1;
 
-      const aStart = normalizeToHHMM(a?.start_time);
-      const bStart = normalizeToHHMM(b?.start_time);
-
-      if (aStart && bStart && aStart !== bStart) {
-        return aStart < bStart ? -1 : 1;
-      }
-
+      // Priority 3: Sort by ID as last resort
       return String(a?.id ?? "").localeCompare(String(b?.id ?? ""));
     };
 
-    // 1) Group slots by day
+    // 1) Group slots by day with deduplication
     const grouped = {};
     const allSlots = Array.isArray(timeSlots) ? timeSlots : [];
 
@@ -85,7 +88,17 @@ export default function useTimetableStructure(
 
       if (d) {
         if (!grouped[d]) grouped[d] = [];
-        grouped[d].push(ts);
+        
+        // Deduplicate: check if a slot with the same start time already exists
+        const startTime = normalizeToHHMM(ts?.startTime || ts?.start_time);
+        const isDuplicate = grouped[d].some(existing => {
+          const existingStart = normalizeToHHMM(existing?.startTime || existing?.start_time);
+          return startTime && existingStart === startTime;
+        });
+        
+        if (!isDuplicate) {
+          grouped[d].push(ts);
+        }
       }
     }
 
@@ -174,7 +187,7 @@ export default function useTimetableStructure(
       // Priority 1: match by start_time
       if (targetHHMM) {
         const foundIdx = slots.findIndex(
-          (s) => normalizeToHHMM(s?.start_time) === targetHHMM,
+          (s) => normalizeToHHMM(s?.startTime || s?.start_time) === targetHHMM,
         );
         if (foundIdx !== -1) idxToMark = foundIdx;
       }

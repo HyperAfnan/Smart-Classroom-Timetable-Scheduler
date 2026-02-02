@@ -2,7 +2,7 @@
 """
 Run entrypoint for the Timetable API.
 
-This script launches the FastAPI application defined in `app.main:app`
+This script launches the FastAPI application defined in `src.main:src`
 using Uvicorn. It supports configuration via command-line arguments and environment
 variables. Command-line options take precedence over environment variables.
 
@@ -36,7 +36,7 @@ _PROJECT_ROOT = _APP_FILE.parents[1]
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-APP_IMPORT_PATH = "app.main:app"
+APP_IMPORT_PATH = "src.main:app"
 
 
 def _parse_bool(value: Optional[str], default: bool = False) -> bool:

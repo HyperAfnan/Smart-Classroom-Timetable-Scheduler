@@ -111,10 +111,13 @@ export function ClassTimetableGrid({
    );
 
    const classEntries = useMemo(() => {
-      return timetableEntries?.filter(
-         (e) => String(e.classId) === String(selectedClass),
-      );
-   }, [timetableEntries, selectedClass]);
+      const selectedClassName = selectedClassObj?.className || selectedClassObj?.class_name || selectedClassObj?.name;
+      
+      return timetableEntries?.filter((e) => {
+         const entryClassName = e?.className || e?.class_name || e?.name;
+         return entryClassName === selectedClassName;
+      });
+   }, [timetableEntries, selectedClass, selectedClassObj]);
 
    const { days, slotsByDay } = useTimetableStructure(timeSlots, {
       breakAfterTime,
@@ -363,7 +366,7 @@ export function ClassTimetableGrid({
                               <ClassWiseTimetableCell
                                  lecture={toLecture(slot)}
                                  isBreak={false}
-                                 isDimmed={isTeacherFilterActive && !(slot && (norm(slot?.teacher_name) === norm(activeTeacherName) || norm(slot?.teacher) === norm(activeTeacherName)))}
+                                 isDimmed={isTeacherFilterActive && !(slot && (norm(slot?.teacherName) === norm(activeTeacherName) || norm(slot?.teacher_name) === norm(activeTeacherName) || norm(slot?.teacher) === norm(activeTeacherName)))}
                               />
                            </TableCell>
                         );

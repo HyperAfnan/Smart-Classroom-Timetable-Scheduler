@@ -32,8 +32,8 @@ export default function ControlsCard({
 	onSelectClass,
 	onExport,
 }) {
-    const { user } = useUser();
-	const departmentId = user?.department_id;
+    const { user, isLoading: isUserLoading } = useUser();
+	const departmentId = user?.departmentId || user?.department_id;
 	const {
 		createTimetableEntryAsync,
 		isError: isTimetableError,
@@ -99,7 +99,7 @@ export default function ControlsCard({
 					<div className="flex gap-2">
 						<Button
 							onClick={onGenerate}
-							disabled={isGenerating || !selectedClass}
+							disabled={isGenerating || !selectedClass || isUserLoading}
 							className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white dark:from-indigo-600 dark:to-indigo-700 dark:hover:from-indigo-500 dark:hover:to-indigo-600"
 						>
 							{isGenerating ? (

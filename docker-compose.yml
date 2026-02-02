@@ -9,3 +9,11 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+
+  algorithm:
+    build: ./algorithm-microservice
+    container_name: calvio-algorithm
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./algorithm-microservice:/app

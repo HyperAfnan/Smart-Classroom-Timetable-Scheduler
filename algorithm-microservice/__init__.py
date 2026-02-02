@@ -36,8 +36,8 @@ def get_app() -> "FastAPI":
     """
     try:
         # Reuse the helper already provided in timetable_api.app
-        module = import_module("timetable_api.app")
-        app = getattr(module, "app", None)
+        module = import_module("timetable_api.src.main")
+        app = getattr(module, "src", None)
         if app is None:
             # Fallback to helper if app attribute isn't bound yet
             get_app_fn = getattr(module, "get_app", None)
@@ -62,6 +62,6 @@ def __getattr__(name: str):
     Example:
         from timetable_api import app
     """
-    if name == "app":
+    if name == "src":
         return get_app()
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

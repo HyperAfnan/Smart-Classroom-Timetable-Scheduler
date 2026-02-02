@@ -75,7 +75,7 @@ function TimetableBody({
     for (const e of Array.isArray(timetableEntries) ? timetableEntries : []) {
       const cls = resolveClassName(e);
       const day = e?.time_slots?.day;
-      const start = normalizeToHHMM(e?.time_slots?.start_time);
+      const start = normalizeToHHMM(e?.time_slots?.startTime || e?.time_slots?.start_time);
       if (!cls || !day || !start) continue;
       m.set(`${cls}|${day}|${start}`, e);
     }
@@ -94,6 +94,8 @@ function TimetableBody({
     }
     return m;
   }, [timetableEntries, classes, classLabels]);
+
+
 
   const isTeacherFilterActive = Boolean(activeTeacherName);
   const norm = (s) =>
@@ -136,26 +138,28 @@ function TimetableBody({
                 );
               }
 
-              // Shifted mapping after break:
-              // cells after the break map to the previous slot's time (or slot index).
               const matchHHMM =
                 breakIndex !== -1 && idx > breakIndex
-                  ? normalizeToHHMM(slots[idx - 1]?.start_time)
-                  : normalizeToHHMM(ts?.start_time);
+                  ? normalizeToHHMM(slots[idx - 1]?.startTime || slots[idx - 1]?.start_time)
+                  : normalizeToHHMM(ts?.startTime || ts?.start_time);
 
               const matchSlot =
                 breakIndex !== -1 && idx > breakIndex
                   ? slots[idx - 1]?.slot
                   : ts?.slot;
 
+              const lookupKey = `${className}|${day}|${matchHHMM}`;
+              
               const entry =
                 (matchHHMM
-                  ? entryByTime.get(`${className}|${day}|${matchHHMM}`)
+                  ? entryByTime.get(lookupKey)
                   : null) ??
                 (typeof matchSlot === "number"
                   ? entryBySlot.get(`${className}|${day}|${matchSlot}`)
                   : null) ??
                 null;
+
+
 
               return (
                 <TableCell
@@ -170,8 +174,8 @@ function TimetableBody({
                     isDimmed={
                       isTeacherFilterActive &&
                       !(entry
-                        ? norm(entry?.teacher_name) ===
-                            norm(activeTeacherName) ||
+                        ? norm(entry?.teacherName) === norm(activeTeacherName) ||
+                          norm(entry?.teacher_name) === norm(activeTeacherName) ||
                           norm(entry?.teacher) === norm(activeTeacherName)
                         : false)
                     }

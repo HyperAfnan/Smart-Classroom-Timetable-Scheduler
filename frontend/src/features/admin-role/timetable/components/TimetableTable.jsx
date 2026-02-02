@@ -127,6 +127,8 @@ export default function TimetableTable({
                   ? (byKey.get(`${day}|${hhmm}`) ?? null)
                   : null;
 
+                     console.log("Rendering slot ", slot, " for key ", `${day}|${hhmm}`);
+
               return (
                 <TableCell
                   key={`${item.start}-${item.end}`}

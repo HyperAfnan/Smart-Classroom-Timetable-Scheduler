@@ -31,7 +31,7 @@ async function fetchClasses(departmentId) {
 async function fetchTimeslots(departmentId) {
   const q = query(
     collection(db, "time_slots"),
-    // where("departmentId", "==", departmentId),
+    where("departmentId", "==", departmentId),
     orderBy("day", "asc"),
     orderBy("slot", "asc")
   );
@@ -46,7 +46,7 @@ async function fetchTimeslots(departmentId) {
 async function fetchTimetableEntries(departmentId) {
   const entriesQ = query(
     collection(db, "timetable_entries"),
-    // where("departmentId", "==", departmentId)
+    where("departmentId", "==", departmentId)
   );
   const entriesSnapshot = await getDocs(entriesQ);
   const entries = [];
@@ -58,11 +58,13 @@ async function fetchTimetableEntries(departmentId) {
     if (data.timeSlotId) timeSlotIds.add(data.timeSlotId);
   });
 
+
+
   if (timeSlotIds.size === 0) return entries;
   
   const slotsQ = query(
     collection(db, "time_slots"),
-    //  where("departmentId", "==", departmentId)
+    where("departmentId", "==", departmentId)
   );
   const slotsSnapshot = await getDocs(slotsQ);
   const slotsMap = {};
@@ -70,10 +72,14 @@ async function fetchTimetableEntries(departmentId) {
       slotsMap[doc.id] = { id: doc.id, ...doc.data() };
   });
 
+
+
   const joinedEntries = entries.map(entry => ({
       ...entry,
       time_slots: slotsMap[entry.timeSlotId] || null
   }));
+  
+
   
   return joinedEntries;
 }
